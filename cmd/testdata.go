@@ -12,22 +12,23 @@ import (
 )
 
 var usage = `
-  Usage: testdata
+  Usage: testdata field1 [[field2] [field3]]
     [--tick d]
     [--max n]
-    [--list]
+    [--generators]
+    [--format]
 
-    testdata -h | --help
+    testdata --help
 
   Options:
-    --list          list all available generators
+    --generators    list all available generators
     --max n         generate data up to n [default: 10]
     --tick d        generate data every d [default: 10ms]
-    -v, --version   show version information
-    -h, --help      show help information
+    --help          show help information
+    --format f      generate data in f format [options: csv|tab, default: " "]
 `
 
-var listFlag = flag.Bool("list", false, "list all the generators")
+var generatorsFlag = flag.Bool("generators", false, "list all the generators")
 var tickFlag = flag.Duration("tick", 10*time.Millisecond, "generate data every d milliseconds")
 var maxFlag = flag.Int("max", 10, "generate up to n rows")
 var helpFlag = flag.Bool("help", false, "print usage")
@@ -39,13 +40,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *listFlag {
+	if *generatorsFlag {
 		generators := testdata.List()
 		sort.Strings(generators)
 
 		for _, name := range generators {
 			fmt.Printf("%s\n", name)
 		}
+		os.Exit(0)
+	}
+
+	if len(flag.Args()) == 0 {
+		fmt.Printf(usage)
 		os.Exit(0)
 	}
 
