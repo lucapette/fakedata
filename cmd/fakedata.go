@@ -23,13 +23,11 @@ var usage = `
   Options:
     --generators    list all available generators
     --max n         generate data up to n [default: 10]
-    --tick d        generate data every d [default: 10ms]
     --help          show help information
     --format f      generate data in f format [options: csv|tab, default: " "]
 `
 
 var generatorsFlag = flag.Bool("generators", false, "list all the generators")
-var tickFlag = flag.Duration("tick", 10*time.Millisecond, "generate data every d milliseconds")
 var maxFlag = flag.Int("max", 10, "generate up to n rows")
 var helpFlag = flag.Bool("help", false, "print usage")
 var formatFlag = flag.String("format", "", "Output format")
@@ -57,16 +55,8 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	tick := time.Tick(*tickFlag)
-
-	total := 0
-
-	for range tick {
+	for i := 0; i < *maxFlag; i++ {
 		fmt.Print(fakedata.GenerateRow(flag.Args(), *formatFlag))
-
-		if total++; total == *maxFlag {
-			return
-		}
 	}
 }
 
