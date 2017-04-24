@@ -1,32 +1,32 @@
-# testdata
+# fakedata
 
 CLI utility to generate test data
 
 # Overview
 
-`testdata` is a small CLI utility that generates test data for you.
+`fakedata` is a small CLI utility that generates test data for you.
 
 # Installation guide
 
 ## Homebrew
 
-`testdata` can be installed through Homebrew:
+`fakedata` can be installed through Homebrew:
 
 ``` sh
 $ brew tap lucapette/tap
-$ brew install testdata
+$ brew install fakedata
 ```
 
 ## Standalone
 
-`testdata` can be installed as an executable. Download the latest
-[compiled binaries](https://github.com/lucapette/testdata/releases) and put it
+`fakedata` can be installed as an executable. Download the latest
+[compiled binaries](https://github.com/lucapette/fakedata/releases) and put it
 anywhere in your executable path.
 
 ## Source
 
 Please refer to our [contributing guidelines](/CONTRIBUTING.md) to build and
-install `testdata` from the source.
+install `fakedata` from the source.
 
 # How to contribute
 

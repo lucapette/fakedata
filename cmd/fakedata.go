@@ -7,18 +7,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/lucapette/testdata/pkg/testdata"
+	"github.com/lucapette/fakedata/pkg/fakedata"
 	flag "github.com/spf13/pflag"
 )
 
 var usage = `
-  Usage: testdata field1 [[field2] [field3]]
+  Usage: fakedata field1 [[field2] [field3]]
     [--tick d]
     [--max n]
     [--generators]
     [--format]
 
-    testdata --help
+    fakedata --help
 
   Options:
     --generators    list all available generators
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	if *generatorsFlag {
-		generators := testdata.List()
+		generators := fakedata.List()
 		sort.Strings(generators)
 
 		for _, name := range generators {
@@ -62,7 +62,7 @@ func main() {
 	total := 0
 
 	for range tick {
-		fmt.Print(testdata.GenerateRow(flag.Args(), *formatFlag))
+		fmt.Print(fakedata.GenerateRow(flag.Args(), *formatFlag))
 
 		if total++; total == *maxFlag {
 			return

@@ -1,4 +1,4 @@
-SOURCE_FILES?=$$(go list ./... | grep -v '/testdata/vendor/')
+SOURCE_FILES?=$$(go list ./... | grep -v '/fakedata/vendor/')
 TEST_PATTERN?=.
 TEST_OPTIONS?=
 
@@ -18,8 +18,8 @@ lint: ## Run all the linters
 
 ci: lint test ## Run all the tests and code checks
 
-build: ## Build a dev version of testdata
-	go build cmd/testdata.go
+build: ## Build a dev version of fakedata
+	go build cmd/fakedata.go
 
 # Absolutely awesome: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:

@@ -1,7 +1,7 @@
 # Contributing
 
 We love every form of contribution. By participating to this project, you
-agree to abide to the `testdata` [code of conduct](/CODE_OF_CONDUCT.md).
+agree to abide to the `fakedata` [code of conduct](/CODE_OF_CONDUCT.md).
 
 ## Setup your machine
 
@@ -13,18 +13,18 @@ do with it, you can run:
 $ make help
 ```
 
-Which shows all the documented targets. `testdata` is written in
+Which shows all the documented targets. `fakedata` is written in
 [Go](https://golang.org/). Here is a list of prerequisites to
 build and test the code:
 
 * `make`
 * [Go 1.8+](http://golang.org/doc/install)
 
-Clone `testdata` from source:
+Clone `fakedata` from source:
 
 ```sh
-$ git clone https://github.com/lucapette/testdata.git
-$ cd testdata
+$ git clone https://github.com/lucapette/fakedata.git
+$ cd fakedata
 ```
 
 Install the build and lint dependencies:
@@ -39,10 +39,10 @@ A good way of making sure everything is all right is running the test suite:
 $ make test
 ```
 
-Please open an [issue](https://github.com/lucapette/testdata/issues/new)
+Please open an [issue](https://github.com/lucapette/fakedata/issues/new)
 if you run into any problem.
 
-## Building and running testdata
+## Building and running fakedata
 
 You can build the entire application by running `make` without arguments:
 
@@ -52,11 +52,11 @@ make
 
 since `build` is the default target.
 
-You can run `testdata` following the steps:
+You can run `fakedata` following the steps:
 
 ```sh
 $ make
-$ ./testdata username
+$ ./fakedata username
 ```
 
 ## Testing
@@ -112,5 +112,5 @@ This command runs all the linters and runs all the tests.
 
 ## Submit a pull request
 
-Push your branch to your `testdata` fork and open a pull request against
+Push your branch to your `fakedata` fork and open a pull request against
 the master branch.
