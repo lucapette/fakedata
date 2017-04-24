@@ -61,7 +61,7 @@ func main() {
 
 	total := 0
 
-	for _ = range tick {
+	for range tick {
 		fmt.Print(testdata.GenerateRow(flag.Args(), *formatFlag))
 
 		if total++; total == *maxFlag {
