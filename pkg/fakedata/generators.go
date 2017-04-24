@@ -24,7 +24,7 @@ func init() {
 
 	withSep := func(left, right, sep string) func() string {
 		return func() string {
-			return fmt.Sprintf("%s%s%s", Generate(left), sep, Generate(right))
+			return fmt.Sprintf("%s%s%s", generate(left), sep, generate(right))
 		}
 	}
 	generators["name"] = withSep("name.first", "name.last", " ")
