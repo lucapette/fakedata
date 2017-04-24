@@ -23,6 +23,16 @@ func formatter(format string) (f func([]string) string) {
 	return f
 }
 
+func generate(key string) string {
+	if f, ok := generators[key]; ok {
+		return f()
+	}
+
+	return ""
+}
+
+// GenerateRow generates a row of fake data according to key
+// in the specified format
 func GenerateRow(keys []string, format string) string {
 	var output bytes.Buffer
 
@@ -41,14 +51,7 @@ func GenerateRow(keys []string, format string) string {
 	return output.String()
 }
 
-func generate(key string) string {
-	if f, ok := generators[key]; ok {
-		return f()
-	}
-
-	return ""
-}
-
+// List returns all the available generators
 func List() []string {
 	list := make([]string, 0)
 
