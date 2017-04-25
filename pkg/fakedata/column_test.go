@@ -25,7 +25,7 @@ func TestNewColumns(t *testing.T) {
 	}
 }
 
-func TestNewColumnsWithSpecs(t *testing.T) {
+func TestNewColumnsWithName(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []string

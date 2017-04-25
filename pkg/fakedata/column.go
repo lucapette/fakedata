@@ -11,7 +11,7 @@ type Column struct {
 // Columns is an array of Column
 type Columns []Column
 
-// NewColumns returns an Array of Columns using keys as a specification
+// NewColumns returns an array of Columns using keys as a specification
 func NewColumns(keys []string) (cols Columns) {
 	cols = make(Columns, len(keys))
 
