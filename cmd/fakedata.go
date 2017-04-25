@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
@@ -20,7 +19,7 @@ var usage = `
     --generators    lists available generators
     --limit n       limits rows up to n [default: 10]
     --help          shows help information
-    --format f      generates rows in f format [options: csv|tab, default: " "]
+    --format f      generates rows in f format [options: csv|tab|sql, default: " "]
     --version       shows version information
 `
 
@@ -42,11 +41,8 @@ func main() {
 	}
 
 	if *generatorsFlag {
-		generators := fakedata.List()
-		sort.Strings(generators)
-
-		for _, name := range generators {
-			fmt.Printf("%s\n", name)
+		for _, generator := range fakedata.Generators() {
+			fmt.Printf("%s\n", generator)
 		}
 		os.Exit(0)
 	}
@@ -58,8 +54,9 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
+	columns := fakedata.NewColumns(flag.Args())
 	for i := 0; i < *limitFlag; i++ {
-		fmt.Print(fakedata.GenerateRow(flag.Args(), *formatFlag))
+		fmt.Print(fakedata.GenerateRow(columns, *formatFlag))
 	}
 }
 

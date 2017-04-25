@@ -10,26 +10,26 @@ import (
 
 func TestGenerateRow(t *testing.T) {
 	type args struct {
-		keys   []string
-		format string
+		columns fakedata.Columns
+		format  string
 	}
 	tests := []struct {
 		name string
 		args args
 		want string
 	}{
-		{"email", args{keys: []string{"email"}, format: ""}, `.+?@.+?\..+`},
-		{"domain", args{keys: []string{"domain"}, format: ""}, `.+?\..+?`},
-		{"username", args{keys: []string{"username"}, format: ""}, `[a-zA-Z0-9]{2,}`},
-		{"duoble", args{keys: []string{"double"}, format: ""}, `-?[0-9]+?(\.[0-9]+?)?`},
-		{"username domain", args{keys: []string{"username", "domain"}, format: " "}, `[a-zA-Z0-9]{2,} .+?\..+?`},
-		{"username domain", args{keys: []string{"username", "domain"}, format: "csv"}, `[a-zA-Z0-9]{2,},.+?\..+?`},
-		{"username domain", args{keys: []string{"username", "domain"}, format: "tab"}, `[a-zA-Z0-9]{2,}\t.+?\..+?`},
+		{"email", args{columns: fakedata.Columns{{Name: "email"}}, format: ""}, `.+?@.+?\..+`},
+		{"domain", args{columns: fakedata.Columns{{Name: "domain"}}, format: ""}, `.+?\..+?`},
+		{"username", args{columns: fakedata.Columns{{Name: "username"}}, format: ""}, `[a-zA-Z0-9]{2,}`},
+		{"duoble", args{columns: fakedata.Columns{{Name: "double"}}, format: ""}, `-?[0-9]+?(\.[0-9]+?)?`},
+		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: " "}, `[a-zA-Z0-9]{2,} .+?\..+?`},
+		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: "csv"}, `[a-zA-Z0-9]{2,},.+?\..+?`},
+		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: "tab"}, `[a-zA-Z0-9]{2,}\t.+?\..+?`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := fakedata.GenerateRow(tt.args.keys, tt.args.format)
+			got := fakedata.GenerateRow(tt.args.columns, tt.args.format)
 
 			matched, err := regexp.MatchString(tt.want, got)
 			if err != nil {
