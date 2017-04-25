@@ -1,6 +1,9 @@
 package fakedata
 
-// Default dict.
+// This file was copied from
+// https://github.com/yields/phony/blob/1142cc14f181e1ccb3c17fc671fb60e94b0e3430/pkg/phony/dict.go
+// Thank you for the inspiration!
+
 var dict = map[string][]string{
 	"domain.tld": {
 		"name",

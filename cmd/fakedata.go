@@ -12,29 +12,23 @@ import (
 )
 
 var usage = `
-  Usage: fakedata field1 [[field2] [field3]]
-    [--tick d]
-    [--max n]
-    [--generators]
-    [--format]
-
-    fakedata --help
+  Usage: fakedata [option ...] [field ...]
 
   Options:
-    --generators    list all available generators
-    --max n         generate data up to n [default: 10]
-    --help          show help information
-    --format f      generate data in f format [options: csv|tab, default: " "]
+    --generators    lists available generators
+    --limit n       limits rows up to n [default: 10]
+    --help          shows help information
+    --format f      generates rows in f format [options: csv|tab, default: " "]
 `
 
-var generatorsFlag = flag.Bool("generators", false, "list all the generators")
-var maxFlag = flag.Int("max", 10, "generate up to n rows")
-var helpFlag = flag.Bool("help", false, "print usage")
-var formatFlag = flag.String("format", "", "Output format")
+var generatorsFlag = flag.Bool("generators", false, "lists available generators")
+var limitFlag = flag.Int("limit", 10, "limits rows up to n")
+var helpFlag = flag.Bool("help", false, "shows help information")
+var formatFlag = flag.String("format", "", "generators rows in f format")
 
 func main() {
 	if *helpFlag {
-		fmt.Printf(usage)
+		fmt.Print(usage)
 		os.Exit(0)
 	}
 
@@ -55,7 +49,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	for i := 0; i < *maxFlag; i++ {
+	for i := 0; i < *limitFlag; i++ {
 		fmt.Print(fakedata.GenerateRow(flag.Args(), *formatFlag))
 	}
 }

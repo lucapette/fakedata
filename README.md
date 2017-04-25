@@ -1,10 +1,83 @@
 # fakedata
 
-CLI utility to generate test data
+CLI utility that generates data in various format.
 
 # Overview
 
-`fakedata` is a small CLI utility that generates test data for you.
+`fakedata` is a small utility that generates data from the command line:
+
+```sh
+$ fakedata email country
+cemshid@example.com Afghanistan
+LucasPerdidao@example.me Turkey
+arthurholcombe1@test.us Saint Helena
+iamgarth@example.us Montenegro
+joelcipriano@test.name Croatia
+keryilmaz@test.name Vietnam
+plbabin@test.org Lithuania
+bermonpainter@test.us Haiti
+opnsrce@example.name Malaysia
+ankitind@test.info Virgin Islands, British
+```
+
+Limit the amout of generated rows:
+
+```sh
+$ fakedata country.code --limit 5
+SH
+CF
+GQ
+PE
+FO
+```
+
+Choose a different output format:
+
+```sh
+$ fakedata product.category product.name --format=csv
+Shoes,Rankfix
+Automotive,Namis
+Movies,Matquadfax
+Tools,Damlight
+Computers,Silverlux
+Industrial,Matquadfax
+Home,Sil-Home
+Health,Toughwarm
+Shoes,Freetop
+Tools,Domnix
+```
+
+List the available generators:
+
+```sh
+$ fakedata --generators
+color
+country
+country.code
+domain
+domain.name
+domain.tld
+double
+email
+event.action
+http.method
+id
+ipv4
+ipv6
+latitude
+longitude
+mac.address
+name
+name.first
+name.last
+product.category
+product.name
+state
+state.code
+timezone
+unixtime
+username
+```
 
 # Installation guide
 
