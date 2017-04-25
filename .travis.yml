@@ -1,0 +1,8 @@
+language: go
+go: 
+   - 1.8
+   - master
+install:
+  - make setup
+script:
+  - make ci
