@@ -1,0 +1,13 @@
+build:
+  main: cmd/fakedata.go
+  goos:
+    - windows
+    - darwin
+    - linux
+  goarch:
+    - amd64
+brew:
+  github:
+    owner: lucapette
+    name: homebrew-tap
+  homepage: https://github.com/lucapette/fakedata
