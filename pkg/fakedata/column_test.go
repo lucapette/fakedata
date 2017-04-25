@@ -41,3 +41,20 @@ func TestNewColumnsWithName(t *testing.T) {
 		})
 	}
 }
+
+func TestNewColumnsWithSpec(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		expected fakedata.Columns
+	}{
+		{name: "int range", input: []string{"int,1..100"}, expected: fakedata.Columns{{Key: "int", Name: "int", Range: "1..100"}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if actual := fakedata.NewColumns(tt.input); !reflect.DeepEqual(actual, tt.expected) {
+				t.Errorf("NewColumns() = %v, want %v", actual, tt.expected)
+			}
+		})
+	}
+}

@@ -4,8 +4,9 @@ import "strings"
 
 // A Column represents one field of data to generate
 type Column struct {
-	Name string
-	Key  string
+	Name  string
+	Key   string
+	Range string
 }
 
 // Columns is an array of Column
@@ -16,7 +17,14 @@ func NewColumns(keys []string) (cols Columns) {
 	cols = make(Columns, len(keys))
 
 	for i, k := range keys {
-		values := strings.Split(k, "=")
+		var rng string
+		specs := strings.Split(k, ",")
+
+		if len(specs) > 1 {
+			rng = specs[1]
+		}
+
+		values := strings.Split(specs[0], "=")
 		var name, key string
 
 		if len(values) == 2 {
@@ -29,6 +37,7 @@ func NewColumns(keys []string) (cols Columns) {
 
 		cols[i].Name = name
 		cols[i].Key = key
+		cols[i].Range = rng
 	}
 
 	return cols
