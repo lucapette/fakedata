@@ -79,6 +79,24 @@ unixtime
 username
 ```
 
+## SQL formatter
+
+`fakedata` can generate insert statements. By default, it uses the name of the generators 
+as column names:
+
+```sh
+$ fakedata email domain --format=sql --limit 1
+INSERT INTO TABLE (email,domain) values ('yigitpinarbasi@example.org','example.me');
+```
+
+You can specify the name of the column using a field with the following format `column_name=generator`.
+For example:
+
+```sh
+$ fakedata login=email referral=domain --format=sql --limit 1
+INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
+```
+
 # Installation guide
 
 ## Homebrew

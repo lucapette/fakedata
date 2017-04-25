@@ -2,26 +2,8 @@ package fakedata
 
 import (
 	"bytes"
-	"strings"
+	"sort"
 )
-
-func joinFunc(sep string) func([]string) string {
-	return func(keys []string) string {
-		return strings.Join(keys, sep)
-	}
-}
-
-func formatter(format string) (f func([]string) string) {
-	switch format {
-	case "tab":
-		f = joinFunc("\t")
-	case "csv":
-		f = joinFunc(",")
-	default:
-		f = joinFunc(" ")
-	}
-	return f
-}
 
 func generate(key string) string {
 	if f, ok := generators[key]; ok {
@@ -31,32 +13,31 @@ func generate(key string) string {
 	return ""
 }
 
-// GenerateRow generates a row of fake data according to key
+// GenerateRow generates a row of fake data using Columns
 // in the specified format
-func GenerateRow(keys []string, format string) string {
+func GenerateRow(columns Columns, formatter Formatter) string {
 	var output bytes.Buffer
 
-	f := formatter(format)
-
-	values := make([]string, len(keys))
-
-	for i, k := range keys {
-		values[i] = generate(k)
+	genValues := make([]string, len(columns))
+	for i, field := range columns {
+		genValues[i] = generate(field.Key)
 	}
 
-	output.WriteString(f(values))
+	output.WriteString(formatter.Format(columns, genValues))
 
 	output.WriteString("\n")
 
 	return output.String()
 }
 
-// List returns all the available generators
-func List() []string {
-	list := make([]string, 0)
+// Generators returns all the available generators
+func Generators() []string {
+	gens := make([]string, 0)
 
 	for k := range generators {
-		list = append(list, k)
+		gens = append(gens, k)
 	}
-	return list
+
+	sort.Strings(gens)
+	return gens
 }
