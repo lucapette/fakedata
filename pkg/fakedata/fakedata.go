@@ -62,7 +62,7 @@ func GenerateRow(columns Columns, format string) string {
 
 	genValues := make([]string, len(columns))
 	for i, field := range columns {
-		genValues[i] = generate(field.Name)
+		genValues[i] = generate(field.Key)
 	}
 
 	output.WriteString(f(columns, genValues))

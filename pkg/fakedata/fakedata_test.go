@@ -18,13 +18,13 @@ func TestGenerateRow(t *testing.T) {
 		args args
 		want string
 	}{
-		{"email", args{columns: fakedata.Columns{{Name: "email"}}, format: ""}, `.+?@.+?\..+`},
-		{"domain", args{columns: fakedata.Columns{{Name: "domain"}}, format: ""}, `.+?\..+?`},
-		{"username", args{columns: fakedata.Columns{{Name: "username"}}, format: ""}, `[a-zA-Z0-9]{2,}`},
-		{"duoble", args{columns: fakedata.Columns{{Name: "double"}}, format: ""}, `-?[0-9]+?(\.[0-9]+?)?`},
-		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: " "}, `[a-zA-Z0-9]{2,} .+?\..+?`},
-		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: "csv"}, `[a-zA-Z0-9]{2,},.+?\..+?`},
-		{"username domain", args{columns: fakedata.Columns{{Name: "username"}, {Name: "domain"}}, format: "tab"}, `[a-zA-Z0-9]{2,}\t.+?\..+?`},
+		{"email", args{columns: fakedata.Columns{{Key: "email"}}, format: ""}, `.+?@.+?\..+`},
+		{"domain", args{columns: fakedata.Columns{{Key: "domain"}}, format: ""}, `.+?\..+?`},
+		{"username", args{columns: fakedata.Columns{{Key: "username"}}, format: ""}, `[a-zA-Z0-9]{2,}`},
+		{"duoble", args{columns: fakedata.Columns{{Key: "double"}}, format: ""}, `-?[0-9]+?(\.[0-9]+?)?`},
+		{"username domain", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, format: " "}, `[a-zA-Z0-9]{2,} .+?\..+?`},
+		{"username domain", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, format: "csv"}, `[a-zA-Z0-9]{2,},.+?\..+?`},
+		{"username domain", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, format: "tab"}, `[a-zA-Z0-9]{2,}\t.+?\..+?`},
 	}
 
 	for _, tt := range tests {
