@@ -1,6 +1,6 @@
 # fakedata
 
-CLI utility that generates data in various format.
+CLI utility that generates data in various formats.
 
 # Overview
 
