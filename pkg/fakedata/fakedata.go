@@ -2,7 +2,6 @@ package fakedata
 
 import (
 	"bytes"
-	"sort"
 )
 
 // GenerateRow generates a row of fake data using Columns
@@ -20,16 +19,4 @@ func GenerateRow(columns Columns, formatter Formatter) string {
 	output.WriteString("\n")
 
 	return output.String()
-}
-
-// Generators returns all the available generators
-func Generators() []string {
-	gens := make([]string, 0)
-
-	for k := range generators {
-		gens = append(gens, k)
-	}
-
-	sort.Strings(gens)
-	return gens
 }
