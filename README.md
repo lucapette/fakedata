@@ -68,7 +68,7 @@ country           Full country name
 country.code      2-digit country code
 date              date
 domain            domain
-domain.tld        example|t
+domain.tld        example|test
 # ...
 # It's a long list :)
 ```
