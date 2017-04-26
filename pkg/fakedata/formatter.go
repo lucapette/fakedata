@@ -31,7 +31,7 @@ func (f *SQLFormatter) Format(columns Columns, values []string) string {
 	sql := bytes.NewBufferString(fmt.Sprintf("INSERT INTO %s (", f.Table))
 
 	sql.WriteString(strings.Join(columns.names(), ","))
-	sql.WriteString(") values (")
+	sql.WriteString(") VALUES (")
 
 	formattedValues := make([]string, len(columns))
 	for i, value := range values {

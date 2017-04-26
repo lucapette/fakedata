@@ -1,11 +1,15 @@
 package fakedata
 
-import "strings"
+import (
+	"strings"
+)
 
 // A Column represents one field of data to generate
 type Column struct {
 	Name string
 	Key  string
+	Min  string
+	Max  string
 }
 
 // Columns is an array of Column
@@ -16,7 +20,19 @@ func NewColumns(keys []string) (cols Columns) {
 	cols = make(Columns, len(keys))
 
 	for i, k := range keys {
-		values := strings.Split(k, "=")
+		specs := strings.Split(k, ",")
+
+		if len(specs) > 1 {
+			rng := strings.Split(specs[1], "..")
+			cols[i].Min = rng[0]
+
+			if len(rng) > 1 {
+				cols[i].Max = rng[1]
+			}
+
+		}
+
+		values := strings.Split(specs[0], "=")
 		var name, key string
 
 		if len(values) == 2 {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"os"
@@ -45,6 +46,25 @@ func getFormatter(format string) (f fakedata.Formatter) {
 	return f
 }
 
+func generatorsHelp(generators []fakedata.Generator) string {
+	var buffer bytes.Buffer
+
+	var max int
+
+	for _, gen := range generators {
+		if len(gen.Name) > max {
+			max = len(gen.Name)
+		}
+	}
+
+	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
+	for _, gen := range generators {
+		buffer.WriteString(fmt.Sprintf(pattern, gen.Name, gen.Desc))
+	}
+
+	return buffer.String()
+}
+
 func main() {
 	if *versionFlag {
 		fmt.Println(version)
@@ -57,9 +77,7 @@ func main() {
 	}
 
 	if *generatorsFlag {
-		for _, generator := range fakedata.Generators() {
-			fmt.Printf("%s\n", generator)
-		}
+		fmt.Print(generatorsHelp(fakedata.Generators()))
 		os.Exit(0)
 	}
 
