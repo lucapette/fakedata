@@ -63,9 +63,13 @@ Tools,Domnix
 
 ```sh
 $ fakedata --generators
-color
-country
-...
+color             one word color
+country           Full country name
+country.code      2-digit country code
+date              date
+domain            domain
+domain.tld        example|t
+# ...
 # It's a long list :)
 ```
 

@@ -6,33 +6,40 @@ import (
 	"math/rand"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
-type generator struct {
-	f    func(Column) string
-	desc string
+// A Generator is a func that generates random data along with its description
+type Generator struct {
+	Func func(Column) string
+	Desc string
+	Name string
 }
 
-var generators map[string]generator
+var generators map[string]Generator
+
+func (g Generator) String() string {
+	return fmt.Sprintf("%s\t%s", g.Name, g.Desc)
+}
 
 func generate(column Column) string {
 	if gen, ok := generators[column.Key]; ok {
-		return gen.f(column)
+		return gen.Func(column)
 	}
 
 	return ""
 }
 
 // Generators returns all the available generators
-func Generators() []string {
-	gens := make([]string, 0)
+func Generators() []Generator {
+	gens := make([]Generator, 0)
 
-	for k := range generators {
-		gens = append(gens, k)
+	for _, v := range generators {
+		gens = append(gens, v)
 	}
 
-	sort.Strings(gens)
+	sort.Slice(gens, func(i, j int) bool { return strings.Compare(gens[i].Name, gens[j].Name) < 0 })
 	return gens
 }
 
@@ -125,27 +132,57 @@ func integer() func(Column) string {
 }
 
 func init() {
-	generators = make(map[string]generator)
+	generators = make(map[string]Generator)
 
-	generators["date"] = generator{desc: "date", f: date()}
+	generators["date"] = Generator{Name: "date", Desc: "date", Func: date()}
 
-	for key := range dict {
-		generators[key] = generator{desc: key, f: withDictKey(key)}
-	}
+	generators["domain.tld"] = Generator{Name: "domain.tld", Desc: "name|info|com|org|me|us", Func: withDictKey("domain.tld")}
 
-	generators["name"] = generator{desc: "name", f: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " ")}
-	generators["email"] = generator{desc: "email", f: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@")}
-	generators["domain"] = generator{desc: "domain", f: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, ".")}
+	generators["domain.name"] = Generator{Name: "domain.tld", Desc: "example|test", Func: withDictKey("domain.name")}
 
-	generators["ipv4"] = generator{desc: "ipv4", f: ipv4()}
-	generators["ipv6"] = generator{desc: "ipv4", f: ipv6()}
+	generators["country"] = Generator{Name: "country", Desc: "Full country name", Func: withDictKey("country")}
 
-	generators["mac.address"] = generator{desc: "mac address", f: mac()}
+	generators["country.code"] = Generator{Name: "country.code", Desc: `2-digit country code`, Func: withDictKey("country.code")}
 
-	generators["latitute"] = generator{desc: "lat", f: latitute()}
-	generators["longitude"] = generator{desc: "longitude", f: longitude()}
+	generators["state"] = Generator{Name: "state", Desc: `Full US state name`, Func: withDictKey("state")}
 
-	generators["double"] = generator{desc: "double", f: double()}
+	generators["state.code"] = Generator{Name: "state.code", Desc: `2-digit US state name`, Func: withDictKey("state.code")}
 
-	generators["int"] = generator{desc: "integer generator", f: integer()}
+	generators["timezone"] = Generator{Name: "timezone", Desc: `tz in the form Area/City`, Func: withDictKey("timezone")}
+
+	generators["username"] = Generator{Name: "username", Desc: `username using the pattern \w+`, Func: withDictKey("username")}
+
+	generators["name.first"] = Generator{Name: "name.first", Desc: `capilized first name`, Func: withDictKey("name.first")}
+
+	generators["name.last"] = Generator{Name: "name.last", Desc: `capilized last name`, Func: withDictKey("name.last")}
+
+	generators["color"] = Generator{Name: "color", Desc: `one word color`, Func: withDictKey("color")}
+
+	generators["product.category"] = Generator{Name: "product.category", Desc: `Beauty|Games|Movies|Tools|..`, Func: withDictKey("product.category")}
+
+	generators["product.name"] = Generator{Name: "product.name", Desc: `invented product name`, Func: withDictKey("product.name")}
+
+	generators["event.action"] = Generator{Name: "event.action", Desc: `Clicked|Purchased|Viewed|Watched`, Func: withDictKey("event.action")}
+
+	generators["http.method"] = Generator{Name: "http.method", Desc: `GET|POST|PUT|PATCH|HEAD|DELETE|OPTION`, Func: withDictKey("http.method")}
+
+	generators["name"] = Generator{Name: "name", Desc: `name.first + " " + name.last`, Func: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " ")}
+
+	generators["email"] = Generator{Name: "email", Desc: "email", Func: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@")}
+
+	generators["domain"] = Generator{Name: "domain", Desc: "domain", Func: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, ".")}
+
+	generators["ipv4"] = Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4()}
+
+	generators["ipv6"] = Generator{Name: "ipv6", Desc: "ipv6", Func: ipv6()}
+
+	generators["mac.address"] = Generator{Name: "mac.address", Desc: "mac address", Func: mac()}
+
+	generators["latitute"] = Generator{Name: "latitute", Desc: "latitute", Func: latitute()}
+
+	generators["longitude"] = Generator{Name: "longitute", Desc: "longitude", Func: longitude()}
+
+	generators["double"] = Generator{Name: "double", Desc: "double number", Func: double()}
+
+	generators["int"] = Generator{Name: "int", Desc: "positive integer. Accepts range mix..max (default: 1..1000).", Func: integer()}
 }
