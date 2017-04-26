@@ -2,7 +2,7 @@
 
 CLI utility that generates data in various formats.
 
-fakedata int,1..100 # will generate only integers between 1 and 100- [Overview](#overview)
+[Overview](#overview)
   - [Quick start](#quick-start)
   - [Generators](#generators)
   - [Formatters](#formatters)
