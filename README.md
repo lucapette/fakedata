@@ -2,7 +2,7 @@
 
 CLI utility that generates data in various formats.
 
-[Overview](#overview)
+- [Overview](#overview)
   - [Quick start](#quick-start)
   - [Generators](#generators)
   - [Formatters](#formatters)
