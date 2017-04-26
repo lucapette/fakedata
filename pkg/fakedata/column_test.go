@@ -48,12 +48,14 @@ func TestNewColumnsWithSpec(t *testing.T) {
 		input    []string
 		expected fakedata.Columns
 	}{
-		{name: "int range", input: []string{"int,1..100"}, expected: fakedata.Columns{{Key: "int", Name: "int", Range: "1..100"}}},
+		{name: "int full range", input: []string{"int,1..100"}, expected: fakedata.Columns{{Key: "int", Name: "int", Min: "1", Max: "100"}}},
+		{name: "int lower bound", input: []string{"int,1.."}, expected: fakedata.Columns{{Key: "int", Name: "int", Min: "1"}}},
+		{name: "int lower bound no range syntax", input: []string{"int,10"}, expected: fakedata.Columns{{Key: "int", Name: "int", Min: "10"}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if actual := fakedata.NewColumns(tt.input); !reflect.DeepEqual(actual, tt.expected) {
-				t.Errorf("NewColumns() = %v, want %v", actual, tt.expected)
+				t.Errorf("NewColumns() = %v, expected %v", actual, tt.expected)
 			}
 		})
 	}

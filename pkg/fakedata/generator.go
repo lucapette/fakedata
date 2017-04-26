@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -100,22 +99,20 @@ func integer() func(Column) string {
 		min := 0
 		max := 1000
 
-		if len(column.Range) > 0 {
-			rng := strings.Split(column.Range, "..")
-
-			m, err := strconv.Atoi(rng[0])
-
+		if len(column.Min) > 0 {
+			m, err := strconv.Atoi(column.Min)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
+
 			min = m
 
-			if len(rng) > 1 && len(rng[1]) > 0 {
-				m, err := strconv.Atoi(rng[1])
-
+			if len(column.Max) > 0 {
+				m, err := strconv.Atoi(column.Max)
 				if err != nil {
 					log.Fatal(err.Error())
 				}
+
 				max = m
 			}
 		}
