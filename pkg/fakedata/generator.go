@@ -55,19 +55,6 @@ func withSep(left, right Column, sep string) func(column Column) string {
 	}
 }
 
-func id() func(Column) string {
-	return func(column Column) string {
-		chars := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-		ret := make([]rune, 10)
-
-		for i := range ret {
-			ret[i] = chars[rand.Intn(len(chars))]
-		}
-
-		return string(ret)
-	}
-}
-
 func ipv4() func(Column) string {
 	return func(column Column) string {
 		return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
@@ -152,8 +139,6 @@ func init() {
 	generators["name"] = generator{desc: "name", f: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " ")}
 	generators["email"] = generator{desc: "email", f: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@")}
 	generators["domain"] = generator{desc: "domain", f: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, ".")}
-
-	generators["id"] = generator{desc: "id", f: id()}
 
 	generators["ipv4"] = generator{desc: "ipv4", f: ipv4()}
 	generators["ipv6"] = generator{desc: "ipv4", f: ipv6()}
