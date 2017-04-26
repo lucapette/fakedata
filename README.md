@@ -2,9 +2,19 @@
 
 CLI utility that generates data in various formats.
 
+fakedata int,1..100 # will generate only integers between 1 and 100- [Overview](#overview)
+  - [Quick start](#quick-start)
+  - [Generators](#generators)
+  - [Formatters](#formatters)
+- [How to install](#how-to-install)
+- [How to contribute](#how-to-contribute)
+- [Code of conduct](#code-of-counduct)
+
 # Overview
 
 `fakedata` is a small utility that generates data from the command line:
+
+## Quick start
 
 ```sh
 $ fakedata email country
@@ -47,39 +57,30 @@ Shoes,Freetop
 Tools,Domnix
 ```
 
-List the available generators:
+## Generators
+
+`fakedata` provides a number of generators:
 
 ```sh
 $ fakedata --generators
 color
 country
-country.code
-domain
-domain.name
-domain.tld
-double
-email
-event.action
-http.method
-id
-ipv4
-ipv6
-latitude
-longitude
-mac.address
-name
-name.first
-name.last
-product.category
-product.name
-state
-state.code
-timezone
-unixtime
-username
+...
+# It's a long list :)
 ```
 
-## SQL formatter
+Some generators allow you to pass in a range so you can scope their generation
+to a subset of values:
+
+```sh
+$ fakedata int,1..100 # will generate only integers between 1 and 100
+$ fakedata int,50.. # specifying only min number works too
+$ fakedata int,50 # also works
+```
+
+## Formatters
+
+### SQL formatter
 
 `fakedata` can generate insert statements. By default, it uses the name of the generators 
 as column names:
@@ -89,15 +90,15 @@ $ fakedata email domain --format=sql --limit 1
 INSERT INTO TABLE (email,domain) values ('yigitpinarbasi@example.org','example.me');
 ```
 
-You can specify the name of the column using a field with the following format `column_name=generator`.
-For example:
+You can specify the name of the column using a field with the following format 
+`column_name=generator`. For example:
 
 ```sh
 $ fakedata login=email referral=domain --format=sql --limit 1
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 ```
 
-# Installation guide
+# How to install
 
 ## Homebrew
 
