@@ -45,7 +45,8 @@ func Generators() []Generator {
 
 func date() func(Column) string {
 	return func(column Column) string {
-		return strconv.FormatInt(time.Now().UnixNano(), 10)
+		hour := rand.Intn(365 * 24) // one year
+		return time.Now().Truncate(time.Duration(hour) * time.Hour).Format("2006-01-02")
 	}
 }
 
@@ -134,7 +135,7 @@ func integer() func(Column) string {
 func init() {
 	generators = make(map[string]Generator)
 
-	generators["date"] = Generator{Name: "date", Desc: "date", Func: date()}
+	generators["date"] = Generator{Name: "date", Desc: "date in the format YYYY-MM-DD", Func: date()}
 
 	generators["domain.tld"] = Generator{Name: "domain.tld", Desc: "name|info|com|org|me|us", Func: withDictKey("domain.tld")}
 
