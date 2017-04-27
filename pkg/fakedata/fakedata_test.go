@@ -25,19 +25,19 @@ func TestGenerateRow(t *testing.T) {
 		args     args
 		expected string
 	}{
-		{"email", args{columns: fakedata.Columns{{Key: "email"}}, formatter: def}, `.+?@.+?\..+`},
-		{"domain", args{columns: fakedata.Columns{{Key: "domain"}}, formatter: def}, `.+?\..+?`},
-		{"username", args{columns: fakedata.Columns{{Key: "username"}}, formatter: def}, `[a-zA-Z0-9]{2,}`},
-		{"double", args{columns: fakedata.Columns{{Key: "double"}}, formatter: def}, `-?[0-9]+?(\.[0-9]+?)?`},
-		{"date", args{columns: fakedata.Columns{{Key: "date"}}, formatter: def}, `\d{4}-\d{2}-\d{2}`},
-		{"username domain", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: def}, `[a-zA-Z0-9]{2,} .+?\..+?`},
-		{"username domain csv", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: csv}, `[a-zA-Z0-9]{2,},.+?\..+?`},
-		{"username domain tab", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: tab}, `[a-zA-Z0-9]{2,}\t.+?\..+?`},
+		{"email", args{columns: fakedata.Columns{{Key: "email"}}, formatter: def}, `^.+?@.+?\..+$`},
+		{"domain", args{columns: fakedata.Columns{{Key: "domain"}}, formatter: def}, `^.+?\..+?$`},
+		{"username", args{columns: fakedata.Columns{{Key: "username"}}, formatter: def}, `^[a-zA-Z0-9]{2,}$`},
+		{"double", args{columns: fakedata.Columns{{Key: "double"}}, formatter: def}, `^-?[0-9]+?(\.[0-9]+?)?$`},
+		{"date", args{columns: fakedata.Columns{{Key: "date"}}, formatter: def}, `^\d{4}-\d{2}-\d{2}$`},
+		{"username domain", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: def}, `^[a-zA-Z0-9]{2,} .+?\..+?$`},
+		{"username domain csv", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: csv}, `^[a-zA-Z0-9]{2,},.+?\..+?$`},
+		{"username domain tab", args{columns: fakedata.Columns{{Key: "username"}, {Key: "domain"}}, formatter: tab}, `^[a-zA-Z0-9]{2,}\t.+?\..+?$`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := fakedata.GenerateRow(tt.args.columns, tt.args.formatter)
+			actual := strings.TrimRight(fakedata.GenerateRow(tt.args.columns, tt.args.formatter), "\n")
 
 			matched, err := regexp.MatchString(tt.expected, actual)
 			if err != nil {
@@ -45,7 +45,7 @@ func TestGenerateRow(t *testing.T) {
 			}
 
 			if !matched {
-				t.Errorf("expected %v, but got %v", tt.expected, actual)
+				t.Errorf("expected %s to match '%s', but did not", tt.expected, actual)
 			}
 		})
 	}
