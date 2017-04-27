@@ -1,11 +1,12 @@
 package fakedata_test
 
 import (
+	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
-
-	"regexp"
+	"time"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
 )
@@ -84,6 +85,54 @@ func TestGenerateRowWithIntRanges(t *testing.T) {
 
 				if !(actual >= tt.min && actual <= tt.max) {
 					t.Fatalf("expected a number between %d and %d, but got %d", tt.min, tt.max, actual)
+				}
+			}
+		})
+	}
+}
+
+func TestGenerateRowWithDateRanges(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     args
+		min, max time.Time
+	}{
+		{
+			"date,2016-01-01..2016-12-31",
+			args{columns: fakedata.Columns{{Key: "date", Min: "2016-01-01", Max: "2016-12-31"}}, formatter: def},
+			time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC),
+			time.Date(2016, time.December, 31, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			"date,2016-01-01..",
+			args{columns: fakedata.Columns{{Key: "date", Min: "2016-01-01"}}, formatter: def},
+			time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC),
+			time.Now(),
+		},
+		{
+			"date,2046-01-01..2047-01-01",
+			args{columns: fakedata.Columns{{Key: "date", Min: "2046-01-01", Max: "2047-01-01"}}, formatter: def},
+			time.Date(2046, time.January, 1, 0, 0, 0, 0, time.UTC),
+			time.Date(2047, time.January, 1, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// this isn't an accurate way of testing random output
+			// but it serves a practical purpose
+			for index := 0; index < 10000; index++ {
+				row := strings.Split(fakedata.GenerateRow(tt.args.columns, tt.args.formatter), " ")
+
+				formattedDate := fmt.Sprintf("%sT00:00:00.000Z", strings.TrimRight(row[0], "\n"))
+
+				actual, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", formattedDate, time.UTC)
+				if err != nil {
+					t.Fatal(err.Error())
+				}
+
+				if !(actual.After(tt.min) && actual.Before(tt.max)) && !actual.Equal(tt.min) && !actual.Equal(tt.max) {
+					t.Fatalf("expected a date between %s and %s, but got %s", tt.min, tt.max, actual)
 				}
 			}
 		})

@@ -45,8 +45,36 @@ func Generators() []Generator {
 
 func date() func(Column) string {
 	return func(column Column) string {
-		hour := rand.Intn(365 * 24) // one year
-		return time.Now().Truncate(time.Duration(hour) * time.Hour).Format("2006-01-02")
+		endDate := time.Now()
+		startDate := endDate.AddDate(-1, 0, 0)
+
+		if len(column.Min) > 0 {
+			if len(column.Max) > 0 {
+				formattedMax := fmt.Sprintf("%sT00:00:00.000Z", column.Max)
+
+				date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
+				if err != nil {
+					log.Fatalf("Problem with Max: %s", err.Error())
+				}
+
+				endDate = date
+			}
+
+			formattedMin := fmt.Sprintf("%sT00:00:00.000Z", column.Min)
+
+			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+
+			startDate = date
+		}
+
+		if startDate.After(endDate) {
+			log.Fatalf("%v is after %v", startDate, endDate)
+		}
+
+		return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
 	}
 }
 
@@ -135,7 +163,7 @@ func integer() func(Column) string {
 func init() {
 	generators = make(map[string]Generator)
 
-	generators["date"] = Generator{Name: "date", Desc: "date in the format YYYY-MM-DD", Func: date()}
+	generators["date"] = Generator{Name: "date", Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.", Func: date()}
 
 	generators["domain.tld"] = Generator{Name: "domain.tld", Desc: "name|info|com|org|me|us", Func: withDictKey("domain.tld")}
 
