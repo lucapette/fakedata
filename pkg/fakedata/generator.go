@@ -156,7 +156,7 @@ func integer() func(Column) string {
 		if min > max {
 			log.Fatalf("%d is smaller than %d in Column(%s=%s)", max, min, column.Name, column.Key)
 		}
-		return strconv.Itoa(min + rand.Intn(max-min))
+		return strconv.Itoa(min + rand.Intn(max+1-min))
 	}
 }
 
