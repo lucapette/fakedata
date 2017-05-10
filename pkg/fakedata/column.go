@@ -1,6 +1,7 @@
 package fakedata
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -10,6 +11,10 @@ type Column struct {
 	Key  string
 	Min  string
 	Max  string
+}
+
+func (c *Column) String() string {
+	return fmt.Sprintf("Column(%s=%s)", c.Name, c.Key)
 }
 
 // Columns is an array of Column

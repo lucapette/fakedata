@@ -121,7 +121,7 @@ var integer = func(column Column) string {
 	if len(column.Min) > 0 {
 		m, err := strconv.Atoi(column.Min)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatalf("could not convert min: %v", err)
 		}
 
 		min = m
@@ -129,7 +129,8 @@ var integer = func(column Column) string {
 		if len(column.Max) > 0 {
 			m, err := strconv.Atoi(column.Max)
 			if err != nil {
-				log.Fatal(err.Error())
+				log.Fatalf("could not convert max: %v", err)
+
 			}
 
 			max = m
@@ -137,8 +138,9 @@ var integer = func(column Column) string {
 	}
 
 	if min > max {
-		log.Fatalf("%d is smaller than %d in Column(%s=%s)", max, min, column.Name, column.Key)
+		log.Fatalf("max(%d) is smaller than min(%d) in %v", max, min, column)
 	}
+
 	return strconv.Itoa(min + rand.Intn(max+1-min))
 }
 
