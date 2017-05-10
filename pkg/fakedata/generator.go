@@ -101,13 +101,11 @@ var mac = func(column Column) string {
 }
 
 var latitute = func(column Column) string {
-	lattitude := (rand.Float64() * 180) - 90
-	return strconv.FormatFloat(lattitude, 'f', 6, 64)
+	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
 }
 
 var longitude = func(column Column) string {
-	longitude := (rand.Float64() * 360) - 180
-	return strconv.FormatFloat(longitude, 'f', 6, 64)
+	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
 }
 
 var double = func(column Column) string {
