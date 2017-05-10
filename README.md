@@ -82,6 +82,24 @@ $ fakedata int,50.. # specifying only min number works too
 $ fakedata int,50 # also works
 ```
 
+The `enum` generator allows you to specify a set of values. It comes handy when
+you need random data from a small subset of values:
+
+```sh
+$ fakedata enum --limit 5
+foo
+baz
+foo
+foo
+baz
+$ fakedata enum,bug..feature..question..duplicate --limit 5
+question
+duplicate
+duplicate
+bug
+feature
+```
+
 ## Formatters
 
 ### SQL formatter
