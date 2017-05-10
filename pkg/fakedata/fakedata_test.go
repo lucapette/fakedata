@@ -60,13 +60,13 @@ func TestGenerateRowWithIntRanges(t *testing.T) {
 	}{
 		{
 			"int,1..10",
-			args{columns: fakedata.Columns{{Key: "int", Min: "10", Max: "100"}}, formatter: def},
+			args{columns: fakedata.Columns{{Key: "int", Constraints: "10..100"}}, formatter: def},
 			1,
 			100,
 		},
 		{
 			"int,100..200",
-			args{columns: fakedata.Columns{{Key: "int", Min: "100", Max: "200"}}, formatter: def},
+			args{columns: fakedata.Columns{{Key: "int", Constraints: "100..200"}}, formatter: def},
 			100,
 			1200,
 		},
@@ -99,19 +99,19 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 	}{
 		{
 			"date,2016-01-01..2016-12-31",
-			args{columns: fakedata.Columns{{Key: "date", Min: "2016-01-01", Max: "2016-12-31"}}, formatter: def},
+			args{columns: fakedata.Columns{{Key: "date", Constraints: "2016-01-01..2016-12-31"}}, formatter: def},
 			time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC),
 			time.Date(2016, time.December, 31, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			"date,2016-01-01..",
-			args{columns: fakedata.Columns{{Key: "date", Min: "2016-01-01"}}, formatter: def},
+			args{columns: fakedata.Columns{{Key: "date", Constraints: "2016-01-01"}}, formatter: def},
 			time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC),
 			time.Now(),
 		},
 		{
 			"date,2046-01-01..2047-01-01",
-			args{columns: fakedata.Columns{{Key: "date", Min: "2046-01-01", Max: "2047-01-01"}}, formatter: def},
+			args{columns: fakedata.Columns{{Key: "date", Constraints: "2046-01-01..2047-01-01"}}, formatter: def},
 			time.Date(2046, time.January, 1, 0, 0, 0, 0, time.UTC),
 			time.Date(2047, time.January, 1, 0, 0, 0, 0, time.UTC),
 		},
@@ -133,6 +133,47 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 
 				if !(actual.After(tt.min) && actual.Before(tt.max)) && !actual.Equal(tt.min) && !actual.Equal(tt.max) {
 					t.Fatalf("expected a date between %s and %s, but got %s", tt.min, tt.max, actual)
+				}
+			}
+		})
+	}
+}
+
+func TestGenerateRowWithEnum(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     args
+		expected []string
+	}{
+		{
+			"enum",
+			args{columns: fakedata.Columns{{Key: "enum"}}, formatter: def},
+			[]string{"foo", "bar", "baz"},
+		},
+		{
+			"enum,Peter..Olivia..Walter",
+			args{columns: fakedata.Columns{{Key: "enum", Constraints: "Peter..Olivia..Walter"}}, formatter: def},
+			[]string{"Peter", "Olivia", "Walter"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// this isn't an accurate way of testing random output
+			// but it serves a practical purpose
+			for index := 0; index < 10000; index++ {
+				row := strings.TrimRight(fakedata.GenerateRow(tt.args.columns, tt.args.formatter), "\n")
+
+				var found bool
+				for _, ex := range tt.expected {
+					if strings.Compare(ex, row) == 0 {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					t.Fatalf("expected to find %s in %v, but did not", row, tt.expected)
 				}
 			}
 		})

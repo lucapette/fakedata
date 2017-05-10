@@ -43,41 +43,6 @@ func Generators() []Generator {
 	return gens
 }
 
-func date() func(Column) string {
-	return func(column Column) string {
-		endDate := time.Now()
-		startDate := endDate.AddDate(-1, 0, 0)
-
-		if len(column.Min) > 0 {
-			if len(column.Max) > 0 {
-				formattedMax := fmt.Sprintf("%sT00:00:00.000Z", column.Max)
-
-				date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
-				if err != nil {
-					log.Fatalf("Problem with Max: %s", err.Error())
-				}
-
-				endDate = date
-			}
-
-			formattedMin := fmt.Sprintf("%sT00:00:00.000Z", column.Min)
-
-			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-
-			startDate = date
-		}
-
-		if startDate.After(endDate) {
-			log.Fatalf("%v is after %v", startDate, endDate)
-		}
-
-		return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
-	}
-}
-
 func withDictKey(key string) func(Column) string {
 	return func(column Column) string {
 		return dict[key][rand.Intn(len(dict[key]))]
@@ -90,128 +55,279 @@ func withSep(left, right Column, sep string) func(column Column) string {
 	}
 }
 
-func ipv4() func(Column) string {
+func withEnum(enum []string) func(column Column) string {
 	return func(column Column) string {
-		return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
-	}
-
-}
-
-func ipv6() func(Column) string {
-	return func(column Column) string {
-		return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
-	}
-
-}
-
-func mac() func(Column) string {
-	return func(column Column) string {
-		return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+		return enum[rand.Intn(len(enum))]
 	}
 }
 
-func latitute() func(Column) string {
-	return func(column Column) string {
-		lattitude := (rand.Float64() * 180) - 90
-		return strconv.FormatFloat(lattitude, 'f', 6, 64)
+var date = func(column Column) string {
+	endDate := time.Now()
+	startDate := endDate.AddDate(-1, 0, 0)
+
+	var min, max string
+
+	rng := strings.Split(column.Constraints, "..")
+	min = rng[0]
+
+	if len(rng) > 1 {
+		max = rng[1]
 	}
-}
 
-func longitude() func(Column) string {
-	return func(column Column) string {
-		longitude := (rand.Float64() * 360) - 180
-		return strconv.FormatFloat(longitude, 'f', 6, 64)
-	}
-}
+	if len(min) > 0 {
+		if len(max) > 0 {
+			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", max)
 
-func double() func(Column) string {
-	return func(column Column) string {
-		return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
-	}
-}
-
-func integer() func(Column) string {
-	return func(column Column) string {
-		min := 0
-		max := 1000
-
-		if len(column.Min) > 0 {
-			m, err := strconv.Atoi(column.Min)
+			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
 			if err != nil {
-				log.Fatal(err.Error())
+				log.Fatalf("Problem with Max: %s", err.Error())
 			}
 
-			min = m
-
-			if len(column.Max) > 0 {
-				m, err := strconv.Atoi(column.Max)
-				if err != nil {
-					log.Fatal(err.Error())
-				}
-
-				max = m
-			}
+			endDate = date
 		}
 
-		if min > max {
-			log.Fatalf("%d is smaller than %d in Column(%s=%s)", max, min, column.Name, column.Key)
+		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", min)
+
+		date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
+		if err != nil {
+			log.Fatal(err.Error())
 		}
-		return strconv.Itoa(min + rand.Intn(max+1-min))
+
+		startDate = date
 	}
+
+	if startDate.After(endDate) {
+		log.Fatalf("%v is after %v", startDate, endDate)
+	}
+
+	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+}
+
+var ipv4 = func(column Column) string {
+	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
+}
+
+var ipv6 = func(column Column) string {
+	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+}
+
+var mac = func(column Column) string {
+	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+}
+
+var latitute = func(column Column) string {
+	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
+}
+
+var longitude = func(column Column) string {
+	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
+}
+
+var double = func(column Column) string {
+	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
+}
+
+var integer = func(column Column) string {
+	min := 0
+	max := 1000
+
+	var _min, _max string
+	rng := strings.Split(column.Constraints, "..")
+	_min = rng[0]
+
+	if len(rng) > 1 {
+		_max = rng[1]
+	}
+
+	if len(_min) > 0 {
+		m, err := strconv.Atoi(_min)
+		if err != nil {
+			log.Fatalf("could not convert min: %v", err)
+		}
+
+		min = m
+
+		if len(_max) > 0 {
+			m, err := strconv.Atoi(_max)
+			if err != nil {
+				log.Fatalf("could not convert max: %v", err)
+
+			}
+
+			max = m
+		}
+	}
+
+	if min > max {
+		log.Fatalf("max(%d) is smaller than min(%d) in %v", max, min, column)
+	}
+
+	return strconv.Itoa(min + rand.Intn(max+1-min))
+}
+
+var enum = func(column Column) string {
+	enum := []string{"foo", "bar", "baz"}
+
+	if len(column.Constraints) > 1 {
+		enum = strings.Split(column.Constraints, "..")
+	}
+
+	return withEnum(enum)(column)
 }
 
 func init() {
 	generators = make(map[string]Generator)
 
-	generators["date"] = Generator{Name: "date", Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.", Func: date()}
+	generators["date"] = Generator{
+		Name: "date",
+		Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.",
+		Func: date,
+	}
 
-	generators["domain.tld"] = Generator{Name: "domain.tld", Desc: "name|info|com|org|me|us", Func: withDictKey("domain.tld")}
+	generators["domain.tld"] = Generator{
+		Name: "domain.tld",
+		Desc: "name|info|com|org|me|us",
+		Func: withEnum([]string{"name", "info", "com", "org", "me", "us"}),
+	}
 
-	generators["domain.name"] = Generator{Name: "domain.tld", Desc: "example|test", Func: withDictKey("domain.name")}
+	generators["domain.name"] = Generator{
+		Name: "domain.tld",
+		Desc: "example|test",
+		Func: withEnum([]string{"example", "test"}),
+	}
 
-	generators["country"] = Generator{Name: "country", Desc: "Full country name", Func: withDictKey("country")}
+	generators["country"] = Generator{
+		Name: "country",
+		Desc: "Full country name",
+		Func: withDictKey("country"),
+	}
 
-	generators["country.code"] = Generator{Name: "country.code", Desc: `2-digit country code`, Func: withDictKey("country.code")}
+	generators["country.code"] = Generator{
+		Name: "country.code",
+		Desc: "2-digit country code",
+		Func: withDictKey("country.code"),
+	}
 
-	generators["state"] = Generator{Name: "state", Desc: `Full US state name`, Func: withDictKey("state")}
+	generators["state"] = Generator{
+		Name: "state",
+		Desc: "Full US state name",
+		Func: withDictKey("state"),
+	}
 
-	generators["state.code"] = Generator{Name: "state.code", Desc: `2-digit US state name`, Func: withDictKey("state.code")}
+	generators["state.code"] = Generator{
+		Name: "state.code",
+		Desc: "2-digit US state name",
+		Func: withDictKey("state.code"),
+	}
 
-	generators["timezone"] = Generator{Name: "timezone", Desc: `tz in the form Area/City`, Func: withDictKey("timezone")}
+	generators["timezone"] = Generator{
+		Name: "timezone",
+		Desc: "tz in the form Area/City",
+		Func: withDictKey("timezone"),
+	}
 
-	generators["username"] = Generator{Name: "username", Desc: `username using the pattern \w+`, Func: withDictKey("username")}
+	generators["username"] = Generator{
+		Name: "username",
+		Desc: `username using the pattern \w+`,
+		Func: withDictKey("username"),
+	}
 
-	generators["name.first"] = Generator{Name: "name.first", Desc: `capilized first name`, Func: withDictKey("name.first")}
+	generators["name.first"] = Generator{
+		Name: "name.first",
+		Desc: "capilized first name",
+		Func: withDictKey("name.first"),
+	}
 
-	generators["name.last"] = Generator{Name: "name.last", Desc: `capilized last name`, Func: withDictKey("name.last")}
+	generators["name.last"] = Generator{
+		Name: "name.last",
+		Desc: "capilized last name",
+		Func: withDictKey("name.last"),
+	}
 
-	generators["color"] = Generator{Name: "color", Desc: `one word color`, Func: withDictKey("color")}
+	generators["color"] = Generator{
+		Name: "color",
+		Desc: "one word color",
+		Func: withDictKey("color"),
+	}
 
-	generators["product.category"] = Generator{Name: "product.category", Desc: `Beauty|Games|Movies|Tools|..`, Func: withDictKey("product.category")}
+	generators["product.category"] = Generator{
+		Name: "product.category",
+		Desc: "Beauty|Games|Movies|Tools|..",
+		Func: withDictKey("product.category"),
+	}
 
-	generators["product.name"] = Generator{Name: "product.name", Desc: `invented product name`, Func: withDictKey("product.name")}
+	generators["product.name"] = Generator{
+		Name: "product.name",
+		Desc: "invented product name",
+		Func: withDictKey("product.name"),
+	}
 
-	generators["event.action"] = Generator{Name: "event.action", Desc: `Clicked|Purchased|Viewed|Watched`, Func: withDictKey("event.action")}
+	generators["event.action"] = Generator{
+		Name: "event.action",
+		Desc: `clicked|purchased|viewed|watched`,
+		Func: withEnum([]string{"clicked", "purchased", "viewed", "watched"}),
+	}
 
-	generators["http.method"] = Generator{Name: "http.method", Desc: `GET|POST|PUT|PATCH|HEAD|DELETE|OPTION`, Func: withDictKey("http.method")}
+	generators["http.method"] = Generator{
+		Name: "http.method",
+		Desc: `DELETE|GET|HEAD|OPTION|PATCH|POST|PUT`,
+		Func: withEnum([]string{"DELETE", "GET", "HEAD", "OPTION", "PATCH", "POST", "PUT"}),
+	}
 
-	generators["name"] = Generator{Name: "name", Desc: `name.first + " " + name.last`, Func: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " ")}
+	generators["name"] = Generator{
+		Name: "name",
+		Desc: `name.first + " " + name.last`,
+		Func: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " "),
+	}
 
-	generators["email"] = Generator{Name: "email", Desc: "email", Func: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@")}
+	generators["email"] = Generator{
+		Name: "email",
+		Desc: "email",
+		Func: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@"),
+	}
 
-	generators["domain"] = Generator{Name: "domain", Desc: "domain", Func: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, ".")}
+	generators["domain"] = Generator{
+		Name: "domain",
+		Desc: "domain",
+		Func: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, "."),
+	}
 
-	generators["ipv4"] = Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4()}
+	generators["ipv4"] = Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4}
 
-	generators["ipv6"] = Generator{Name: "ipv6", Desc: "ipv6", Func: ipv6()}
+	generators["ipv6"] = Generator{Name: "ipv6", Desc: "ipv6", Func: ipv6}
 
-	generators["mac.address"] = Generator{Name: "mac.address", Desc: "mac address", Func: mac()}
+	generators["mac.address"] = Generator{
+		Name: "mac.address",
+		Desc: "mac address",
+		Func: mac}
 
-	generators["latitute"] = Generator{Name: "latitute", Desc: "latitute", Func: latitute()}
+	generators["latitute"] = Generator{
+		Name: "latitute",
+		Desc: "latitute",
+		Func: latitute,
+	}
 
-	generators["longitude"] = Generator{Name: "longitute", Desc: "longitude", Func: longitude()}
+	generators["longitude"] = Generator{
+		Name: "longitude",
+		Desc: "longitude",
+		Func: longitude,
+	}
 
-	generators["double"] = Generator{Name: "double", Desc: "double number", Func: double()}
+	generators["double"] = Generator{
+		Name: "double",
+		Desc: "double number",
+		Func: double,
+	}
 
-	generators["int"] = Generator{Name: "int", Desc: "positive integer. Accepts range mix..max (default: 1..1000).", Func: integer()}
+	generators["int"] = Generator{
+		Name: "int",
+		Desc: "positive integer. Accepts range mix..max (default: 1..1000).",
+		Func: integer,
+	}
+
+	generators["enum"] = Generator{
+		Name: "enum",
+		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
+		Func: enum,
+	}
 }
