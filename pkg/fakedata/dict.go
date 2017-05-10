@@ -5,18 +5,6 @@ package fakedata
 // Thank you for the inspiration!
 
 var dict = map[string][]string{
-	"domain.tld": {
-		"name",
-		"info",
-		"com",
-		"org",
-		"me",
-		"us",
-	},
-	"domain.name": {
-		"example",
-		"test",
-	},
 	"country": {
 		"Afghanistan",
 		"Albania",
@@ -2384,20 +2372,5 @@ var dict = map[string][]string{
 		"Yearlam",
 		"Zerzamhold",
 		"Zunfan",
-	},
-	"event.action": {
-		"Clicked",
-		"Purchased",
-		"Viewed",
-		"Watched",
-	},
-	"http.method": {
-		"DELETE",
-		"GET",
-		"HEAD",
-		"OPTION",
-		"PATCH",
-		"POST",
-		"PUT",
 	},
 }

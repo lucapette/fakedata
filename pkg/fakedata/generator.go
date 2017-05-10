@@ -55,6 +55,12 @@ func withSep(left, right Column, sep string) func(column Column) string {
 	}
 }
 
+func withEnum(enum []string) func(column Column) string {
+	return func(column Column) string {
+		return enum[rand.Intn(len(enum))]
+	}
+}
+
 var date = func(column Column) string {
 	endDate := time.Now()
 	startDate := endDate.AddDate(-1, 0, 0)
@@ -159,6 +165,16 @@ var integer = func(column Column) string {
 	return strconv.Itoa(min + rand.Intn(max+1-min))
 }
 
+var enum = func(column Column) string {
+	enum := []string{"foo", "bar", "baz"}
+
+	if len(column.Constraints) > 1 {
+		enum = strings.Split(column.Constraints, "..")
+	}
+
+	return withEnum(enum)(column)
+}
+
 func init() {
 	generators = make(map[string]Generator)
 
@@ -171,13 +187,13 @@ func init() {
 	generators["domain.tld"] = Generator{
 		Name: "domain.tld",
 		Desc: "name|info|com|org|me|us",
-		Func: withDictKey("domain.tld"),
+		Func: withEnum([]string{"name", "info", "com", "org", "me", "us"}),
 	}
 
 	generators["domain.name"] = Generator{
 		Name: "domain.tld",
 		Desc: "example|test",
-		Func: withDictKey("domain.name"),
+		Func: withEnum([]string{"example", "test"}),
 	}
 
 	generators["country"] = Generator{
@@ -248,14 +264,14 @@ func init() {
 
 	generators["event.action"] = Generator{
 		Name: "event.action",
-		Desc: `Clicked|Purchased|Viewed|Watched`,
-		Func: withDictKey("event.action"),
+		Desc: `clicked|purchased|viewed|watched`,
+		Func: withEnum([]string{"clicked", "purchased", "viewed", "watched"}),
 	}
 
 	generators["http.method"] = Generator{
 		Name: "http.method",
-		Desc: `GET|POST|PUT|PATCH|HEAD|DELETE|OPTION`,
-		Func: withDictKey("http.method"),
+		Desc: `DELETE|GET|HEAD|OPTION|PATCH|POST|PUT`,
+		Func: withEnum([]string{"DELETE", "GET", "HEAD", "OPTION", "PATCH", "POST", "PUT"}),
 	}
 
 	generators["name"] = Generator{
@@ -307,5 +323,11 @@ func init() {
 		Name: "int",
 		Desc: "positive integer. Accepts range mix..max (default: 1..1000).",
 		Func: integer,
+	}
+
+	generators["enum"] = Generator{
+		Name: "enum",
+		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
+		Func: enum,
 	}
 }

@@ -138,3 +138,44 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateRowWithEnum(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     args
+		expected []string
+	}{
+		{
+			"enum",
+			args{columns: fakedata.Columns{{Key: "enum"}}, formatter: def},
+			[]string{"foo", "bar", "baz"},
+		},
+		{
+			"enum,Peter..Olivia..Walter",
+			args{columns: fakedata.Columns{{Key: "enum", Constraints: "Peter..Olivia..Walter"}}, formatter: def},
+			[]string{"Peter", "Olivia", "Walter"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// this isn't an accurate way of testing random output
+			// but it serves a practical purpose
+			for index := 0; index < 10000; index++ {
+				row := strings.TrimRight(fakedata.GenerateRow(tt.args.columns, tt.args.formatter), "\n")
+
+				var found bool
+				for _, ex := range tt.expected {
+					if strings.Compare(ex, row) == 0 {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					t.Fatalf("expected to find %s in %v, but did not", row, tt.expected)
+				}
+			}
+		})
+	}
+}
