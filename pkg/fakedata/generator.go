@@ -59,9 +59,18 @@ var date = func(column Column) string {
 	endDate := time.Now()
 	startDate := endDate.AddDate(-1, 0, 0)
 
-	if len(column.Min) > 0 {
-		if len(column.Max) > 0 {
-			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", column.Max)
+	var min, max string
+
+	rng := strings.Split(column.Constraints, "..")
+	min = rng[0]
+
+	if len(rng) > 1 {
+		max = rng[1]
+	}
+
+	if len(min) > 0 {
+		if len(max) > 0 {
+			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", max)
 
 			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
 			if err != nil {
@@ -71,7 +80,7 @@ var date = func(column Column) string {
 			endDate = date
 		}
 
-		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", column.Min)
+		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", min)
 
 		date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
 		if err != nil {
@@ -116,16 +125,24 @@ var integer = func(column Column) string {
 	min := 0
 	max := 1000
 
-	if len(column.Min) > 0 {
-		m, err := strconv.Atoi(column.Min)
+	var _min, _max string
+	rng := strings.Split(column.Constraints, "..")
+	_min = rng[0]
+
+	if len(rng) > 1 {
+		_max = rng[1]
+	}
+
+	if len(_min) > 0 {
+		m, err := strconv.Atoi(_min)
 		if err != nil {
 			log.Fatalf("could not convert min: %v", err)
 		}
 
 		min = m
 
-		if len(column.Max) > 0 {
-			m, err := strconv.Atoi(column.Max)
+		if len(_max) > 0 {
+			m, err := strconv.Atoi(_max)
 			if err != nil {
 				log.Fatalf("could not convert max: %v", err)
 
