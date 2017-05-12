@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
@@ -81,6 +82,11 @@ func validateGenerators(generators []fakedata.Generator) {
 	// check each parameter
 	for f := range flag.Args() {
 		k := flag.Arg(f)
+		paramArg := strings.Split(k, ",")
+		// Seperate arguments that have parameters, e.g. int,1..50
+		if len(paramArg) > 1 {
+			k = paramArg[0]
+		}
 		// If the parameter is not a generator, fail and log message.
 		if !availableGens[k] {
 			fmt.Printf(unknownGeneratorError, k)
