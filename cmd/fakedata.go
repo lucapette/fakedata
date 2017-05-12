@@ -25,6 +25,9 @@ var usage = `
     --version       shows version information
 `
 
+var unknownGeneratorError = `
+  Unknown generator: %s.`
+
 var generatorsFlag = flag.Bool("generators", false, "lists available generators")
 var limitFlag = flag.Int("limit", 10, "limits rows up to n")
 var helpFlag = flag.Bool("help", false, "shows help information")
@@ -65,6 +68,32 @@ func generatorsHelp(generators []fakedata.Generator) string {
 	return buffer.String()
 }
 
+// Validate generators passed as flags
+func validateGenerators(generators []fakedata.Generator) {
+	availableGens := make(map[string]bool)
+	// Assume generators exist
+	var hasGenerator = true
+
+	// Create a map from the generator slice
+	for _, v := range generators {
+		availableGens[v.Name] = true
+	}
+	// check each parameter
+	for f := range flag.Args() {
+		k := flag.Arg(f)
+		// If the parameter is not a generator, fail and log message.
+		if !availableGens[k] {
+			fmt.Printf(unknownGeneratorError, k)
+			hasGenerator = false
+		}
+	}
+	// If one generator does not exist, exit and print a message about --generators
+	if hasGenerator == false {
+		fmt.Println("\n\n  Please check fakedata --generators for more information about available generators.")
+		os.Exit(0)
+	}
+}
+
 func main() {
 	if *versionFlag {
 		fmt.Println(version)
@@ -85,6 +114,9 @@ func main() {
 		fmt.Printf(usage)
 		os.Exit(0)
 	}
+
+	// Validate generators exist
+	validateGenerators(fakedata.Generators())
 
 	rand.Seed(time.Now().UnixNano())
 
