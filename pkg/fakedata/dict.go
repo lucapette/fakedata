@@ -1432,7 +1432,7 @@ var dict = map[string][]string{
 		"Jonah",
 		"Jordon",
 		"Josiah",
-		"Jospeh",
+		"Joseph",
 		"Josphine",
 		"Jude",
 		"Judson",
