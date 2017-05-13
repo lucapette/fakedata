@@ -4,7 +4,7 @@
 
 # Table Of Contents
 
-- [Overview](#quick-start)
+- [Overview](#overview)
 - [Generators](#generators)
 - [Formatters](#formatters)
 - [How to install](#how-to-install)
