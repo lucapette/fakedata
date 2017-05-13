@@ -1,20 +1,19 @@
 # fakedata
 
-CLI utility that generates data in various formats.
+`fakedata` is a small command line utility that generates random data.
 
-- [Overview](#overview)
-  - [Quick start](#quick-start)
-  - [Generators](#generators)
-  - [Formatters](#formatters)
+# Table Of Contents
+
+- [Overview](#quick-start)
+- [Generators](#generators)
+- [Formatters](#formatters)
 - [How to install](#how-to-install)
 - [How to contribute](#how-to-contribute)
-- [Code of conduct](#code-of-counduct)
+- [Code of conduct](#code-of-conduct)
 
 # Overview
 
-`fakedata` is a small utility that generates data from the command line:
-
-## Quick start
+Here is a list of examples to get a feeling of how `fakedata` works
 
 ```sh
 $ fakedata email country
@@ -30,10 +29,10 @@ opnsrce@example.name Malaysia
 ankitind@test.info Virgin Islands, British
 ```
 
-Limit the amout of generated rows:
+Limit the number of rows:
 
 ```sh
-$ fakedata country.code --limit 5
+$ fakedata --limit 5 country.code
 SH
 CF
 GQ
@@ -44,7 +43,7 @@ FO
 Choose a different output format:
 
 ```sh
-$ fakedata product.category product.name --format=csv
+$ fakedata --format=csv product.category product.name
 Shoes,Rankfix
 Automotive,Namis
 Movies,Matquadfax
@@ -57,9 +56,10 @@ Shoes,Freetop
 Tools,Domnix
 ```
 
-## Generators
+# Generators
 
-`fakedata` provides a number of generators:
+`fakedata` provides a number of generators. You can see the full list running
+the following command:
 
 ```sh
 $ fakedata --generators
@@ -73,8 +73,8 @@ domain.tld        example|test
 # It's a long list :)
 ```
 
-Some generators allow you to pass in a range so you can scope their generation
-to a subset of values:
+Some generators allow you to pass in a range to constraint the output to a
+subset of values:
 
 ```sh
 $ fakedata int,1..100 # will generate only integers between 1 and 100
@@ -100,24 +100,29 @@ bug
 feature
 ```
 
-## Formatters
+# Formatters
 
 ### SQL formatter
 
-`fakedata` can generate insert statements. By default, it uses the name of the generators 
-as column names:
+`fakedata` can generate insert statements. By default, it uses the name of the
+generators as column names:
 
 ```sh
-$ fakedata email domain --format=sql --limit 1
-INSERT INTO TABLE (email,domain) values ('yigitpinarbasi@example.org','example.me');
+$ fakedata --format=sql --limit 1 email domain
+INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
 ```
 
 You can specify the name of the column using a field with the following format 
-`column_name=generator`. For example:
+`column_name=generator`:
 
 ```sh
-$ fakedata login=email referral=domain --format=sql --limit 1
+$ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
+```
+
+```sh
+fakedata --format=sql --limit=1 --table=users login=email referral=domain
+INSERT INTO users (login,referral) VALUES ('mikema@example.com' 'test.us');
 ```
 
 # How to install
