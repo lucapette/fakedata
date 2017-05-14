@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/lucapette/fakedata/pkg/fakedata"
+	"github.com/kevingimbel/fakedata/pkg/fakedata"
 	flag "github.com/spf13/pflag"
 )
 
@@ -25,9 +24,6 @@ var usage = `
     --table t       uses t for the table name of the sql statement [default: TABLE]
     --version       shows version information
 `
-
-var unknownGeneratorError = `
-  Unknown generator: %s.`
 
 var generatorsFlag = flag.Bool("generators", false, "lists available generators")
 var limitFlag = flag.Int("limit", 10, "limits rows up to n")
@@ -69,37 +65,6 @@ func generatorsHelp(generators []fakedata.Generator) string {
 	return buffer.String()
 }
 
-// Validate generators passed as flags
-func validateGenerators(generators []fakedata.Generator) {
-	availableGens := make(map[string]bool)
-	// Assume generators exist
-	var hasGenerator = true
-
-	// Create a map from the generator slice
-	for _, v := range generators {
-		availableGens[v.Name] = true
-	}
-	// check each parameter
-	for f := range flag.Args() {
-		k := flag.Arg(f)
-		paramArg := strings.Split(k, ",")
-		// Seperate arguments that have parameters, e.g. int,1..50
-		if len(paramArg) > 1 {
-			k = paramArg[0]
-		}
-		// If the parameter is not a generator, fail and log message.
-		if !availableGens[k] {
-			fmt.Printf(unknownGeneratorError, k)
-			hasGenerator = false
-		}
-	}
-	// If one generator does not exist, exit and print a message about --generators
-	if hasGenerator == false {
-		fmt.Println("\n\n  Please check fakedata --generators for more information about available generators.")
-		os.Exit(0)
-	}
-}
-
 func main() {
 	if *versionFlag {
 		fmt.Println(version)
@@ -122,7 +87,13 @@ func main() {
 	}
 
 	// Validate generators exist
-	validateGenerators(fakedata.Generators())
+	err := fakedata.ValidateGenerators(flag.Args())
+
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("\n  See fakedata --generators for a list of all available generators.")
+		os.Exit(0)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
