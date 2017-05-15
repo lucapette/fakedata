@@ -13,24 +13,11 @@ import (
 
 var version = "master"
 
-var usage = `
-  Usage: fakedata [option ...] [field ...]
-
-  Options:
-    --generators    lists available generators
-    --limit n       limits rows up to n [default: 10]
-    --help          shows help information
-    --format f      generates rows in f format [options: csv|tab|sql, default: " "]
-    --table t       uses t for the table name of the sql statement [default: TABLE]
-    --version       shows version information
-`
-
-var generatorsFlag = flag.Bool("generators", false, "lists available generators")
-var limitFlag = flag.Int("limit", 10, "limits rows up to n")
-var helpFlag = flag.Bool("help", false, "shows help information")
-var formatFlag = flag.String("format", "", "generators rows in f format")
-var versionFlag = flag.Bool("version", false, "shows version information")
-var tableFlag = flag.String("table", "TABLE", "uses t for the table name of the sql statement [default: TABLE]")
+var generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
+var limitFlag = flag.IntP("limit", "l", 10, "limits rows up to n")
+var formatFlag = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
+var versionFlag = flag.BoolP("version", "v", false, "shows version information")
+var tableFlag = flag.StringP("table", "t", "TABLE", "table name of the sql format")
 
 func getFormatter(format string) (f fakedata.Formatter) {
 	switch format {
@@ -71,18 +58,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *helpFlag {
-		fmt.Print(usage)
-		os.Exit(0)
-	}
-
 	if *generatorsFlag {
 		fmt.Print(generatorsHelp(fakedata.Generators()))
 		os.Exit(0)
 	}
 
 	if len(flag.Args()) == 0 {
-		fmt.Printf(usage)
+		flag.Usage()
 		os.Exit(0)
 	}
 
@@ -102,5 +84,9 @@ func main() {
 }
 
 func init() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [option ...] field...\n\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 }
