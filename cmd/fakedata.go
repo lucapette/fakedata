@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/kevingimbel/fakedata/pkg/fakedata"
+	"github.com/lucapette/fakedata/pkg/fakedata"
 	flag "github.com/spf13/pflag"
 )
 
