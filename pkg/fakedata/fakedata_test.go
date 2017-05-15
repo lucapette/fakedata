@@ -179,3 +179,28 @@ func TestGenerateRowWithEnum(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateGenerators(t *testing.T) {
+	type args struct {
+		keys []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"known generator", args{keys: []string{"email", "domain"}}, false},
+		{"unknown generator", args{keys: []string{"nogen"}}, true},
+		{"mixed generators", args{keys: []string{"nogen", "email", "domain"}}, true},
+		{"generator with arguments", args{keys: []string{"int,1..100"}}, false},
+		{"mixed generator with arguments", args{keys: []string{"int,1..100", "domain", "email"}}, false},
+		{"mixed unknwon generator with arguments", args{keys: []string{"int,1..100", "salery,10k..100k", "email"}}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := fakedata.ValidateGenerators(tt.args.keys); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateKeys() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
