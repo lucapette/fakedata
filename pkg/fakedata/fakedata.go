@@ -31,7 +31,7 @@ func ValidateGenerators(keys []string) (err error) {
 		key := strings.Split(k, ",")[0]
 
 		if _, ok := generators[key]; !ok {
-			errors.WriteString(fmt.Sprintf("Unknown generator: %s.", key))
+			errors.WriteString(fmt.Sprintf("Unknown generator: %s.\n", key))
 		}
 	}
 
