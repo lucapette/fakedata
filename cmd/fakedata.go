@@ -86,6 +86,15 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Validate generators exist
+	err := fakedata.ValidateGenerators(flag.Args())
+
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("\n  See fakedata --generators for a list of all available generators.")
+		os.Exit(0)
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	columns := fakedata.NewColumns(flag.Args())
