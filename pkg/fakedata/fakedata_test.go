@@ -193,8 +193,8 @@ func TestValidateGenerators(t *testing.T) {
 		{"unknown generator", args{keys: []string{"nogen"}}, true},
 		{"mixed generators", args{keys: []string{"nogen", "email", "domain"}}, true},
 		{"generator with arguments", args{keys: []string{"int,1..100"}}, false},
-		{"mixed generator with arguments", args{keys: []string{"int,1..100", "domain", "email"}}, false},
-		{"mixed unknwon generator with arguments", args{keys: []string{"int,1..100", "salery,10k..100k", "email"}}, true},
+		{"mixed generators with arguments", args{keys: []string{"int,1..100", "domain", "email"}}, false},
+		{"mixed unknown generators with arguments", args{keys: []string{"int,1..100", "salary,10k..100k", "email"}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

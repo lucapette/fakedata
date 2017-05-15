@@ -86,12 +86,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Validate generators exist
-	err := fakedata.ValidateGenerators(flag.Args())
-
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("\n  See fakedata --generators for a list of all available generators.")
+	if err := fakedata.ValidateGenerators(flag.Args()); err != nil {
+		fmt.Printf("%v\n\nSee fakedata --generators for a list of available generators.\n", err)
 		os.Exit(0)
 	}
 
