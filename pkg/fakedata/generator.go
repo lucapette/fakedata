@@ -115,7 +115,7 @@ var mac = func(column Column) string {
 	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
-var latitute = func(column Column) string {
+var latitude = func(column Column) string {
 	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
 }
 
@@ -191,7 +191,7 @@ func init() {
 	}
 
 	generators["domain.name"] = Generator{
-		Name: "domain.tld",
+		Name: "domain.name",
 		Desc: "example|test",
 		Func: withEnum([]string{"example", "test"}),
 	}
@@ -234,13 +234,13 @@ func init() {
 
 	generators["name.first"] = Generator{
 		Name: "name.first",
-		Desc: "capilized first name",
+		Desc: "capitalized first name",
 		Func: withDictKey("name.first"),
 	}
 
 	generators["name.last"] = Generator{
 		Name: "name.last",
-		Desc: "capilized last name",
+		Desc: "capitalized last name",
 		Func: withDictKey("name.last"),
 	}
 
@@ -301,10 +301,10 @@ func init() {
 		Desc: "mac address",
 		Func: mac}
 
-	generators["latitute"] = Generator{
-		Name: "latitute",
-		Desc: "latitute",
-		Func: latitute,
+	generators["latitude"] = Generator{
+		Name: "latitude",
+		Desc: "latitude",
+		Func: latitude,
 	}
 
 	generators["longitude"] = Generator{
