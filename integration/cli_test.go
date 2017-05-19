@@ -64,6 +64,7 @@ func TestCliArgs(t *testing.T) {
 		{"csv format", []string{"--format=csv", "int,42..42", "enum,foo..foo"}, "csv-format.golden"},
 		{"tab format", []string{"-f=tab", "int,42..42", "enum,foo..foo"}, "tab-format.golden"},
 		{"sql format", []string{"-f=sql", "int,42..42", "enum,foo..foo"}, "sql-format.golden"},
+		{"sql format with keys", []string{"-f=sql", "age=int,42..42", "name=enum,foo..foo"}, "sql-format-with-keys.golden"},
 		{"sql format with table name", []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"}, "sql-format-with-table-name.golden"},
 	}
 
