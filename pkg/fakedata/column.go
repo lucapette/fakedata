@@ -20,7 +20,8 @@ func (c *Column) String() string {
 // Columns is an array of Column
 type Columns []Column
 
-// NewColumns returns an array of Columns using keys as a specification
+// NewColumns returns an array of Columns using keys as a specification.
+// It returns an error with a line for each unknown key
 func NewColumns(keys []string) (cols Columns, err error) {
 	cols = make(Columns, len(keys))
 	var errors bytes.Buffer
@@ -44,7 +45,7 @@ func NewColumns(keys []string) (cols Columns, err error) {
 		}
 
 		if _, ok := generators[key]; !ok {
-			errors.WriteString(fmt.Sprintf("Unknown generator: %s.\n", key))
+			fmt.Fprintf(&errors, "Unknown generator: %s.\n", key)
 		}
 
 		cols[i].Name = name

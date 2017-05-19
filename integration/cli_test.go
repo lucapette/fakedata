@@ -58,6 +58,7 @@ func TestCliArgs(t *testing.T) {
 		{"no arguments", []string{}, "help.golden"},
 		{"list generators", []string{"-g"}, "generators.golden"},
 		{"default format", []string{"int,42..42", "enum,foo..foo"}, "default-format.golden"},
+		{"unknown generators", []string{"madeupgenerator", "anothermadeupgenerator"}, "unknown-generators.golden"},
 		{"default format with limit short", []string{"-l=5", "int,42..42", "enum,foo..foo"}, "default-format-with-limit.golden"},
 		{"default format with limit", []string{"--limit=5", "int,42..42", "enum,foo..foo"}, "default-format-with-limit.golden"},
 		{"csv format short", []string{"-f=csv", "int,42..42", "enum,foo..foo"}, "csv-format.golden"},
