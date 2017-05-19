@@ -1,0 +1,10 @@
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');
+INSERT INTO USERS (int,enum) VALUES ('42','foo');

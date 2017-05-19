@@ -33,7 +33,8 @@ func getFormatter(format string) (f fakedata.Formatter) {
 	return f
 }
 
-func generatorsHelp(generators []fakedata.Generator) string {
+func generatorsHelp() string {
+	generators := fakedata.Generators()
 	var buffer bytes.Buffer
 
 	var max int
@@ -46,7 +47,7 @@ func generatorsHelp(generators []fakedata.Generator) string {
 
 	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
 	for _, gen := range generators {
-		buffer.WriteString(fmt.Sprintf(pattern, gen.Name, gen.Desc))
+		fmt.Fprintf(&buffer, pattern, gen.Name, gen.Desc)
 	}
 
 	return buffer.String()
@@ -59,7 +60,7 @@ func main() {
 	}
 
 	if *generatorsFlag {
-		fmt.Print(generatorsHelp(fakedata.Generators()))
+		fmt.Print(generatorsHelp())
 		os.Exit(0)
 	}
 
@@ -85,7 +86,7 @@ func main() {
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [option ...] field...\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
