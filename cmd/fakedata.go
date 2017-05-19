@@ -68,14 +68,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	if err := fakedata.ValidateGenerators(flag.Args()); err != nil {
+	rand.Seed(time.Now().UnixNano())
+
+	columns, err := fakedata.NewColumns(flag.Args())
+	if err != nil {
 		fmt.Printf("%v\n\nSee fakedata --generators for a list of available generators.\n", err)
 		os.Exit(0)
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
-	columns := fakedata.NewColumns(flag.Args())
 	formatter := getFormatter(*formatFlag)
 
 	for i := 0; i < *limitFlag; i++ {

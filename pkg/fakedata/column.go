@@ -1,6 +1,7 @@
 package fakedata
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 )
@@ -20,8 +21,9 @@ func (c *Column) String() string {
 type Columns []Column
 
 // NewColumns returns an array of Columns using keys as a specification
-func NewColumns(keys []string) (cols Columns) {
+func NewColumns(keys []string) (cols Columns, err error) {
 	cols = make(Columns, len(keys))
+	var errors bytes.Buffer
 
 	for i, k := range keys {
 		specs := strings.Split(k, ",")
@@ -41,11 +43,19 @@ func NewColumns(keys []string) (cols Columns) {
 			key = values[0]
 		}
 
+		if _, ok := generators[key]; !ok {
+			errors.WriteString(fmt.Sprintf("Unknown generator: %s.\n", key))
+		}
+
 		cols[i].Name = name
 		cols[i].Key = key
 	}
 
-	return cols
+	if errors.Len() > 0 {
+		err = fmt.Errorf(errors.String())
+	}
+
+	return cols, err
 }
 
 func (columns Columns) names() (names []string) {
