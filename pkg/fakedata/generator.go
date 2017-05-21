@@ -175,6 +175,17 @@ var enum = func(column Column) string {
 	return withEnum(enum)(column)
 }
 
+var concated = func(column Column) string {
+	concated := []string{"latitude", "longitude", ","}
+
+	if len(column.Constraints) > 1 {
+		concated = strings.Split(column.Constraints, "..")
+	}
+
+    return withSep(Column{Key: concated[0]}, Column{Key: concated[1]}, concated[2])(column)
+}
+
+
 func init() {
 	generators = make(map[string]Generator)
 
@@ -280,6 +291,12 @@ func init() {
 		Func: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " "),
 	}
 
+	generators["namereverse"] = Generator{
+		Name: "namereverse",
+		Desc: `reverse name order`,
+		Func: withSep(Column{Key: "name.last"}, Column{Key: "name.first"}, " "),
+	}
+
 	generators["email"] = Generator{
 		Name: "email",
 		Desc: "email",
@@ -330,4 +347,11 @@ func init() {
 		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
 		Func: enum,
 	}
+
+	generators["concated"] = Generator{
+		Name: "concated",
+		Desc: `concatenate two fields with separator Defaults to "latitude..longitude..,"`,
+		Func: concated,
+	}
+
 }
