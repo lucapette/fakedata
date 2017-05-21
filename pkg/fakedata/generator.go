@@ -182,7 +182,7 @@ var concated = func(column Column) string {
 		concated = strings.Split(column.Constraints, "..")
 	}
 
-    return withSep(Column{Key: concated[0]}, Column{Key: concated[1]}, concated[2])(column)
+	return withSep(Column{Key: concated[0]}, Column{Key: concated[1]}, concated[2])(column)
 }
 
 
