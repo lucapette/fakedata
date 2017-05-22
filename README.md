@@ -149,7 +149,17 @@ install `fakedata` from the source.
 
 # How to contribute
 
-Please refer to our [contributing guidelines](/CONTRIBUTING.md).
+We love every form of contribution! Good entry points to the project are:
+
+- Our [contributing guidelines](/CONTRIBUTING.md) document
+- Issues with the tag
+  [gardening](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3Agardening)
+- Issues with the tag [good first
+  patch](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+patch%22)
+
+If you're still not sure where to start, please open a [new
+issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly
+help you get started.
 
 # Code of Conduct
 
