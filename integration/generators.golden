@@ -10,7 +10,7 @@ email             email
 enum              a random value from an enum. Defaults to "foo..bar..baz"
 event.action      clicked|purchased|viewed|watched
 http.method       DELETE|GET|HEAD|OPTION|PATCH|POST|PUT
-int               positive integer. Accepts range mix..max (default: 1..1000).
+int               positive integer. Accepts range min..max (default: 1..1000).
 ipv4              ipv4
 ipv6              ipv6
 latitude          latitude

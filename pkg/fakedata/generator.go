@@ -321,7 +321,7 @@ func init() {
 
 	generators["int"] = Generator{
 		Name: "int",
-		Desc: "positive integer. Accepts range mix..max (default: 1..1000).",
+		Desc: "positive integer. Accepts range min..max (default: 1..1000).",
 		Func: integer,
 	}
 
