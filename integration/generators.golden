@@ -1,4 +1,5 @@
 color             one word color
+concated          concatenate two fields with separator Defaults to "latitude..longitude..,"
 country           Full country name
 country.code      2-digit country code
 date              YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.
@@ -19,6 +20,7 @@ mac.address       mac address
 name              name.first + " " + name.last
 name.first        capitalized first name
 name.last         capitalized last name
+namereverse       reverse name order
 product.category  Beauty|Games|Movies|Tools|..
 product.name      invented product name
 state             Full US state name
