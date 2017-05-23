@@ -86,18 +86,29 @@ The `enum` generator allows you to specify a set of values. It comes handy when
 you need random data from a small subset of values:
 
 ```sh
-$ fakedata enum --limit 5
+$ fakedata --limit 5 enum
 foo
 baz
 foo
 foo
 baz
-$ fakedata enum,bug..feature..question..duplicate --limit 5
+$ fakedata --limit 5 enum,bug..feature..question..duplicate
 question
 duplicate
 duplicate
 bug
 feature
+```
+
+When passing a single value `enum` can be used to repeat a value in every line:
+
+```sh
+$ fakedata --limit 5 enum,one..two enum,repeat
+two repeat
+one repeat
+two repeat
+one repeat
+one repeat
 ```
 
 # Formatters
