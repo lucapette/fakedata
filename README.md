@@ -132,8 +132,7 @@ INSERT INTO users (login,referral) VALUES ('mikema@example.com' 'test.us');
 `fakedata` can be installed through Homebrew:
 
 ``` sh
-$ brew tap lucapette/tap
-$ brew install fakedata
+$ brew install lucapette/tap/fakedata
 ```
 
 ## Standalone
