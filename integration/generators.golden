@@ -9,6 +9,7 @@ double            double number
 email             email
 enum              a random value from an enum. Defaults to "foo..bar..baz"
 event.action      clicked|purchased|viewed|watched
+file              Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.
 http.method       DELETE|GET|HEAD|OPTION|PATCH|POST|PUT
 int               positive integer. Accepts range min..max (default: 1..1000).
 ipv4              ipv4
