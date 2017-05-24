@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/lucapette/fakedata/pkg/data"
 )
 
 // A Generator is a func that generates random data along with its description
@@ -43,9 +45,9 @@ func Generators() []Generator {
 	return gens
 }
 
-func withDictKey(key string) func(Column) string {
-	return func(column Column) string {
-		return dict[key][rand.Intn(len(dict[key]))]
+func withList(list []string) func(Column) string {
+	return func(c Column) string {
+		return list[rand.Intn(len(list))]
 	}
 }
 
@@ -199,67 +201,67 @@ func init() {
 	generators["country"] = Generator{
 		Name: "country",
 		Desc: "Full country name",
-		Func: withDictKey("country"),
+		Func: withList(data.Countries),
 	}
 
 	generators["country.code"] = Generator{
 		Name: "country.code",
 		Desc: "2-digit country code",
-		Func: withDictKey("country.code"),
+		Func: withList(data.CountryCodes),
 	}
 
 	generators["state"] = Generator{
 		Name: "state",
 		Desc: "Full US state name",
-		Func: withDictKey("state"),
+		Func: withList(data.States),
 	}
 
 	generators["state.code"] = Generator{
 		Name: "state.code",
 		Desc: "2-digit US state name",
-		Func: withDictKey("state.code"),
+		Func: withList(data.StateCodes),
 	}
 
 	generators["timezone"] = Generator{
 		Name: "timezone",
 		Desc: "tz in the form Area/City",
-		Func: withDictKey("timezone"),
+		Func: withList(data.Timezones),
 	}
 
 	generators["username"] = Generator{
 		Name: "username",
 		Desc: `username using the pattern \w+`,
-		Func: withDictKey("username"),
+		Func: withList(data.Usernames),
 	}
 
 	generators["name.first"] = Generator{
 		Name: "name.first",
 		Desc: "capitalized first name",
-		Func: withDictKey("name.first"),
+		Func: withList(data.Firstnames),
 	}
 
 	generators["name.last"] = Generator{
 		Name: "name.last",
 		Desc: "capitalized last name",
-		Func: withDictKey("name.last"),
+		Func: withList(data.Lastnames),
 	}
 
 	generators["color"] = Generator{
 		Name: "color",
 		Desc: "one word color",
-		Func: withDictKey("color"),
+		Func: withList(data.Colors),
 	}
 
 	generators["product.category"] = Generator{
 		Name: "product.category",
 		Desc: "Beauty|Games|Movies|Tools|..",
-		Func: withDictKey("product.category"),
+		Func: withList(data.ProductCategories),
 	}
 
 	generators["product.name"] = Generator{
 		Name: "product.name",
 		Desc: "invented product name",
-		Func: withDictKey("product.name"),
+		Func: withList(data.ProductNames),
 	}
 
 	generators["event.action"] = Generator{
