@@ -2,6 +2,7 @@ package fakedata
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"sort"
@@ -177,6 +178,27 @@ var enum = func(column Column) string {
 	return withEnum(enum)(column)
 }
 
+var fileCache map[string][]string
+
+var file = func(column Column) string {
+	p := column.Constraints
+	if p == "" {
+		log.Fatalf("%s: no file path given", column.Name)
+	}
+	// Try to get file from cache
+	f := fileCache[p]
+	// Load file if cache is empty
+	if f == nil {
+		content, err := ioutil.ReadFile(p)
+		if err != nil {
+			log.Fatalf("%s: no readable file found at '%s'", column.Name, p)
+		}
+		f = strings.Split(string(content), "\n")
+	}
+	// Return random line
+	return f[rand.Intn(len(f))]
+}
+
 func init() {
 	generators = make(map[string]Generator)
 
@@ -331,5 +353,11 @@ func init() {
 		Name: "enum",
 		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
 		Func: enum,
+	}
+
+	generators["file"] = Generator{
+		Name: "file",
+		Desc: `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		Func: file,
 	}
 }
