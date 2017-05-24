@@ -189,7 +189,7 @@ func init() {
 	generators["domain.tld"] = Generator{
 		Name: "domain.tld",
 		Desc: "name|info|com|org|me|us",
-		Func: withEnum([]string{"name", "info", "com", "org", "me", "us"}),
+		Func: withList(data.TLDs),
 	}
 
 	generators["domain.name"] = Generator{
