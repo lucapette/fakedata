@@ -111,6 +111,18 @@ one repeat
 one repeat
 ```
 
+The `file` generator can be use to read custom values from a file:
+
+```sh
+$ printf "one\ntwo\nthree" > values.txt
+$ fakedata -l5 file,values.txt
+three
+two
+two
+one
+two
+```
+
 # Formatters
 
 ### SQL formatter
@@ -123,7 +135,7 @@ $ fakedata --format=sql --limit 1 email domain
 INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
 ```
 
-You can specify the name of the column using a field with the following format 
+You can specify the name of the column using a field with the following format
 `column_name=generator`:
 
 ```sh
