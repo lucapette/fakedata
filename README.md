@@ -2,6 +2,8 @@
 
 `fakedata` is a small command line utility that generates random data.
 
+For questions join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in the [Gophers Slack](https://invite.slack.golangbridge.org/).
+
 # Table Of Contents
 
 - [Overview](#overview)
