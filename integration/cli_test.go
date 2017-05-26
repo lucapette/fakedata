@@ -23,6 +23,8 @@ var update = flag.Bool("update", false, "update golden files")
 
 const binaryName = "fakedata"
 
+var binaryPath string
+
 func diff(expected, actual interface{}) []string {
 	return pretty.Diff(expected, actual)
 }
@@ -122,7 +124,7 @@ func TestCliArgs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryName, tt.args...)
+			cmd := exec.Command(binaryPath, tt.args...)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				t.Fatalf("output: %s\nerr: %v", output, err)
@@ -158,7 +160,7 @@ func TestFileGenerator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryName, tt.args...)
+			cmd := exec.Command(binaryPath, tt.args...)
 			output, err := cmd.CombinedOutput()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
@@ -183,6 +185,15 @@ func TestMain(m *testing.M) {
 		fmt.Printf("could not change dir: %v", err)
 		os.Exit(1)
 	}
+
+	abs, err := filepath.Abs(binaryName)
+	if err != nil {
+		fmt.Printf("could not get abs path for %s: %v", binaryName, err)
+		os.Exit(1)
+	}
+
+	binaryPath = abs
+
 	make := exec.Command("make")
 	err = make.Run()
 	if err != nil {
