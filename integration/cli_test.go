@@ -6,19 +6,21 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"testing"
 
 	"reflect"
+	"strings"
 
 	"github.com/kr/pretty"
 )
 
 var update = flag.Bool("update", false, "update golden files")
 
-var binaryName = "fakedata"
+const binaryName = "fakedata"
+
+var binaryPath string
 
 func diff(expected, actual interface{}) []string {
 	return pretty.Diff(expected, actual)
@@ -54,32 +56,89 @@ func TestCliArgs(t *testing.T) {
 		name    string
 		args    []string
 		fixture string
+		match   func(string, string) bool
 	}{
-		{"no arguments", []string{}, "help.golden"},
-		{"list generators", []string{"-g"}, "generators.golden"},
-		{"default format", []string{"int,42..42", "enum,foo..foo"}, "default-format.golden"},
-		{"unknown generators", []string{"madeupgenerator", "anothermadeupgenerator"}, "unknown-generators.golden"},
-		{"default format with limit short", []string{"-l=5", "int,42..42", "enum,foo..foo"}, "default-format-with-limit.golden"},
-		{"default format with limit", []string{"--limit=5", "int,42..42", "enum,foo..foo"}, "default-format-with-limit.golden"},
-		{"csv format short", []string{"-f=csv", "int,42..42", "enum,foo..foo"}, "csv-format.golden"},
-		{"csv format", []string{"--format=csv", "int,42..42", "enum,foo..foo"}, "csv-format.golden"},
-		{"tab format", []string{"-f=tab", "int,42..42", "enum,foo..foo"}, "tab-format.golden"},
-		{"sql format", []string{"-f=sql", "int,42..42", "enum,foo..foo"}, "sql-format.golden"},
-		{"sql format with keys", []string{"-f=sql", "age=int,42..42", "name=enum,foo..foo"}, "sql-format-with-keys.golden"},
-		{"sql format with table name", []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"}, "sql-format-with-table-name.golden"},
+		{
+			name:    "no arguments",
+			args:    []string{},
+			fixture: "help.golden",
+		},
+		{
+			name:    "list generators",
+			args:    []string{"-g"},
+			fixture: "generators.golden",
+		},
+		{
+			name:    "default format",
+			args:    []string{"int,42..42", "enum,foo..foo"},
+			fixture: "default-format.golden",
+		},
+		{
+			name:    "unknown generators",
+			args:    []string{"madeupgenerator", "anothermadeupgenerator"},
+			fixture: "unknown-generators.golden",
+		},
+		{
+			name:    "default format with limit short",
+			args:    []string{"-l=5", "int,42..42", "enum,foo..foo"},
+			fixture: "default-format-with-limit.golden",
+		},
+		{
+			name:    "default format with limit",
+			args:    []string{"--limit=5", "int,42..42", "enum,foo..foo"},
+			fixture: "default-format-with-limit.golden",
+		},
+		{
+			name:    "csv format short",
+			args:    []string{"-f=csv", "int,42..42", "enum,foo..foo"},
+			fixture: "csv-format.golden",
+		},
+		{
+			name:    "csv format",
+			args:    []string{"--format=csv", "int,42..42", "enum,foo..foo"},
+			fixture: "csv-format.golden",
+		},
+		{
+			name:    "tab format",
+			args:    []string{"-f=tab", "int,42..42", "enum,foo..foo"},
+			fixture: "tab-format.golden",
+		},
+		{
+			name:    "sql format",
+			args:    []string{"-f=sql", "int,42..42", "enum,foo..foo"},
+			fixture: "sql-format.golden",
+		},
+		{
+			name:    "sql format with keys",
+			args:    []string{"-f=sql", "age=int,42..42", "name=enum,foo..foo"},
+			fixture: "sql-format-with-keys.golden",
+		},
+		{
+			name:    "sql format with table name",
+			args:    []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"},
+			fixture: "sql-format-with-table-name.golden",
+		},
+		{
+			name:    "file generator",
+			args:    []string{"file,integration/file.golden"},
+			fixture: "file.golden",
+			match: func(actual, expected string) bool {
+				for _, line := range strings.Split(actual, "\n") {
+					if !strings.Contains(expected+"\n", line+"\n") {
+						return false
+					}
+				}
+				return true
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dir, err := os.Getwd()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			cmd := exec.Command(path.Join(dir, binaryName), tt.args...)
+			cmd := exec.Command(binaryPath, tt.args...)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal(err, "\n", string(output))
 			}
 
 			if *update {
@@ -87,11 +146,35 @@ func TestCliArgs(t *testing.T) {
 			}
 
 			actual := string(output)
-
 			expected := loadFixture(t, tt.fixture)
 
-			if !reflect.DeepEqual(actual, expected) {
+			if tt.match != nil {
+				if !tt.match(actual, expected) {
+					t.Fatalf("values do not match: \n%v\n%v", actual, expected)
+				}
+			} else if !reflect.DeepEqual(actual, expected) {
 				t.Fatalf("diff: %v", diff(expected, actual))
+			}
+		})
+	}
+}
+
+func TestCliErr(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{"no file", []string{"file"}},
+		{"no file,", []string{"file,"}},
+		{"no file,''", []string{"file,''"}},
+		{`no file,""`, []string{`file,""`}},
+		{"file does not exist", []string{`file,'this file does not exist.txt'`}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := exec.Command(binaryPath, tt.args...).Run(); err == nil {
+				t.Fatalf("expected to fail with args: %v", tt.args)
 			}
 		})
 	}
@@ -107,6 +190,11 @@ func TestMain(m *testing.M) {
 	err = make.Run()
 	if err != nil {
 		fmt.Printf("could not make binary for %s: %v", binaryName, err)
+		os.Exit(1)
+	}
+	binaryPath, err = filepath.Abs(binaryName)
+	if err != nil {
+		fmt.Printf("could not get binary path: %v", err)
 		os.Exit(1)
 	}
 
