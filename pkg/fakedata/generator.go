@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -181,22 +182,25 @@ var enum = func(column Column) string {
 var fileCache map[string][]string
 
 var file = func(column Column) string {
-	p := column.Constraints
-	if p == "" {
-		log.Fatalf("%s: no file path given", column.Name)
+	constraint := column.Constraints
+	if len(constraint) == 0 {
+		fmt.Printf("%s: no file path given", column.Name)
+		os.Exit(1)
 	}
-	// Try to get file from cache
-	f := fileCache[p]
-	// Load file if cache is empty
-	if f == nil {
-		content, err := ioutil.ReadFile(p)
+
+	filePath := strings.Trim(constraint, "'\"")
+
+	list, ok := fileCache[filePath]
+	if !ok {
+		content, err := ioutil.ReadFile(filePath)
 		if err != nil {
-			log.Fatalf("%s: no readable file found at '%s'", column.Name, p)
+			fmt.Printf("could not read file %s: %v", filePath, err)
+			os.Exit(1)
 		}
-		f = strings.Split(string(content), "\n")
+		list = strings.Split(string(content), "\n")
 	}
-	// Return random line
-	return f[rand.Intn(len(f))]
+
+	return list[rand.Intn(len(list))]
 }
 
 func init() {

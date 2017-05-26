@@ -11,16 +11,17 @@ import (
 	"testing"
 
 	"reflect"
-	"strings"
 
 	"github.com/kr/pretty"
 )
 
+// In the following tests, there's a lot going on.
+// Please have a look at the following article for a longer explanation:
+// http://lucapette.me/writing-integration-tests-for-a-go-cli-application
+
 var update = flag.Bool("update", false, "update golden files")
 
 const binaryName = "fakedata"
-
-var binaryPath string
 
 func diff(expected, actual interface{}) []string {
 	return pretty.Diff(expected, actual)
@@ -56,7 +57,6 @@ func TestCliArgs(t *testing.T) {
 		name    string
 		args    []string
 		fixture string
-		match   func(string, string) bool
 	}{
 		{
 			name:    "no arguments",
@@ -118,27 +118,14 @@ func TestCliArgs(t *testing.T) {
 			args:    []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"},
 			fixture: "sql-format-with-table-name.golden",
 		},
-		{
-			name:    "file generator",
-			args:    []string{"file,integration/file.golden"},
-			fixture: "file.golden",
-			match: func(actual, expected string) bool {
-				for _, line := range strings.Split(actual, "\n") {
-					if !strings.Contains(expected+"\n", line+"\n") {
-						return false
-					}
-				}
-				return true
-			},
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, tt.args...)
+			cmd := exec.Command(binaryName, tt.args...)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
-				t.Fatal(err, "\n", string(output))
+				t.Fatalf("output: %s\nerr: %v", output, err)
 			}
 
 			if *update {
@@ -148,33 +135,43 @@ func TestCliArgs(t *testing.T) {
 			actual := string(output)
 			expected := loadFixture(t, tt.fixture)
 
-			if tt.match != nil {
-				if !tt.match(actual, expected) {
-					t.Fatalf("values do not match: \n%v\n%v", actual, expected)
-				}
-			} else if !reflect.DeepEqual(actual, expected) {
+			if !reflect.DeepEqual(actual, expected) {
 				t.Fatalf("diff: %v", diff(expected, actual))
 			}
 		})
 	}
 }
 
-func TestCliErr(t *testing.T) {
+func TestFileGenerator(t *testing.T) {
 	tests := []struct {
-		name string
-		args []string
+		name    string
+		args    []string
+		fixture string
+		wantErr bool
 	}{
-		{"no file", []string{"file"}},
-		{"no file,", []string{"file,"}},
-		{"no file,''", []string{"file,''"}},
-		{`no file,""`, []string{`file,""`}},
-		{"file does not exist", []string{`file,'this file does not exist.txt'`}},
+		{"no file", []string{"file"}, "path-empty.golden", true},
+		{"no file,", []string{"file,"}, "path-empty.golden", true},
+		{"file does not exist", []string{`file,'this file does not exist.txt'`}, "file-empty.golden", true},
+		{"file exists", []string{`file,integration/file.txt`}, "file-exist.golden", false},
+		{"file exists with quotes", []string{`file,'integration/file.txt'`}, "file-exist.golden", false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := exec.Command(binaryPath, tt.args...).Run(); err == nil {
-				t.Fatalf("expected to fail with args: %v", tt.args)
+			cmd := exec.Command(binaryName, tt.args...)
+			output, err := cmd.CombinedOutput()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
+			}
+			if *update {
+				writeFixture(t, tt.fixture, output)
+			}
+
+			actual := string(output)
+			expected := loadFixture(t, tt.fixture)
+
+			if !reflect.DeepEqual(actual, expected) {
+				t.Fatalf("diff: %v", diff(expected, actual))
 			}
 		})
 	}
@@ -192,11 +189,5 @@ func TestMain(m *testing.M) {
 		fmt.Printf("could not make binary for %s: %v", binaryName, err)
 		os.Exit(1)
 	}
-	binaryPath, err = filepath.Abs(binaryName)
-	if err != nil {
-		fmt.Printf("could not get binary path: %v", err)
-		os.Exit(1)
-	}
-
 	os.Exit(m.Run())
 }
