@@ -1,5 +1,4 @@
 build:
-  main: cmd/fakedata.go
   goos:
     - windows
     - darwin
