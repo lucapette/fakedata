@@ -2,8 +2,6 @@
 
 `fakedata` is a small command line utility that generates random data.
 
-For questions join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in the [Gophers Slack](https://invite.slack.golangbridge.org/).
-
 # Table Of Contents
 
 - [Overview](#overview)
@@ -15,7 +13,9 @@ For questions join the [#fakedata](https://gophers.slack.com/messages/fakedata/)
 
 # Overview
 
-Here is a list of examples to get a feeling of how `fakedata` works
+Here is a list of examples to get a feeling of how `fakedata` works.
+
+You can specify the name of generators you want to use:
 
 ```sh
 $ fakedata email country
@@ -79,9 +79,9 @@ Some generators allow you to pass in a range to constraint the output to a
 subset of values:
 
 ```sh
-$ fakedata int,1..100 # will generate only integers between 1 and 100
-$ fakedata int,50.. # specifying only min number works too
-$ fakedata int,50 # also works
+$ fakedata int:1,100 # will generate only integers between 1 and 100
+$ fakedata int:50, # specifying only min number works too
+$ fakedata int:50 # also works
 ```
 
 The `enum` generator allows you to specify a set of values. It comes handy when
@@ -94,7 +94,7 @@ baz
 foo
 foo
 baz
-$ fakedata --limit 5 enum,bug..feature..question..duplicate
+$ fakedata --limit 5 enum:bug,feature,question,duplicate
 question
 duplicate
 duplicate
@@ -105,7 +105,7 @@ feature
 When passing a single value `enum` can be used to repeat a value in every line:
 
 ```sh
-$ fakedata --limit 5 enum,one..two enum,repeat
+$ fakedata --limit 5 enum:one,two enum,repeat
 two repeat
 one repeat
 two repeat
@@ -117,7 +117,7 @@ The `file` generator can be use to read custom values from a file:
 
 ```sh
 $ printf "one\ntwo\nthree" > values.txt
-$ fakedata -l5 file,values.txt
+$ fakedata -l5 file:values.txt
 three
 two
 two
@@ -180,10 +180,12 @@ We love every form of contribution! Good entry points to the project are:
   [gardening](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3Agardening)
 - Issues with the tag [good first
   patch](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+patch%22)
+- Join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in
+the [Gophers Slack](https://invite.slack.golangbridge.org/).
 
-If you're still not sure where to start, please open a [new
-issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly
-help you get started.
+If you're not sure where to start, please open a [new
+issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly help
+you get started.
 
 # Code of Conduct
 

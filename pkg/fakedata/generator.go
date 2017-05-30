@@ -71,7 +71,7 @@ var date = func(column Column) string {
 
 	var min, max string
 
-	rng := strings.Split(column.Constraints, "..")
+	rng := strings.Split(column.Constraints, ",")
 	min = rng[0]
 
 	if len(rng) > 1 {
@@ -84,7 +84,8 @@ var date = func(column Column) string {
 
 			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
 			if err != nil {
-				log.Fatalf("Problem with Max: %s", err.Error())
+				fmt.Printf("Problem with Max: %s", err.Error())
+				os.Exit(1)
 			}
 
 			endDate = date
@@ -101,7 +102,8 @@ var date = func(column Column) string {
 	}
 
 	if startDate.After(endDate) {
-		log.Fatalf("%v is after %v", startDate, endDate)
+		fmt.Printf("%v is after %v", startDate, endDate)
+		os.Exit(1)
 	}
 
 	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
@@ -136,7 +138,7 @@ var integer = func(column Column) string {
 	max := 1000
 
 	var _min, _max string
-	rng := strings.Split(column.Constraints, "..")
+	rng := strings.Split(column.Constraints, ",")
 	_min = rng[0]
 
 	if len(rng) > 1 {
@@ -146,7 +148,8 @@ var integer = func(column Column) string {
 	if len(_min) > 0 {
 		m, err := strconv.Atoi(_min)
 		if err != nil {
-			log.Fatalf("could not convert min: %v", err)
+			fmt.Printf("could not convert min: %v", err)
+			os.Exit(1)
 		}
 
 		min = m
@@ -154,8 +157,8 @@ var integer = func(column Column) string {
 		if len(_max) > 0 {
 			m, err := strconv.Atoi(_max)
 			if err != nil {
-				log.Fatalf("could not convert max: %v", err)
-
+				fmt.Printf("could not convert max: %v", err)
+				os.Exit(1)
 			}
 
 			max = m
@@ -163,7 +166,8 @@ var integer = func(column Column) string {
 	}
 
 	if min > max {
-		log.Fatalf("max(%d) is smaller than min(%d) in %v", max, min, column)
+		fmt.Printf("max(%d) is smaller than min(%d) in %v", max, min, column)
+		os.Exit(1)
 	}
 
 	return strconv.Itoa(min + rand.Intn(max+1-min))
@@ -173,7 +177,7 @@ var enum = func(column Column) string {
 	enum := []string{"foo", "bar", "baz"}
 
 	if len(column.Constraints) > 1 {
-		enum = strings.Split(column.Constraints, "..")
+		enum = strings.Split(column.Constraints, ",")
 	}
 
 	return withEnum(enum)(column)
@@ -208,7 +212,7 @@ func init() {
 
 	generators["date"] = Generator{
 		Name: "date",
-		Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.",
+		Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
 		Func: date,
 	}
 
@@ -349,13 +353,13 @@ func init() {
 
 	generators["int"] = Generator{
 		Name: "int",
-		Desc: "positive integer. Accepts range min..max (default: 1..1000).",
+		Desc: "positive integer. Accepts range min..max (default: 1,1000).",
 		Func: integer,
 	}
 
 	generators["enum"] = Generator{
 		Name: "enum",
-		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
+		Desc: `a random value from an enum. Defaults to "foo,bar,baz"`,
 		Func: enum,
 	}
 

@@ -27,7 +27,7 @@ func NewColumns(keys []string) (cols Columns, err error) {
 	var errors bytes.Buffer
 
 	for i, k := range keys {
-		specs := strings.Split(k, ",")
+		specs := strings.Split(k, ":")
 
 		if len(specs) > 1 {
 			cols[i].Constraints = specs[1]
