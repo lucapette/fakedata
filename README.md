@@ -162,9 +162,9 @@ $ brew install lucapette/tap/fakedata
 
 ## Standalone
 
-`fakedata` can be installed as an executable. Download the latest
-[compiled binaries](https://github.com/lucapette/fakedata/releases) and put it
-anywhere in your executable path.
+`fakedata` can be installed as an executable. Download the latest [compiled
+binary](https://github.com/lucapette/fakedata/releases) and put it anywhere in
+your executable path.
 
 ## Source
 
