@@ -89,13 +89,13 @@ func TestNewColumnsWithSpec(t *testing.T) {
 		{
 			name:     "int full range",
 			input:    []string{"int:1,100"},
-			expected: fakedata.Columns{{Key: "int", Name: "int", Constraints: "1,100"}},
+			expected: fakedata.Columns{{Key: "int", Name: "int", Options: "1,100"}},
 			wantErr:  false,
 		},
 		{
 			name:     "int lower bound",
 			input:    []string{"int:1,"},
-			expected: fakedata.Columns{{Key: "int", Name: "int", Constraints: "1,"}},
+			expected: fakedata.Columns{{Key: "int", Name: "int", Options: "1,"}},
 			wantErr:  false,
 		},
 	}

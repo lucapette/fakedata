@@ -71,7 +71,7 @@ var date = func(column Column) string {
 
 	var min, max string
 
-	rng := strings.Split(column.Constraints, ",")
+	rng := strings.Split(column.Options, ",")
 	min = rng[0]
 
 	if len(rng) > 1 {
@@ -138,7 +138,7 @@ var integer = func(column Column) string {
 	max := 1000
 
 	var _min, _max string
-	rng := strings.Split(column.Constraints, ",")
+	rng := strings.Split(column.Options, ",")
 	_min = rng[0]
 
 	if len(rng) > 1 {
@@ -176,8 +176,8 @@ var integer = func(column Column) string {
 var enum = func(column Column) string {
 	enum := []string{"foo", "bar", "baz"}
 
-	if len(column.Constraints) > 1 {
-		enum = strings.Split(column.Constraints, ",")
+	if len(column.Options) > 1 {
+		enum = strings.Split(column.Options, ",")
 	}
 
 	return withEnum(enum)(column)
@@ -186,7 +186,7 @@ var enum = func(column Column) string {
 var fileCache map[string][]string
 
 var file = func(column Column) string {
-	constraint := column.Constraints
+	constraint := column.Options
 	if len(constraint) == 0 {
 		fmt.Printf("%s: no file path given", column.Name)
 		os.Exit(1)

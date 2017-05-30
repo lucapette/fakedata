@@ -8,9 +8,9 @@ import (
 
 // A Column represents one field of data to generate
 type Column struct {
-	Name        string
-	Key         string
-	Constraints string
+	Name    string
+	Key     string
+	Options string
 }
 
 func (c *Column) String() string {
@@ -30,7 +30,7 @@ func NewColumns(keys []string) (cols Columns, err error) {
 		specs := strings.Split(k, ":")
 
 		if len(specs) > 1 {
-			cols[i].Constraints = specs[1]
+			cols[i].Options = specs[1]
 		}
 
 		values := strings.Split(specs[0], "=")
