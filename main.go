@@ -18,7 +18,7 @@ var limitFlag = flag.IntP("limit", "l", 10, "limits rows up to n")
 var formatFlag = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
 var versionFlag = flag.BoolP("version", "v", false, "shows version information")
 var tableFlag = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-var templateFlag = flag.StringP("template", "", "", "Use template")
+var templateFlag = flag.StringP("template", "", "", "Use template as input")
 
 func getFormatter(format string) (f fakedata.Formatter) {
 	switch format {

@@ -50,11 +50,19 @@ func createConstraints(params []string) string {
 }
 
 func getTemplateNameFromPath(name string) string {
-	ts := strings.Split(name, "/")
+	ts := strings.FieldsFunc(name, splitPathName)
 	tn := ts[len(ts)-1]
 	return tn
 }
 
+// this custom split function is used with strings.FieldsFunc to split the path
+// by `/` (Unix, MacOS) or `\` (Windows) for absolute and relative paths to template files
+func splitPathName(r rune) bool {
+	return r == '/' || r == '\\'
+}
+
+// ParseTemplate takes a path to a template file as argument. It parses the template file and executes it on
+// os.Stdout.
 func ParseTemplate(path string) {
 	tn := getTemplateNameFromPath(path)
 	tmp, err := template.New(tn).Funcs(generatorFunctions).ParseFiles(path)
