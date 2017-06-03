@@ -13,24 +13,20 @@ import (
 
 var version = "master"
 
-var generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
-var limitFlag = flag.IntP("limit", "l", 10, "limits rows up to n")
-var formatFlag = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
-var versionFlag = flag.BoolP("version", "v", false, "shows version information")
-var tableFlag = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-
-func getFormatter(format string) (f fakedata.Formatter) {
+func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {
 	case "csv":
 		f = fakedata.NewSeparatorFormatter(",")
 	case "tab":
 		f = fakedata.NewSeparatorFormatter("\t")
 	case "sql":
-		f = fakedata.NewSQLFormatter(*tableFlag)
-	default:
+		f = fakedata.NewSQLFormatter(table)
+	case "":
 		f = fakedata.NewSeparatorFormatter(" ")
+	default:
+		err = fmt.Errorf("unknown format: %s", format)
 	}
-	return f
+	return f, err
 }
 
 func generatorsHelp() string {
@@ -54,6 +50,19 @@ func generatorsHelp() string {
 }
 
 func main() {
+	var (
+		generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
+		limitFlag      = flag.IntP("limit", "l", 10, "limits rows up to n")
+		formatFlag     = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
+		versionFlag    = flag.BoolP("version", "v", false, "shows version information")
+		tableFlag      = flag.StringP("table", "t", "TABLE", "table name of the sql format")
+	)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
+		flag.PrintDefaults()
+	}
+	flag.Parse()
+
 	if *versionFlag {
 		fmt.Println(version)
 		os.Exit(0)
@@ -77,17 +86,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	formatter := getFormatter(*formatFlag)
+	formatter, err := getFormatter(*formatFlag, *tableFlag)
+	if err != nil {
+		fmt.Printf("%v\n\n", err)
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	for i := 0; i < *limitFlag; i++ {
 		fmt.Print(fakedata.GenerateRow(columns, formatter))
 	}
-}
-
-func init() {
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
-		flag.PrintDefaults()
-	}
-	flag.Parse()
 }

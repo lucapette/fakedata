@@ -120,6 +120,11 @@ func TestCliArgs(t *testing.T) {
 			args:    []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"},
 			fixture: "sql-format-with-table-name.golden",
 		},
+		{
+			name:    "unknown format",
+			args:    []string{"-f=sqll", "-t=USERS", "int,42..42", "enum,foo..foo"},
+			fixture: "unknown-format.golden",
+		},
 	}
 
 	for _, tt := range tests {
