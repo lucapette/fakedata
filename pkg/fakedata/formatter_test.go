@@ -1,6 +1,7 @@
 package fakedata_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
@@ -22,7 +23,7 @@ func TestSeparatorFormatter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &fakedata.SeparatorFormatter{Separator: tt.sep}
-			if got := f.Format(columns, values); got != tt.want {
+			if got := f.Format(columns, values); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("SeparatorFormatter.Format() = %v, want %v", got, tt.want)
 			}
 		})
@@ -40,7 +41,7 @@ func TestSQLFormatter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &fakedata.SQLFormatter{Table: tt.table}
-			if got := f.Format(columns, values); got != tt.want {
+			if got := f.Format(columns, values); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("SQLFormatter.Format() = %v, want %v", got, tt.want)
 			}
 		})
