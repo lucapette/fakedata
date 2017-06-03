@@ -66,7 +66,7 @@ func main() {
 		content := fmt.Sprintf(fileTemplate, d.Var, value)
 
 		// Create required directories
-		to := filepath.Join("pkg/data", d.To)
+		to := filepath.Join(targetDir, d.To)
 		if err := os.MkdirAll(filepath.Dir(to), 0777); err != nil {
 			log.Fatal(err)
 		}
