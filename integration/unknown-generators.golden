@@ -1,5 +1,9 @@
-Unknown generator: madeupgenerator.
-Unknown generator: anothermadeupgenerator.
+unknown generator: madeupgenerator
 
+Usage: fakedata [option ...] field...
 
-See fakedata --generators for a list of available generators.
+  -f, --format string   generators rows in f format. Available formats: csv|tab|sql
+  -g, --generators      lists available generators
+  -l, --limit int       limits rows up to n (default 10)
+  -t, --table string    table name of the sql format (default "TABLE")
+  -v, --version         shows version information

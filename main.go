@@ -73,14 +73,15 @@ func main() {
 
 	columns, err := fakedata.NewColumns(flag.Args())
 	if err != nil {
-		fmt.Printf("%v\n\nSee fakedata --generators for a list of available generators.\n", err)
-		os.Exit(0)
+		fmt.Printf("%v\n\n", err)
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	formatter := getFormatter(*formatFlag)
 
 	for i := 0; i < *limitFlag; i++ {
-		fmt.Print(fakedata.GenerateRow(columns, formatter))
+		fmt.Println(columns.GenerateRow(formatter))
 	}
 }
 

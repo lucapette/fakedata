@@ -1,4 +1,4 @@
-no file path given
+could not read file this file does not exist.txt: open this file does not exist.txt: no such file or directory
 
 Usage: fakedata [option ...] field...
 

@@ -54,108 +54,115 @@ func loadFixture(t *testing.T, fixture string) string {
 	return string(content)
 }
 
-func TestCliArgs(t *testing.T) {
-	tests := []struct {
-		name    string
-		args    []string
-		fixture string
-	}{
-		{
-			name:    "no arguments",
-			args:    []string{},
-			fixture: "help.golden",
-		},
-		{
-			name:    "list generators",
-			args:    []string{"-g"},
-			fixture: "generators.golden",
-		},
-		{
-			name:    "default format",
-			args:    []string{"int:42,42", "enum:foo,foo"},
-			fixture: "default-format.golden",
-		},
-		{
-			name:    "unknown generators",
-			args:    []string{"madeupgenerator", "anothermadeupgenerator"},
-			fixture: "unknown-generators.golden",
-		},
-		{
-			name:    "default format with limit short",
-			args:    []string{"-l=5", "int:42,42", "enum:foo,foo"},
-			fixture: "default-format-with-limit.golden",
-		},
-		{
-			name:    "default format with limit",
-			args:    []string{"--limit=5", "int:42,42", "enum:foo,foo"},
-			fixture: "default-format-with-limit.golden",
-		},
-		{
-			name:    "csv format short",
-			args:    []string{"-f=csv", "int:42,42", "enum:foo,foo"},
-			fixture: "csv-format.golden",
-		},
-		{
-			name:    "csv format",
-			args:    []string{"--format=csv", "int:42,42", "enum:foo,foo"},
-			fixture: "csv-format.golden",
-		},
-		{
-			name:    "tab format",
-			args:    []string{"-f=tab", "int:42,42", "enum:foo,foo"},
-			fixture: "tab-format.golden",
-		},
-		{
-			name:    "sql format",
-			args:    []string{"-f=sql", "int:42,42", "enum:foo,foo"},
-			fixture: "sql-format.golden",
-		},
-		{
-			name:    "sql format with keys",
-			args:    []string{"-f=sql", "age=int:42,42", "name=enum:foo,foo"},
-			fixture: "sql-format-with-keys.golden",
-		},
-		{
-			name:    "sql format with table name",
-			args:    []string{"-f=sql", "-t=USERS", "int:42,42", "enum:foo,foo"},
-			fixture: "sql-format-with-table-name.golden",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, tt.args...)
-			output, err := cmd.CombinedOutput()
-			if err != nil {
-				t.Fatalf("output: %s\nerr: %v", output, err)
-			}
-
-			if *update {
-				writeFixture(t, tt.fixture, output)
-			}
-
-			actual := string(output)
-			expected := loadFixture(t, tt.fixture)
-
-			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", diff(expected, actual))
-			}
-		})
-	}
-}
-
-func TestFileGenerator(t *testing.T) {
+func TestCLI(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    []string
 		fixture string
 		wantErr bool
 	}{
-		{"no file", []string{"file"}, "path-empty.golden", true},
-		{"no file,", []string{"file:"}, "path-empty.golden", true},
-		{"file does not exist", []string{`file:'this file does not exist.txt'`}, "file-empty.golden", true},
-		{"file exists", []string{`file:integration/file.txt`}, "file-exist.golden", false},
-		{"file exists with quotes", []string{`file:'integration/file.txt'`}, "file-exist.golden", false},
+		{
+			"no arguments",
+			[]string{},
+			"help.golden",
+			false,
+		},
+		{
+			"list generators",
+			[]string{"-g"},
+			"generators.golden",
+			false,
+		},
+		{
+			"default format",
+			[]string{"int:42,42", "enum:foo,foo"},
+			"default-format.golden",
+			false,
+		},
+		{
+			"unknown generators",
+			[]string{"madeupgenerator"},
+			"unknown-generators.golden",
+			true,
+		},
+		{
+			"default format with limit short",
+			[]string{"-l=5", "int:42,42", "enum:foo,foo"},
+			"default-format-with-limit.golden",
+			false,
+		},
+		{
+			"default format with limit",
+			[]string{"--limit=5", "int:42,42", "enum:foo,foo"},
+			"default-format-with-limit.golden",
+			false,
+		},
+		{
+			"csv format short",
+			[]string{"-f=csv", "int:42,42", "enum:foo,foo"},
+			"csv-format.golden",
+			false,
+		},
+		{
+			"csv format",
+			[]string{"--format=csv", "int:42,42", "enum:foo,foo"},
+			"csv-format.golden",
+			false,
+		},
+		{
+			"tab format",
+			[]string{"-f=tab", "int:42,42", "enum:foo,foo"},
+			"tab-format.golden",
+			false,
+		},
+		{
+			"sql format",
+			[]string{"-f=sql", "int:42,42", "enum:foo,foo"},
+			"sql-format.golden",
+			false,
+		},
+		{
+			"sql format with keys",
+			[]string{"-f=sql", "age=int:42,42", "name=enum:foo,foo"},
+			"sql-format-with-keys.golden",
+			false,
+		},
+		{
+			"sql format with table name",
+			[]string{"-f=sql", "-t=USERS", "int:42,42", "enum:foo,foo"},
+			"sql-format-with-table-name.golden",
+			false,
+		},
+		{
+			"no file",
+			[]string{"file"},
+			"path-empty.golden",
+			true,
+		},
+		{
+			"no file,",
+			[]string{"file:"},
+			"path-empty.golden",
+			true,
+		},
+		{
+			"file does not exist",
+			[]string{`file:'this file does not exist.txt'`},
+			"file-does-not-exist.golden",
+			true,
+		},
+		{
+			"file exists",
+			[]string{`file:integration/file.txt`},
+			"file-exist.golden",
+			false,
+		},
+		{
+			"file exists with quotes",
+			[]string{`file:'integration/file.txt'`},
+			"file-exist.golden",
+			false,
+		},
 	}
 
 	for _, tt := range tests {
