@@ -11,12 +11,12 @@ type Formatter interface {
 	Format(Columns, []string) string
 }
 
-// SeparatorFormatter is a Formatter for characther separated formats
+// SeparatorFormatter is a Formatter for character separated formats
 type SeparatorFormatter struct {
 	Separator string
 }
 
-// Format as characther separated strings
+// Format as character separated strings
 func (f *SeparatorFormatter) Format(columns Columns, values []string) string {
 	return strings.Join(values, f.Separator)
 }
