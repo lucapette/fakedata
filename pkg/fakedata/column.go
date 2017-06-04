@@ -63,22 +63,12 @@ func NewColumns(keys []string) (cols Columns, err error) {
 func (columns Columns) GenerateRow(formatter Formatter) string {
 	row := &bytes.Buffer{}
 
-	genValues := make([]string, len(columns))
+	values := make([]string, len(columns))
 	for i, column := range columns {
-		genValues[i] = column.generate()
+		values[i] = column.generate()
 	}
 
-	fmt.Fprintf(row, "%s", formatter.Format(columns, genValues))
+	fmt.Fprintf(row, "%s", formatter.Format(columns, values))
 
 	return row.String()
-}
-
-func (columns Columns) names() (names []string) {
-	names = make([]string, len(columns))
-
-	for i, field := range columns {
-		names[i] = field.Name
-	}
-
-	return names
 }

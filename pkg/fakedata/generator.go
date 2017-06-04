@@ -19,7 +19,7 @@ type Generator struct {
 	Name string
 }
 
-// Generators returns all the available generators
+// Generators returns available generators
 func Generators() []Generator {
 	f := newFactory()
 	gens := make([]Generator, 0)
@@ -38,13 +38,17 @@ func withList(list []string) func() string {
 	}
 }
 
-var defaultDate = func() string {
+func _date(startDate, endDate time.Time) string {
+	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+}
+
+func defaultDate() string {
 	endDate := time.Now()
 	startDate := endDate.AddDate(-1, 0, 0)
 	return _date(startDate, endDate)
 }
 
-var customDate = func(options string) (f func() string, err error) {
+func customDate(options string) (f func() string, err error) {
 	var min, max string
 
 	endDate := time.Now()
@@ -85,39 +89,39 @@ var customDate = func(options string) (f func() string, err error) {
 	return func() string { return _date(startDate, endDate) }, err
 }
 
-var _date = func(startDate, endDate time.Time) string {
-	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
-}
-
-var ipv4 = func() string {
+func ipv4() string {
 	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
 }
 
-var ipv6 = func() string {
+func ipv6() string {
 	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
-var mac = func() string {
+func mac() string {
 	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
-var latitude = func() string {
+func latitude() string {
 	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
 }
 
-var longitude = func() string {
+func longitude() string {
 	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
 }
 
-var double = func() string {
+func double() string {
 	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
 }
 
-var defaultInteger = func() string {
+func _integer(min, max int) string {
+	return strconv.Itoa(min + rand.Intn(max+1-min))
+}
+
+func defaultInteger() string {
 	return _integer(0, 1000)
 }
 
-var customInteger = func(options string) (func() string, error) {
+func customInteger(options string) (func() string, error) {
 	min := 0
 	max := 1000
 	var low, high string
@@ -153,11 +157,7 @@ var customInteger = func(options string) (func() string, error) {
 	return func() string { return _integer(min, max) }, nil
 }
 
-var _integer = func(min, max int) string {
-	return strconv.Itoa(min + rand.Intn(max+1-min))
-}
-
-var file = func(path string) (func() string, error) {
+func file(path string) (func() string, error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf("no file path given")
 	}
@@ -205,7 +205,7 @@ func (f factory) getGenerator(key, options string) (gen Generator, err error) {
 	return gen, err
 }
 
-var domain = func() string {
+func domain() string {
 	return withList([]string{"test", "example"})() + "." + withList(data.TLDs)()
 }
 
