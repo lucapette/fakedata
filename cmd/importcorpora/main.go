@@ -23,7 +23,7 @@ const targetDir = "pkg/data"
 // Content of a Go file
 const fileTemplate = `package data
 
-// %s is a list of %s
+// %s is an array of %s
 var %s = %s`
 
 func main() {
