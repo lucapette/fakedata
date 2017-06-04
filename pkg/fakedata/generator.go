@@ -65,9 +65,9 @@ func customDate(options string) (f func() string, err error) {
 		if len(max) > 0 {
 			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", max)
 
-			date, e := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
-			if e != nil {
-				err = fmt.Errorf("problem parsing max date: %v", e)
+			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
+			if err != nil {
+				return nil, fmt.Errorf("problem parsing max date: %v", err)
 			}
 
 			endDate = date
@@ -75,17 +75,18 @@ func customDate(options string) (f func() string, err error) {
 
 		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", min)
 
-		date, e := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
-		if e != nil {
-			err = fmt.Errorf("problem parsing mix date: %v", e)
+		date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
+		if err != nil {
+			return nil, fmt.Errorf("problem parsing mix date: %v", err)
 		}
 
 		startDate = date
 	}
 
 	if startDate.After(endDate) {
-		err = fmt.Errorf("%v is after %v", startDate, endDate)
+		return nil, fmt.Errorf("%v is after %v", startDate, endDate)
 	}
+
 	return func() string { return _date(startDate, endDate) }, err
 }
 
