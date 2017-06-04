@@ -203,12 +203,6 @@ var file = func(column Column) string {
 	return list[rand.Intn(len(list))]
 }
 
-var corporaGenerator = func(source []string) func(Column) string {
-	return func(column Column) string {
-		return source[rand.Intn(len(source))]
-	}
-}
-
 func init() {
 	generators = make(map[string]Generator)
 
@@ -374,24 +368,24 @@ func init() {
 	generators["noun"] = Generator{
 		Name: "noun",
 		Desc: "random noun",
-		Func: corporaGenerator(data.Nouns),
+		Func: withList(data.Nouns),
 	}
 
 	generators["emoji"] = Generator{
 		Name: "emoji",
 		Desc: "random emoji",
-		Func: corporaGenerator(data.Emojis),
+		Func: withList(data.Emojis),
 	}
 
 	generators["cat"] = Generator{
 		Name: "cat",
 		Desc: "random cat breed",
-		Func: corporaGenerator(data.Cats),
+		Func: withList(data.Cats),
 	}
 
 	generators["animal"] = Generator{
 		Name: "animal",
 		Desc: "random animal name",
-		Func: corporaGenerator(data.Animals),
+		Func: withList(data.Animals),
 	}
 }

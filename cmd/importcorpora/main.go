@@ -25,6 +25,7 @@ const targetDir = "pkg/data"
 // Content of a Go file
 const fileTemplate = `package data
 
+// %s is a list of %s
 var %s = %s`
 
 func main() {
@@ -63,7 +64,7 @@ func main() {
 
 		// Fix formatting
 		value := strings.Replace(fmt.Sprintf("%#v\n", jsonData[d.Key]), "interface {}", "string", 1)
-		content := fmt.Sprintf(fileTemplate, d.Var, value)
+		content := fmt.Sprintf(fileTemplate, d.Var, strings.ToLower(d.Var), d.Var, value)
 
 		// Create required directories
 		to := filepath.Join(targetDir, d.To)
