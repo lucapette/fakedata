@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // relative package data dir
@@ -18,7 +17,7 @@ const targetDir = "pkg/data"
 const fileTemplate = `package data
 
 // %s is an array of %s
-var %s = []string{%s}
+var %s = %#v
 `
 
 var tasks = []struct {
@@ -87,12 +86,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		array := make([]string, len(data))
-		for i, val := range data {
-			array[i] = fmt.Sprintf("\"%s\"", val)
-		}
-
-		content := fmt.Sprintf(fileTemplate, task.Var, task.Key, task.Var, strings.Join(array, ", "))
+		content := fmt.Sprintf(fileTemplate, task.Var, task.Key, task.Var, data)
 
 		// Write to Go file
 		if err := ioutil.WriteFile(file, []byte(content), 0644); err != nil {
