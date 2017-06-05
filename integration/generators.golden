@@ -1,3 +1,5 @@
+animal            random animal name
+cat               random cat breed
 color             one word color
 country           Full country name
 country.code      2-digit country code
@@ -7,6 +9,7 @@ domain.name       example|test
 domain.tld        name|info|com|org|me|us
 double            double number
 email             email
+emoji             random emoji
 enum              a random value from an enum. Defaults to "foo..bar..baz"
 event.action      clicked|purchased|viewed|watched
 file              Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.
@@ -20,6 +23,7 @@ mac.address       mac address
 name              name.first + " " + name.last
 name.first        capitalized first name
 name.last         capitalized last name
+noun              random noun
 product.category  Beauty|Games|Movies|Tools|..
 product.name      invented product name
 state             Full US state name
