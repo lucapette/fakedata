@@ -374,18 +374,18 @@ func init() {
 	generators["emoji"] = Generator{
 		Name: "emoji",
 		Desc: "random emoji",
-		Func: withList(data.Emojis),
-	}
-
-	generators["cat"] = Generator{
-		Name: "cat",
-		Desc: "random cat breed",
-		Func: withList(data.Cats),
+		Func: withList(data.Emoji),
 	}
 
 	generators["animal"] = Generator{
 		Name: "animal",
 		Desc: "random animal name",
 		Func: withList(data.Animals),
+	}
+
+	generators["animal.cat"] = Generator{
+		Name: "animal.cat",
+		Desc: "random cat breed",
+		Func: withList(data.Cats),
 	}
 }

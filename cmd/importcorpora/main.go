@@ -1,6 +1,3 @@
-// Usage: go run cmd/importcorpora/main.go
-//
-// Updates the at the bottom of this file specified data from dariusk/corpora.
 package main
 
 import (
@@ -14,31 +11,58 @@ import (
 	"strings"
 )
 
-// Base URL to download JSON files from
-const baseURL = "https://raw.githubusercontent.com/dariusk/corpora/master/data/"
-
-// Path to write Go files to
+// relative package data dir
 const targetDir = "pkg/data"
 
 // Content of a Go file
 const fileTemplate = `package data
 
 // %s is an array of %s
-var %s = %s`
+var %s = []string{%s}
+`
+
+var tasks = []struct {
+	URL, Key, Var, File string
+}{
+	{
+		URL:  "https://raw.githubusercontent.com/dariusk/corpora/master/data/words/nouns.json",
+		Key:  "nouns",
+		Var:  "Nouns",
+		File: "nouns.go",
+	},
+	{
+		URL:  "https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/common.json",
+		Key:  "animals",
+		Var:  "Animals",
+		File: "animals.go",
+	},
+	{
+		URL:  "https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/cats.json",
+		Key:  "cats",
+		Var:  "Cats",
+		File: "cats.go",
+	},
+	{
+		URL:  "https://raw.githubusercontent.com/dariusk/corpora/master/data/words/emoji/emoji.json",
+		Key:  "emoji",
+		Var:  "Emoji",
+		File: "emoji.go",
+	},
+}
 
 func main() {
-	// Check if running in repo directory
+	// Check if running in repository directory
 	_, err := os.Stat(targetDir)
 	if err != nil && !os.IsNotExist(err) {
 		log.Fatal(err)
 	}
 	if err != nil {
-		log.Fatalf("The data directory cannot be found at %s. Ensure the importer is running in the correct location.", targetDir)
+		log.Fatalf("the data directory cannot be found at %s. Ensure the importer is running in the correct location: %v", targetDir, err)
 	}
 
-	for _, d := range data {
+	for _, task := range tasks {
 		// Get JSON from URL
-		resp, err := http.Get(baseURL + d.From)
+		resp, err := http.Get(task.URL)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -48,62 +72,31 @@ func main() {
 			}
 		}()
 
-		// Get data from JSON
-		var jsonData map[string]interface{}
+		var jsonData map[string]json.RawMessage
 		if err := json.NewDecoder(resp.Body).Decode(&jsonData); err != nil {
 			log.Fatal(err)
 		}
 
-		// Fix formatting
-		value := strings.Replace(fmt.Sprintf("%#v\n", jsonData[d.Key]), "interface {}", "string", 1)
-		content := fmt.Sprintf(fileTemplate, d.Var, strings.ToLower(d.Var), d.Var, value)
-
-		// Create required directories
-		to := filepath.Join(targetDir, d.To)
-		if err := os.MkdirAll(filepath.Dir(to), 0777); err != nil {
+		var data []string
+		if err := json.Unmarshal(jsonData[task.Key], &data); err != nil {
 			log.Fatal(err)
 		}
 
+		file := filepath.Join(targetDir, task.File)
+		if err := os.MkdirAll(filepath.Dir(file), 0777); err != nil {
+			log.Fatal(err)
+		}
+
+		array := make([]string, len(data))
+		for i, val := range data {
+			array[i] = fmt.Sprintf("\"%s\"", val)
+		}
+
+		content := fmt.Sprintf(fileTemplate, task.Var, task.Key, task.Var, strings.Join(array, ", "))
+
 		// Write to Go file
-		if err := ioutil.WriteFile(to, []byte(content), 0644); err != nil {
+		if err := ioutil.WriteFile(file, []byte(content), 0644); err != nil {
 			log.Fatal(err)
 		}
 	}
-}
-
-// Data to import is specified here
-var data = []struct {
-	// JSON file to read from
-	From string
-	// Key containing data in JSON file
-	Key string
-	// Go File to write to
-	To string
-	// Variable name in the Go File
-	Var string
-}{
-	{
-		From: "words/nouns.json",
-		Key:  "nouns",
-		To:   "nouns.go",
-		Var:  "Nouns",
-	},
-	{
-		From: "animals/common.json",
-		Key:  "animals",
-		To:   "animals.go",
-		Var:  "Animals",
-	},
-	{
-		From: "animals/cats.json",
-		Key:  "cats",
-		To:   "cats.go",
-		Var:  "Cats",
-	},
-	{
-		From: "words/emoji/emoji.json",
-		Key:  "emoji",
-		To:   "emojis.go",
-		Var:  "Emojis",
-	},
 }
