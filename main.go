@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/lucapette/fakedata/pkg/fakedata"
+	flag "github.com/spf13/pflag"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
-
-	"github.com/lucapette/fakedata/pkg/fakedata"
-	flag "github.com/spf13/pflag"
 )
 
 var version = "master"
@@ -65,8 +65,27 @@ func main() {
 		os.Exit(0)
 	}
 
+	rand.Seed(time.Now().UnixNano())
+
 	if *templateFlag != "" {
-		fakedata.ParseTemplate(*templateFlag)
+		fakedata.ParseTemplate(*templateFlag, *limitFlag)
+		os.Exit(0)
+	}
+
+	stat, _ := os.Stdin.Stat()
+	// Check if template data is piped to fakedata
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		t, err := ioutil.ReadAll(os.Stdin)
+
+		if err != nil {
+			fmt.Println("Unable to read input: %s", err)
+			os.Exit(0)
+		}
+
+		err = fakedata.ParseTemplateFromPipe(string(t), *limitFlag)
+		if err != nil {
+			fmt.Println(err)
+		}
 		os.Exit(0)
 	}
 
@@ -74,8 +93,6 @@ func main() {
 		flag.Usage()
 		os.Exit(0)
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	columns, err := fakedata.NewColumns(flag.Args())
 	if err != nil {
