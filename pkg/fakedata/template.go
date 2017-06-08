@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// var generatorFunctions template.FuncMap
+// generatorFunctions holds all the functions available for the template
 var generatorFunctions = template.FuncMap{
 	"Loop": func(i int) []int {
 		c := make([]int, i)
@@ -146,24 +146,26 @@ func ParseTemplate(path string, limit int) (err error) {
 	if err != nil {
 		return err
 	}
-	b := io.Writer(os.Stdout)
-	for i := 1; i <= limit; i++ {
-		tmp.Execute(b, nil)
-	}
 
-	return nil
+	return executeTemplate(tmp, limit)
 }
 
+// ParseTemplateFromPipe takes a string as template, parses it and executed the template. The function returns an error
+// or nil on success. The template is written to os.Stdout
 func ParseTemplateFromPipe(t string, limit int) (err error) {
 	tmp, err := template.New("stdin").Funcs(generatorFunctions).Parse(t)
 
 	if err != nil {
 		return err
 	}
+
+	return executeTemplate(tmp, limit)
+}
+
+func executeTemplate(t *template.Template, limit int) (err error) {
 	b := io.Writer(os.Stdout)
 	for i := 1; i <= limit; i++ {
-		tmp.Execute(b, nil)
+		err = t.Execute(b, nil)
 	}
-
-	return nil
+	return err
 }

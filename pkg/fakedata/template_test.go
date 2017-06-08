@@ -46,3 +46,27 @@ func TestGetTemplateNameFromPath(t *testing.T) {
 		})
 	}
 }
+
+func TestParseTemplateFromPipe(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
+	}{
+		{"name generator", "{{ Name }}", false},
+		{"undefined function", "{{ NotAGen }}", true},
+		{"invalid template function, unexpected end", "{{ Name }} {{ end }}", true},
+		{"invalid template function, unclosed range", "{{ range Loop 10 }} {{ Name }}, {{ Int }}", true},
+		{"printf in template", "{{ printf \"%s, %s\" NameLast NameFirst }}", false},
+		{"function with arguments, int", "{{ Int 12 15 }}", false},
+		{"function with arguments, enum", "{{ Enum \"Feature\" \"Issue\" \"Resolved\" \"On hold\" }}", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ParseTemplateFromPipe(tt.input, 1); err != nil && (tt.wantErr != true) {
+				t.Errorf("template.ParseTemplateFromPipe = %v, want %v", err, tt.wantErr)
+			}
+		})
+	}
+}

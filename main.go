@@ -68,7 +68,11 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	if *templateFlag != "" {
-		fakedata.ParseTemplate(*templateFlag, *limitFlag)
+		if err := fakedata.ParseTemplate(*templateFlag, *limitFlag); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 		os.Exit(0)
 	}
 
@@ -78,13 +82,13 @@ func main() {
 		t, err := ioutil.ReadAll(os.Stdin)
 
 		if err != nil {
-			fmt.Println("Unable to read input: %s", err)
-			os.Exit(0)
+			fmt.Printf("Unable to read input: %s", err)
+			os.Exit(1)
 		}
 
-		err = fakedata.ParseTemplateFromPipe(string(t), *limitFlag)
-		if err != nil {
+		if err = fakedata.ParseTemplateFromPipe(string(t), *limitFlag); err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 		os.Exit(0)
 	}
