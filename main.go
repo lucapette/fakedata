@@ -54,6 +54,12 @@ func generatorsHelp() string {
 	return buffer.String()
 }
 
+func isPipe() bool {
+	stat, _ := os.Stdin.Stat()
+	// Check if template data is piped to fakedata
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
 func main() {
 	if *versionFlag {
 		fmt.Println(version)
@@ -76,9 +82,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	stat, _ := os.Stdin.Stat()
-	// Check if template data is piped to fakedata
-	if (stat.Mode() & os.ModeCharDevice) == 0 {
+	if isPipe() {
 		t, err := ioutil.ReadAll(os.Stdin)
 
 		if err != nil {
