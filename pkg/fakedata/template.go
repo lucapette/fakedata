@@ -2,10 +2,10 @@ package fakedata
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"os"
 	"strings"
+	"text/template"
 )
 
 // generatorFunctions holds all the functions available for the template
