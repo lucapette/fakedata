@@ -8,10 +8,12 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"text/template"
 	"time"
 )
 
 var version = "master"
+var tmp *template.Template
 
 func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {
@@ -83,29 +85,35 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	if *templateFlag != "" {
-		template, err := fakedata.ParseTemplate(*templateFlag)
+		t, err := fakedata.ParseTemplate(*templateFlag)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fakedata.ExecuteTemplate(template, *limitFlag)
-		os.Exit(0)
+		tmp = t
 	}
 
 	if isPipe() {
-		t, err := ioutil.ReadAll(os.Stdin)
+		tp, err := ioutil.ReadAll(os.Stdin)
 
 		if err != nil {
 			fmt.Printf("Unable to read input: %s", err)
 			os.Exit(1)
 		}
 
-		template, err := fakedata.ParseTemplateFromPipe(string(t))
+		t, err := fakedata.ParseTemplateFromPipe(string(tp))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fakedata.ExecuteTemplate(template, *limitFlag)
+		tmp = t
+	}
+	// Execute a template if there is one
+	if tmp != nil {
+		if err := fakedata.ExecuteTemplate(tmp, *limitFlag); err != nil {
+			fmt.Println(err)
+		}
+
 		os.Exit(0)
 	}
 
