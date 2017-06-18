@@ -364,4 +364,28 @@ func init() {
 		Desc: `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
 		Func: file,
 	}
+
+	generators["noun"] = Generator{
+		Name: "noun",
+		Desc: "random noun",
+		Func: withList(data.Nouns),
+	}
+
+	generators["emoji"] = Generator{
+		Name: "emoji",
+		Desc: "random emoji",
+		Func: withList(data.Emoji),
+	}
+
+	generators["animal"] = Generator{
+		Name: "animal",
+		Desc: "random animal name",
+		Func: withList(data.Animals),
+	}
+
+	generators["animal.cat"] = Generator{
+		Name: "animal.cat",
+		Desc: "random cat breed",
+		Func: withList(data.Cats),
+	}
 }
