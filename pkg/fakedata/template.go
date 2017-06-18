@@ -140,29 +140,29 @@ func splitPathName(r rune) bool {
 
 // ParseTemplate takes a path to a template file as argument. It parses the template file and executes it on
 // os.Stdout.
-func ParseTemplate(path string, limit int) (err error) {
+func ParseTemplate(path string) (tmp *template.Template, err error) {
 	tn := getTemplateNameFromPath(path)
-	tmp, err := template.New(tn).Funcs(generatorFunctions).ParseFiles(path)
+	tmp, err = template.New(tn).Funcs(generatorFunctions).ParseFiles(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return executeTemplate(tmp, limit)
+	return tmp, nil
 }
 
 // ParseTemplateFromPipe takes a string as template, parses it and executed the template. The function returns an error
 // or nil on success. The template is written to os.Stdout
-func ParseTemplateFromPipe(t string, limit int) (err error) {
-	tmp, err := template.New("stdin").Funcs(generatorFunctions).Parse(t)
+func ParseTemplateFromPipe(t string) (tmp *template.Template, err error) {
+	tmp, err = template.New("stdin").Funcs(generatorFunctions).Parse(t)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return executeTemplate(tmp, limit)
+	return tmp, nil
 }
 
-func executeTemplate(t *template.Template, limit int) (err error) {
+func ExecuteTemplate(t *template.Template, limit int) (err error) {
 	b := io.Writer(os.Stdout)
 	for i := 1; i <= limit; i++ {
 		err = t.Execute(b, nil)

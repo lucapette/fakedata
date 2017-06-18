@@ -83,11 +83,12 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	if *templateFlag != "" {
-		if err := fakedata.ParseTemplate(*templateFlag, *limitFlag); err != nil {
+		template, err := fakedata.ParseTemplate(*templateFlag)
+		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-
+		fakedata.ExecuteTemplate(template, *limitFlag)
 		os.Exit(0)
 	}
 
@@ -99,10 +100,12 @@ func main() {
 			os.Exit(1)
 		}
 
-		if err = fakedata.ParseTemplateFromPipe(string(t), *limitFlag); err != nil {
+		template, err := fakedata.ParseTemplateFromPipe(string(t))
+		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		fakedata.ExecuteTemplate(template, *limitFlag)
 		os.Exit(0)
 	}
 
