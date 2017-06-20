@@ -163,7 +163,7 @@ To read an parse an actual template file from disk, run `fakedata --template tem
 
 ### Shell Pipes
 
-You can also pipe a template to `fakedata`. For example you can run the following `echo` command with a pile to pass a template to fakedata.
+You can also pipe a template to `fakedata`. For example you can run the following `echo` command with a pipe to pass a template to fakedata.
 
 ```sh
 $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
