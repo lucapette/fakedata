@@ -3,17 +3,17 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/lucapette/fakedata/pkg/fakedata"
-	flag "github.com/spf13/pflag"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"text/template"
 	"time"
+
+	"github.com/lucapette/fakedata/pkg/fakedata"
+	flag "github.com/spf13/pflag"
 )
 
 var version = "master"
-var tmpl *template.Template
 
 func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {
@@ -33,9 +33,8 @@ func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 
 func generatorsHelp() string {
 	generators := fakedata.Generators()
-	var buffer bytes.Buffer
-
-	var max int
+	buffer := &bytes.Buffer{}
+	max := 0
 
 	for _, gen := range generators {
 		if len(gen.Name) > max {
@@ -45,7 +44,7 @@ func generatorsHelp() string {
 
 	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
 	for _, gen := range generators {
-		fmt.Fprintf(&buffer, pattern, gen.Name, gen.Desc)
+		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
 	}
 
 	return buffer.String()
@@ -87,6 +86,8 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
+	var tmpl *template.Template
+
 	if *templateFlag != "" {
 		t, err := fakedata.ParseTemplate(*templateFlag)
 		if err != nil {
@@ -100,7 +101,7 @@ func main() {
 		tp, err := ioutil.ReadAll(os.Stdin)
 
 		if err != nil {
-			fmt.Printf("Unable to read input: %s", err)
+			fmt.Printf("unable to read input: %s", err)
 			os.Exit(1)
 		}
 
@@ -111,12 +112,10 @@ func main() {
 		}
 		tmpl = t
 	}
-	// Execute a template if there is one
 	if tmpl != nil {
 		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag); err != nil {
 			fmt.Println(err)
 		}
-
 		os.Exit(0)
 	}
 
