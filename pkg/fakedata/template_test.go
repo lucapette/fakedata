@@ -61,6 +61,7 @@ func TestParseTemplateFromPipe(t *testing.T) {
 		{"printf in template", "{{ printf \"%s, %s\" NameLast NameFirst }}", false},
 		{"function with arguments, int", "{{ Int 12 15 }}", false},
 		{"function with arguments, enum", "{{ Enum \"Feature\" \"Issue\" \"Resolved\" \"On hold\" }}", false},
+		{"no file", "{{ File \"NotAFile.txt\" }}", true},
 	}
 
 	for _, tt := range tests {
@@ -87,6 +88,7 @@ func TestExecuteTemplate(t *testing.T) {
 		{"function with parameters", "{{ Enum \"Lorem\" \"Ipsum\"}}", false},
 		{"invalid template", "{{ Name, {{ Int 15 20 }},  }}", true},
 		{"text template", "Hello, World!", false},
+		{"no file", "{{ File \"NotAFile.txt\" }}", true},
 	}
 
 	for _, tt := range tests {

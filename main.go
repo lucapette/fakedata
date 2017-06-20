@@ -13,7 +13,7 @@ import (
 )
 
 var version = "master"
-var tmp *template.Template
+var tmpl *template.Template
 
 func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {
@@ -52,7 +52,10 @@ func generatorsHelp() string {
 }
 
 func isPipe() bool {
-	stat, _ := os.Stdin.Stat()
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Printf("Error checking shell pipe: %s", err)
+	}
 	// Check if template data is piped to fakedata
 	return (stat.Mode() & os.ModeCharDevice) == 0
 }
@@ -64,7 +67,7 @@ func main() {
 		formatFlag     = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
 		versionFlag    = flag.BoolP("version", "v", false, "shows version information")
 		tableFlag      = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-		templateFlag   = flag.StringP("template", "", "", "Use template as input")
+		templateFlag   = flag.StringP("template", "T", "", "Use template as input")
 	)
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
@@ -90,7 +93,7 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		tmp = t
+		tmpl = t
 	}
 
 	if isPipe() {
@@ -106,11 +109,11 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		tmp = t
+		tmpl = t
 	}
 	// Execute a template if there is one
-	if tmp != nil {
-		if err := fakedata.ExecuteTemplate(tmp, *limitFlag); err != nil {
+	if tmpl != nil {
+		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag); err != nil {
 			fmt.Println(err)
 		}
 

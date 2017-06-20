@@ -6,5 +6,5 @@ Usage: fakedata [option ...] field...
   -g, --generators        lists available generators
   -l, --limit int         limits rows up to n (default 10)
   -t, --table string      table name of the sql format (default "TABLE")
-      --template string   Use template as input
+  -T, --template string   Use template as input
   -v, --version           shows version information

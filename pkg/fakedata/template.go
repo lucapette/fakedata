@@ -11,21 +11,13 @@ import (
 // generatorFunctions holds all the functions available for the template
 var generatorFunctions = template.FuncMap{
 	"Loop": func(i int) []int {
-		c := make([]int, i)
-
-		return c
+		return make([]int, i)
 	},
 	"Odd": func(i int) bool {
-		if i%2 != 0 {
-			return true
-		}
-		return false
+		return i%2 != 0
 	},
 	"Even": func(i int) bool {
-		if i%2 == 0 {
-			return true
-		}
-		return false
+		return i%2 == 0
 	},
 	"Date": func() string {
 		return generators["date"].Func(Column{Name: "tmplDate", Key: "tmplDateKey", Constraints: ""})
@@ -111,14 +103,19 @@ var generatorFunctions = template.FuncMap{
 			b = params[1]
 		}
 		constraint = fmt.Sprintf("%d..%d", a, b)
-		return generators["int"].Func(Column{"Int", "int", constraint})
+		return generators["int"].Func(Column{"tmplInt", "tmplIntKey", constraint})
 	},
 	"Enum": func(keywords ...string) string {
 		constraints := createConstraints(keywords)
-		return generators["enum"].Func(Column{"Enum", "enu", constraints})
+		return generators["enum"].Func(Column{"tmplEnum", "tmplEnumKey", constraints})
 	},
 	"File": func(path string) string {
-		return generators["file"].Func(Column{Name: "tmplA", Key: "tmplAKey", Constraints: path})
+		_, err := os.Stat(path)
+		if err != nil {
+			fmt.Printf("Error reading file: %s", err)
+			os.Exit(1)
+		}
+		return generators["file"].Func(Column{Name: "tmplFile", Key: "tmplFileKey", Constraints: path})
 	},
 }
 
