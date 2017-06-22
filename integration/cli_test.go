@@ -209,18 +209,18 @@ func TestFileGenerator(t *testing.T) {
 	}
 }
 
-func TestTemplatesWithCLIArgs(t *testing.T) {
-	tests := []struct {
-		tmpl    string
-		golden  string
-		wantErr bool
-	}{
-		{"simple.tmpl", "simple-template.golden", false},
-		{"broken.tmpl", "broken-template.golden", true},
-		{"unknown-function.tmpl", "unknown-function.golden", true},
-	}
+var templateTests = []struct {
+	tmpl    string
+	golden  string
+	wantErr bool
+}{
+	{"simple.tmpl", "simple-template.golden", false},
+	{"broken.tmpl", "broken-template.golden", true},
+	{"unknown-function.tmpl", "unknown-function.golden", true},
+}
 
-	for _, tt := range tests {
+func TestTemplatesWithCLIArgs(t *testing.T) {
+	for _, tt := range templateTests {
 		t.Run(tt.tmpl, func(t *testing.T) {
 			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("integration/fixtures/%s", tt.tmpl))
 			output, err := cmd.CombinedOutput()
@@ -244,17 +244,7 @@ func TestTemplatesWithCLIArgs(t *testing.T) {
 }
 
 func TestTemplatesWithPipe(t *testing.T) {
-	tests := []struct {
-		tmpl    string
-		golden  string
-		wantErr bool
-	}{
-		{"simple.tmpl", "simple-template-pipe.golden", false},
-		{"broken.tmpl", "broken-template-pipe.golden", true},
-		{"unknown-function.tmpl", "unknown-function-pipe.golden", true},
-	}
-
-	for _, tt := range tests {
+	for _, tt := range templateTests {
 		t.Run(tt.tmpl, func(t *testing.T) {
 			fixture := newFixture(t, tt.tmpl)
 			cmd := exec.Command(binaryPath)

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
-	"text/template"
 	"time"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
@@ -59,6 +58,30 @@ func isPipe() bool {
 	return (stat.Mode() & os.ModeCharDevice) == 0
 }
 
+func findTemplate(path string) string {
+	if path != "" {
+		tp, err := ioutil.ReadFile(path)
+		if err != nil {
+			fmt.Printf("unable to read input: %s", err)
+			os.Exit(1)
+		}
+
+		return string(tp)
+	}
+
+	if isPipe() {
+		tp, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Printf("unable to read input: %s", err)
+			os.Exit(1)
+		}
+
+		return string(tp)
+	}
+
+	return ""
+}
+
 func main() {
 	var (
 		generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
@@ -86,36 +109,12 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	var tmpl *template.Template
-
-	if *templateFlag != "" {
-		t, err := fakedata.ParseTemplate(*templateFlag)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		tmpl = t
-	}
-
-	if isPipe() {
-		tp, err := ioutil.ReadAll(os.Stdin)
-
-		if err != nil {
-			fmt.Printf("unable to read input: %s", err)
-			os.Exit(1)
-		}
-
-		t, err := fakedata.ParseTemplateFromPipe(string(tp))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		tmpl = t
-	}
-	if tmpl != nil {
+	if tmpl := findTemplate(*templateFlag); tmpl != "" {
 		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag); err != nil {
 			fmt.Println(err)
+			os.Exit(1)
 		}
+
 		os.Exit(0)
 	}
 

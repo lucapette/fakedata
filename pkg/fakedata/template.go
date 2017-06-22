@@ -2,9 +2,7 @@ package fakedata
 
 import (
 	"fmt"
-	"io"
 	"os"
-	"path"
 	"strings"
 	"text/template"
 )
@@ -120,22 +118,14 @@ var generatorFunctions = template.FuncMap{
 	},
 }
 
-// ParseTemplate takes a file to a template file as argument
-func ParseTemplate(file string) (tmp *template.Template, err error) {
-	return template.New(path.Base(file)).Funcs(generatorFunctions).ParseFiles(file)
-}
-
-// ParseTemplateFromPipe takes a string as template, parses it and executed the template. The function returns an error
-// or nil on success. The template is written to os.Stdout
-func ParseTemplateFromPipe(t string) (tmp *template.Template, err error) {
-	return template.New("stdin").Funcs(generatorFunctions).Parse(t)
-}
-
-func ExecuteTemplate(t *template.Template, limit int) (err error) {
-	wr := io.Writer(os.Stdout)
+func ExecuteTemplate(tmpl string, limit int) (err error) {
+	t, err := template.New("template").Funcs(generatorFunctions).Parse(tmpl)
+	if err != nil {
+		return err
+	}
 
 	for i := 1; i <= limit; i++ {
-		err = t.Execute(wr, nil)
+		err = t.Execute(os.Stdout, nil)
 		if err != nil {
 			return err
 		}
