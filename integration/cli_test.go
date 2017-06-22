@@ -208,6 +208,8 @@ func TestTemplatesWithCLIArgs(t *testing.T) {
 		wantErr bool
 	}{
 		{"simple.tmpl", "simple-template.golden", false},
+		{"broken.tmpl", "broken-template.golden", true},
+		{"unknown-function.tmpl", "unknown-function.golden", true},
 	}
 
 	for _, tt := range tests {
