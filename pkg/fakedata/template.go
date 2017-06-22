@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -119,22 +120,9 @@ var generatorFunctions = template.FuncMap{
 	},
 }
 
-func getTemplateNameFromPath(name string) string {
-	ts := strings.FieldsFunc(name, splitPathName)
-	return ts[len(ts)-1]
-}
-
-// this custom split function is used with strings.FieldsFunc to split the path
-// by `/` (Unix, MacOS) or `\` (Windows) for absolute and relative paths to template files
-func splitPathName(r rune) bool {
-	return r == '/' || r == '\\'
-}
-
-// ParseTemplate takes a path to a template file as argument. It parses the template file and executes it on
-// os.Stdout.
-func ParseTemplate(path string) (tmp *template.Template, err error) {
-	name := getTemplateNameFromPath(path)
-	return template.New(name).Funcs(generatorFunctions).ParseFiles(path)
+// ParseTemplate takes a file to a template file as argument
+func ParseTemplate(file string) (tmp *template.Template, err error) {
+	return template.New(path.Base(file)).Funcs(generatorFunctions).ParseFiles(file)
 }
 
 // ParseTemplateFromPipe takes a string as template, parses it and executed the template. The function returns an error
