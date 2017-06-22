@@ -166,12 +166,13 @@ To read an parse an actual template file from disk, run `fakedata --template tem
 You can also pipe a template to `fakedata`. For example you can run the following `echo` command with a pipe to pass a template to fakedata.
 
 ```sh
-$ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
+$ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 ```
 
 `fakedata` will read the template from `stdout` and execute it.
 
 ### Loops
+
 
 By default the templates loop based on the `--limit` flag. If you want to execute your template 50 times, add `--limit 50` to the command. When using the Template function `Loop` (see below), you should specify `--limit 1` to avoid running you template multiple times.
 

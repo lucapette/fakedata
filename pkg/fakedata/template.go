@@ -112,7 +112,7 @@ var generatorFunctions = template.FuncMap{
 	"File": func(path string) string {
 		_, err := os.Stat(path)
 		if err != nil {
-			fmt.Printf("Error reading file: %s", err)
+			fmt.Printf("could not read file: %v", err)
 			os.Exit(1)
 		}
 		return generators["file"].Func(Column{Name: "tmplFile", Key: "tmplFileKey", Constraints: path})
