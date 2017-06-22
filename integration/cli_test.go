@@ -59,6 +59,14 @@ func (tf *testFile) write(content string) {
 	}
 }
 
+func (tf *testFile) asFile() *os.File {
+	file, err := os.Open(tf.path())
+	if err != nil {
+		tf.t.Fatalf("could not open %s: %v", tf.name, err)
+	}
+	return file
+}
+
 func (tf *testFile) load() string {
 	content, err := ioutil.ReadFile(tf.path())
 	if err != nil {
@@ -215,6 +223,42 @@ func TestTemplatesWithCLIArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.tmpl, func(t *testing.T) {
 			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("integration/fixtures/%s", tt.tmpl))
+			output, err := cmd.CombinedOutput()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
+			}
+
+			golden := newGoldenFile(t, tt.golden)
+			actual := string(output)
+			if *update {
+				golden.write(actual)
+			}
+
+			expected := golden.load()
+
+			if !reflect.DeepEqual(actual, expected) {
+				t.Fatalf("diff: %v", diff(expected, actual))
+			}
+		})
+	}
+}
+
+func TestTemplatesWithPipe(t *testing.T) {
+	tests := []struct {
+		tmpl    string
+		golden  string
+		wantErr bool
+	}{
+		{"simple.tmpl", "simple-template-pipe.golden", false},
+		{"broken.tmpl", "broken-template-pipe.golden", true},
+		{"unknown-function.tmpl", "unknown-function-pipe.golden", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.tmpl, func(t *testing.T) {
+			fixture := newFixture(t, tt.tmpl)
+			cmd := exec.Command(binaryPath)
+			cmd.Stdin = fixture.asFile()
 			output, err := cmd.CombinedOutput()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
