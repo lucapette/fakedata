@@ -158,35 +158,44 @@ customized output formats. `fakedata` executes the provided template a number of
 times based on the limit flag (`-l`, `--limit`) and writes the output to
 `stdout`, exactly like using inline generators.
 
-The template functionality can be used in one of two ways:
+`fakedata` can read templates from disk:
 
-### Template file
+```sh
+$ echo "{{Email}}--{{Int}}" > /tmp/template.tmpl
+$ fakedata --template /tmp/template.tmpl
+ademilter@test.school--214
+Silveredge9@example.anquan--379
+plbabin@example.here--902
+silvanmuhlemann@test.aero--412
+ivanfilipovbg@test.bmw--517
+robbschiller@example.feedback--471
+rickdt@example.vista--963
+rmlewisuk@test.info--101
+linux29@example.archi--453
+g3d@test.pl--921
+```
 
-To read an parse an actual template file from disk, run `fakedata --template
-template.tmpl` which will read in the file `template.tmpl` and execute it 10
-times (default of `--limit`). If there's an error reading, `fakedata` exits with
-status code 1 and prints the error.
-
-### Shell Pipes
-
-You can also pipe a template to `fakedata`. For example you can run the following `echo` command with a pipe to pass a template to fakedata.
+Or you can pipe the template into `fakedata`:
 
 ```sh
 $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
+#56 Dannie Martin <bassamology@test.th>
+#89 Moshe Walsh <baires@example.autos>
+#48 Buck Reid <syropian@test.cg>
+#55 Rico Powell <findingjenny@example.pohl>
+#92 Luise Wood <91bilal@example.link>
+#30 Isreal Henderson <thierrykoblentz@test.scb>
+#96 Josphine Patton <abelcabans@test.wtf>
+#95 Jetta Blair <tgerken@example.jewelry>
+#10 Clorinda Parsons <roybarberuk@test.gives>
+#0 Dionna Bates <jefffis@test.flights>
 ```
 
-`fakedata` will read the template from `stdout` and execute it.
+### Generators
 
-### Loops
+All the generators listed under `fakedata -g` are available into templates.
 
-By default the templates loop based on the `--limit` flag. If you want to
-execute your template 50 times, add `--limit 50` to the command. When using the
-Template function `Loop` (see below), you should specify `--limit 1` to avoid
-running you template multiple times.
-
-### Available generators
-
-The generators return a string and take no arguments, except for:
+`fakedata` provides the following custom generators:
 
 - `Enum` 
 - `File`
@@ -195,7 +204,8 @@ The generators return a string and take no arguments, except for:
 
 ### `Enum`
 
-Enum takes one or more strings and returns a random string on each run. Strings are passed to Enum like so:
+Enum takes one or more strings and returns a random string on each run. Strings
+are passed to Enum like so:
 
 ```html
 {{ Enum "feature" "bug" "documentation" }}
@@ -209,31 +219,37 @@ each run.
 File reads a file from disk and returns a random line on each run. It takes one
 parameter which is the path to the file on disk.
 
-```html
+```
 {{ File "/var/data/dummy/dummy.txt" }}
 ```
 
 ### `Int`
 
-Int takes one or two integer values and returns a number within this range. By default it returns a number between `0` and `1000`.
+Int takes one or two integer values and returns a number within this range. By
+default it returns a number between `0` and `1000`.
 
-```html
+```
 {{ Int 15 20 }}
 ```
 
 The above function call returns a number between 15 and 20 for each run.
 
-### Additional template helpers
+### Helpers
 
-Beside the generator functions, the `fakedata` template implementation provides a set of helper functions:
+Beside the generator functions, the `fakedata` template implementation provides
+a set of helper functions:
 
 - `Loop`
 - `Odd`
 - `Even`
 
-When using a custom loop make sure to use `--limit 1`, otherwise the loop will run multiple times! Running a template with `{{ range Loop 5}}` and `--limit 5` will execute 25 times.
+When using a custom loop make sure to use `--limit 1`, otherwise the loop will
+run multiple times! Running a template with `{{ range Loop 5}}` and `--limit 5`
+will execute 25 times.
 
-If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function. This function takes a single integer as parameter which is the number of iterations. `Loop` has to be used with `range` e.g.
+If you need to create your own loop for advanced templates you can use the `{{
+Loop }}` function. This function takes a single integer as parameter which is
+the number of iterations. `Loop` has to be used with `range` e.g.
 
 ```html
 {{ range Loop 10 }}
@@ -241,7 +257,9 @@ If you need to create your own loop for advanced templates you can use the `{{ L
 {{ end }}
 ```
 
-In combination with `Loop` and `range` you can use `Odd` and `Even` to determine if the current iteration is odd or even. This is especially helpful when creating HTML tables, for example:
+In combination with `Loop` and `range` you can use `Odd` and `Even` to determine
+if the current iteration is odd or even. This is especially helpful when
+creating HTML tables:
 
 ```html
 {{ range $i, $j := Loop 5 }}
@@ -257,15 +275,21 @@ In combination with `Loop` and `range` you can use `Odd` and `Even` to determine
 {{ end }}
 ```
 
-By using `Odd` we can create tables with a class name of  `odd` and `even` when generating our HTML. Odd takes an integer as parameter which is why we need to assign the return values of `Loop 5` to the variables `$i` and `$j`.
+By using `Odd` we can create tables with a class name of  `odd` and `even` when
+generating our HTML. Odd takes an integer as parameter which is why we need to
+assign the return values of `Loop 5` to the variables `$i` and `$j`.
 
-Beside the helper function `Loop`, `Odd`, and `Even` Go templates also support manipulation with `printf`. By using `printf` we can create a custom output, for example to display a full name in the format `Lastname Firstname` instead of `Firstname Lastname`.
+Beside the helper function `Loop`, `Odd`, and `Even` templates also support
+manipulation with `printf`. By using `printf` we can create a custom output, for
+example to display a full name in the format `Lastname Firstname` instead of
+`Firstname Lastname`.
 
 ```html
 {{ printf "%s %s" NameLast NameFirst }}
 ```
 
 This `printf` will return a name displayed as `LastName FirstName` for each run.
+
 # How to install
 
 ## Homebrew
