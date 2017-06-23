@@ -355,25 +355,29 @@ func newFactory() (f factory) {
 	}
 
 	generators["date"] = Generator{
-		Name: "date",
-		Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
-		Func: defaultDate,
+		Name:           "date",
+		Desc:           "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
+		Func:           defaultDate,
+		AcceptsOptions: true,
 	}
 
 	generators["int"] = Generator{
-		Name: "int",
-		Desc: "positive integer. Accepts range min..max (default: 1,1000).",
-		Func: defaultInteger,
+		Name:           "int",
+		Desc:           "positive integer. Accepts range min..max (default: 1,1000).",
+		Func:           defaultInteger,
+		AcceptsOptions: true,
 	}
 
 	generators["enum"] = Generator{
-		Name: "enum",
-		Desc: `a random value from an enum. Defaults to "foo,bar,baz"`,
+		Name:           "enum",
+		Desc:           `a random value from an enum. Defaults to "foo,bar,baz"`,
+		AcceptsOptions: true,
 	}
 
 	generators["file"] = Generator{
-		Name: "file",
-		Desc: `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		Name:           "file",
+		Desc:           `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		AcceptsOptions: true,
 	}
 
 	generators["noun"] = Generator{
