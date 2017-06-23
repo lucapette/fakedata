@@ -14,9 +14,10 @@ import (
 
 // A Generator is a func that generates random data along with its description
 type Generator struct {
-	Func func() string
-	Desc string
-	Name string
+	Func           func() string
+	Desc           string
+	Name           string
+	AcceptsOptions bool
 }
 
 // Generators returns available generators
@@ -373,6 +374,30 @@ func newFactory() (f factory) {
 	generators["file"] = Generator{
 		Name: "file",
 		Desc: `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+	}
+
+	generators["noun"] = Generator{
+		Name: "noun",
+		Desc: "random noun",
+		Func: withList(data.Nouns),
+	}
+
+	generators["emoji"] = Generator{
+		Name: "emoji",
+		Desc: "random emoji",
+		Func: withList(data.Emoji),
+	}
+
+	generators["animal"] = Generator{
+		Name: "animal",
+		Desc: "random animal name",
+		Func: withList(data.Animals),
+	}
+
+	generators["animal.cat"] = Generator{
+		Name: "animal.cat",
+		Desc: "random cat breed",
+		Func: withList(data.Cats),
 	}
 
 	return factory{generators: generators}

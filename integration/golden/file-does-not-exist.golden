@@ -1,0 +1,10 @@
+could not read file this file does not exist.txt: open this file does not exist.txt: no such file or directory
+
+Usage: fakedata [option ...] field...
+
+  -f, --format string     generators rows in f format. Available formats: csv|tab|sql
+  -g, --generators        lists available generators
+  -l, --limit int         limits rows up to n (default 10)
+  -t, --table string      table name of the sql format (default "TABLE")
+  -T, --template string   Use template as input
+  -v, --version           shows version information

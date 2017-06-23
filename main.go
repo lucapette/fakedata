@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
@@ -13,31 +14,26 @@ import (
 
 var version = "master"
 
-var generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
-var limitFlag = flag.IntP("limit", "l", 10, "limits rows up to n")
-var formatFlag = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
-var versionFlag = flag.BoolP("version", "v", false, "shows version information")
-var tableFlag = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-
-func getFormatter(format string) (f fakedata.Formatter) {
+func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {
 	case "csv":
 		f = fakedata.NewSeparatorFormatter(",")
 	case "tab":
 		f = fakedata.NewSeparatorFormatter("\t")
 	case "sql":
-		f = fakedata.NewSQLFormatter(*tableFlag)
-	default:
+		f = fakedata.NewSQLFormatter(table)
+	case "":
 		f = fakedata.NewSeparatorFormatter(" ")
+	default:
+		err = fmt.Errorf("unknown format: %s", format)
 	}
-	return f
+	return f, err
 }
 
 func generatorsHelp() string {
 	generators := fakedata.Generators()
-	var buffer bytes.Buffer
-
-	var max int
+	buffer := &bytes.Buffer{}
+	max := 0
 
 	for _, gen := range generators {
 		if len(gen.Name) > max {
@@ -47,13 +43,60 @@ func generatorsHelp() string {
 
 	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
 	for _, gen := range generators {
-		fmt.Fprintf(&buffer, pattern, gen.Name, gen.Desc)
+		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
 	}
 
 	return buffer.String()
 }
 
+func isPipe() bool {
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Printf("Error checking shell pipe: %s", err)
+	}
+	// Check if template data is piped to fakedata
+	return (stat.Mode() & os.ModeCharDevice) == 0
+}
+
+func findTemplate(path string) string {
+	if path != "" {
+		tp, err := ioutil.ReadFile(path)
+		if err != nil {
+			fmt.Printf("unable to read input: %s", err)
+			os.Exit(1)
+		}
+
+		return string(tp)
+	}
+
+	if isPipe() {
+		tp, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Printf("unable to read input: %s", err)
+			os.Exit(1)
+		}
+
+		return string(tp)
+	}
+
+	return ""
+}
+
 func main() {
+	var (
+		generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
+		limitFlag      = flag.IntP("limit", "l", 10, "limits rows up to n")
+		formatFlag     = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
+		versionFlag    = flag.BoolP("version", "v", false, "shows version information")
+		tableFlag      = flag.StringP("table", "t", "TABLE", "table name of the sql format")
+		templateFlag   = flag.StringP("template", "T", "", "Use template as input")
+	)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
+		flag.PrintDefaults()
+	}
+	flag.Parse()
+
 	if *versionFlag {
 		fmt.Println(version)
 		os.Exit(0)
@@ -64,12 +107,21 @@ func main() {
 		os.Exit(0)
 	}
 
+	rand.Seed(time.Now().UnixNano())
+
+	if tmpl := findTemplate(*templateFlag); tmpl != "" {
+		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		os.Exit(0)
+	}
+
 	if len(flag.Args()) == 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	columns, err := fakedata.NewColumns(flag.Args())
 	if err != nil {
@@ -78,17 +130,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	formatter := getFormatter(*formatFlag)
+	formatter, err := getFormatter(*formatFlag, *tableFlag)
+	if err != nil {
+		fmt.Printf("%v\n\n", err)
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	for i := 0; i < *limitFlag; i++ {
 		fmt.Println(columns.GenerateRow(formatter))
 	}
-}
-
-func init() {
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
-		flag.PrintDefaults()
-	}
-	flag.Parse()
 }
