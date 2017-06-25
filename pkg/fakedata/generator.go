@@ -14,10 +14,16 @@ import (
 
 // A Generator is a func that generates random data along with its description
 type Generator struct {
-	Func           func() string
-	Desc           string
-	Name           string
-	AcceptsOptions bool
+	Func       func() string
+	CustomFunc func(string) (func() string, error)
+	Desc       string
+	Name       string
+}
+
+// IsCustom returns a bool indicating whether the generator has a CustomFunc or
+// not
+func (g Generator) IsCustom() bool {
+	return g.CustomFunc != nil
 }
 
 // Generators returns available generators
@@ -39,17 +45,31 @@ func withList(list []string) func() string {
 	}
 }
 
-func _date(startDate, endDate time.Time) string {
-	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+func ipv4() string {
+	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
 }
 
-func defaultDate() string {
-	endDate := time.Now()
-	startDate := endDate.AddDate(-1, 0, 0)
-	return _date(startDate, endDate)
+func ipv6() string {
+	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
-func customDate(options string) (f func() string, err error) {
+func mac() string {
+	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+}
+
+func latitude() string {
+	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
+}
+
+func longitude() string {
+	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
+}
+
+func double() string {
+	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
+}
+
+func date(options string) (f func() string, err error) {
 	var min, max string
 
 	endDate := time.Now()
@@ -88,42 +108,12 @@ func customDate(options string) (f func() string, err error) {
 		return nil, fmt.Errorf("%v is after %v", startDate, endDate)
 	}
 
-	return func() string { return _date(startDate, endDate) }, err
+	return func() string {
+		return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+	}, err
 }
 
-func ipv4() string {
-	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
-}
-
-func ipv6() string {
-	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
-}
-
-func mac() string {
-	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
-}
-
-func latitude() string {
-	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
-}
-
-func longitude() string {
-	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
-}
-
-func double() string {
-	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
-}
-
-func _integer(min, max int) string {
-	return strconv.Itoa(min + rand.Intn(max+1-min))
-}
-
-func defaultInteger() string {
-	return _integer(0, 1000)
-}
-
-func customInteger(options string) (func() string, error) {
+func integer(options string) (func() string, error) {
 	min := 0
 	max := 1000
 	var low, high string
@@ -156,11 +146,11 @@ func customInteger(options string) (func() string, error) {
 		return nil, fmt.Errorf("max(%d) is smaller than min(%d)", max, min)
 	}
 
-	return func() string { return _integer(min, max) }, nil
+	return func() string { return strconv.Itoa(min + rand.Intn(max+1-min)) }, nil
 }
 
 func file(path string) (func() string, error) {
-	if len(path) == 0 {
+	if path == "" {
 		return nil, fmt.Errorf("no file path given")
 	}
 
@@ -175,35 +165,29 @@ func file(path string) (func() string, error) {
 	return func() string { return withList(list)() }, nil
 }
 
+func enum(options string) (func() string, error) {
+	list := []string{"foo", "bar", "baz"}
+	if options != "" {
+		list = strings.Split(options, ",")
+	}
+	return func() string { return withList(list)() }, nil
+}
+
 type factory struct {
 	generators map[string]Generator
 }
 
-func (f factory) getGenerator(key, options string) (gen Generator, err error) {
+func (f factory) extractFunc(key, options string) (fn func() string, err error) {
 	gen, ok := f.generators[key]
 	if !ok {
-		return gen, fmt.Errorf("unknown generator: %s", key)
+		return nil, fmt.Errorf("unknown generator: %s", key)
 	}
 
-	customFn := gen.Func
-
-	switch key {
-	case "int":
-		customFn, err = customInteger(options)
-	case "date":
-		customFn, err = customDate(options)
-	case "enum":
-		if len(options) > 0 {
-			list := strings.Split(options, ",")
-			customFn = func() string { return withList(list)() }
-		}
-	case "file":
-		customFn, err = file(options)
+	if gen.IsCustom() {
+		return gen.CustomFunc(options)
 	}
 
-	gen.Func = customFn
-
-	return gen, err
+	return gen.Func, nil
 }
 
 func domain() string {
@@ -353,33 +337,6 @@ func newFactory() (f factory) {
 		Func: double,
 	}
 
-	generators["date"] = Generator{
-		Name:           "date",
-		Desc:           "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
-		Func:           defaultDate,
-		AcceptsOptions: true,
-	}
-
-	generators["int"] = Generator{
-		Name:           "int",
-		Desc:           "positive integer. Accepts range min..max (default: 1,1000).",
-		Func:           defaultInteger,
-		AcceptsOptions: true,
-	}
-
-	generators["enum"] = Generator{
-		Name:           "enum",
-		Desc:           `a random value from an enum. Defaults to "foo,bar,baz"`,
-		Func:           withList([]string{"foo", "bar", "baz"}),
-		AcceptsOptions: true,
-	}
-
-	generators["file"] = Generator{
-		Name:           "file",
-		Desc:           `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
-		AcceptsOptions: true,
-	}
-
 	generators["noun"] = Generator{
 		Name: "noun",
 		Desc: "random noun",
@@ -402,6 +359,31 @@ func newFactory() (f factory) {
 		Name: "animal.cat",
 		Desc: "random cat breed",
 		Func: withList(data.Cats),
+	}
+
+	// custom generators
+	generators["date"] = Generator{
+		Name:       "date",
+		Desc:       "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
+		CustomFunc: date,
+	}
+
+	generators["int"] = Generator{
+		Name:       "int",
+		Desc:       "positive integer. Accepts range min..max (default: 1,1000).",
+		CustomFunc: integer,
+	}
+
+	generators["enum"] = Generator{
+		Name:       "enum",
+		Desc:       `a random value from an enum. Defaults to "foo,bar,baz"`,
+		CustomFunc: enum,
+	}
+
+	generators["file"] = Generator{
+		Name:       "file",
+		Desc:       `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		CustomFunc: file,
 	}
 
 	return factory{generators: generators}

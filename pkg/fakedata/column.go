@@ -8,13 +8,9 @@ import (
 
 // A Column represents one field of data to generate
 type Column struct {
-	Name string
-	Key  string
-	Gen  Generator
-}
-
-func (column Column) generate() string {
-	return column.Gen.Func()
+	Name     string
+	Key      string
+	Generate func() string
 }
 
 // Columns is an array of Column
@@ -45,14 +41,14 @@ func NewColumns(keys []string) (cols Columns, err error) {
 			options = specs[1]
 		}
 
-		gen, err := f.getGenerator(key, options)
+		fn, err := f.extractFunc(key, options)
 		if err != nil {
 			return cols, err
 		}
 
 		cols[i].Name = name
 		cols[i].Key = key
-		cols[i].Gen = gen
+		cols[i].Generate = fn
 	}
 
 	return cols, err
@@ -65,7 +61,7 @@ func (columns Columns) GenerateRow(formatter Formatter) string {
 
 	values := make([]string, len(columns))
 	for i, column := range columns {
-		values[i] = column.generate()
+		values[i] = column.Generate()
 	}
 
 	fmt.Fprintf(row, "%s", formatter.Format(columns, values))

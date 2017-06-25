@@ -1,6 +1,7 @@
 package fakedata
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
@@ -22,31 +23,14 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 	}
 
 	for _, gen := range tf.factory.generators {
-		if !gen.AcceptsOptions {
-			name := strings.Replace(strings.Title(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
+		name := strings.Replace(strings.Title(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
+		if !gen.IsCustom() {
 			funcMap[name] = gen.Func
 		}
 	}
 
-	funcMap["Int"] = func(ranges ...int) string {
-		min := 0
-		max := 1000
-
-		switch len(ranges) {
-		case 1:
-			min = ranges[0]
-		case 2:
-			min = ranges[0]
-			max = ranges[1]
-		}
-
-		return _integer(min, max)
-	}
-
-	funcMap["Enum"] = func(enum ...string) string { return withList(enum)() }
-
-	funcMap["File"] = func(path string) (string, error) {
-		f, err := file(path)
+	handler := func(in func(string) (func() string, error), options []string) (string, error) {
+		f, err := in(strings.Join(options, ","))
 		if err != nil {
 			return "", err
 		}
@@ -54,17 +38,39 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 		return f(), nil
 	}
 
+	funcMap["Int"] = func(ranges ...int) (string, error) {
+		options := make([]string, len(ranges))
+		for i, r := range ranges {
+			options[i] = fmt.Sprintf("%v", r)
+		}
+		return handler(integer, options)
+	}
+
+	funcMap["Enum"] = func(options ...string) (string, error) {
+		return handler(enum, options)
+	}
+
+	funcMap["File"] = func(path string) (string, error) {
+		return handler(file, []string{path})
+	}
+
+	funcMap["Date"] = func(dates ...string) (string, error) {
+		return handler(date, dates)
+	}
+
 	return funcMap
 }
 
-func ExecuteTemplate(tmpl string, limit int) (err error) {
+// ExecuteTemplate takes a tmpl string and a n int and generates n rows of based
+// on the specified tmpl
+func ExecuteTemplate(tmpl string, n int) (err error) {
 	f := newTemplateFactory()
 	t, err := template.New("template").Funcs(f.getFunctions()).Parse(tmpl)
 	if err != nil {
 		return err
 	}
 
-	for i := 1; i <= limit; i++ {
+	for i := 1; i <= n; i++ {
 		err = t.Execute(os.Stdout, nil)
 		if err != nil {
 			return err
