@@ -193,11 +193,10 @@ func (f factory) getGenerator(key, options string) (gen Generator, err error) {
 	case "date":
 		customFn, err = customDate(options)
 	case "enum":
-		list := []string{"foo", "bar", "baz"}
 		if len(options) > 0 {
-			list = strings.Split(options, ",")
+			list := strings.Split(options, ",")
+			customFn = func() string { return withList(list)() }
 		}
-		customFn = func() string { return withList(list)() }
 	case "file":
 		customFn, err = file(options)
 	}
@@ -371,6 +370,7 @@ func newFactory() (f factory) {
 	generators["enum"] = Generator{
 		Name:           "enum",
 		Desc:           `a random value from an enum. Defaults to "foo,bar,baz"`,
+		Func:           withList([]string{"foo", "bar", "baz"}),
 		AcceptsOptions: true,
 	}
 
