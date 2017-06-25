@@ -8,13 +8,9 @@ import (
 
 // A Column represents one field of data to generate
 type Column struct {
-	Name        string
-	Key         string
-	Constraints string
-}
-
-func (c *Column) String() string {
-	return fmt.Sprintf("Column(%s=%s)", c.Name, c.Key)
+	Name     string
+	Key      string
+	Generate func() string
 }
 
 // Columns is an array of Column
@@ -24,17 +20,14 @@ type Columns []Column
 // It returns an error with a line for each unknown key
 func NewColumns(keys []string) (cols Columns, err error) {
 	cols = make(Columns, len(keys))
-	var errors bytes.Buffer
+
+	f := newFactory()
 
 	for i, k := range keys {
-		specs := strings.Split(k, ",")
-
-		if len(specs) > 1 {
-			cols[i].Constraints = specs[1]
-		}
+		specs := strings.Split(k, ":")
 
 		values := strings.Split(specs[0], "=")
-		var name, key string
+		var name, key, options string
 
 		if len(values) == 2 {
 			name = values[0]
@@ -44,27 +37,34 @@ func NewColumns(keys []string) (cols Columns, err error) {
 			key = values[0]
 		}
 
-		if _, ok := generators[key]; !ok {
-			fmt.Fprintf(&errors, "Unknown generator: %s.\n", key)
+		if len(specs) > 1 {
+			options = specs[1]
+		}
+
+		fn, err := f.extractFunc(key, options)
+		if err != nil {
+			return cols, err
 		}
 
 		cols[i].Name = name
 		cols[i].Key = key
-	}
-
-	if errors.Len() > 0 {
-		err = fmt.Errorf(errors.String())
+		cols[i].Generate = fn
 	}
 
 	return cols, err
 }
 
-func (columns Columns) names() (names []string) {
-	names = make([]string, len(columns))
+// GenerateRow generates a row of fake data using columns
+// in the specified format
+func (columns Columns) GenerateRow(formatter Formatter) string {
+	row := &bytes.Buffer{}
 
-	for i, field := range columns {
-		names[i] = field.Name
+	values := make([]string, len(columns))
+	for i, column := range columns {
+		values[i] = column.Generate()
 	}
 
-	return names
+	fmt.Fprintf(row, "%s", formatter.Format(columns, values))
+
+	return row.String()
 }

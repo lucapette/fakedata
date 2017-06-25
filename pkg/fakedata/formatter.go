@@ -6,17 +6,17 @@ import (
 	"strings"
 )
 
-// Formatter is that wraps the Format method we use to format each row
+// Formatter is the interface wraps the Format method we use to format each row
 type Formatter interface {
 	Format(Columns, []string) string
 }
 
-// SeparatorFormatter is a Formatter for characther separated formats
+// SeparatorFormatter is a Formatter for character separated formats
 type SeparatorFormatter struct {
 	Separator string
 }
 
-// Format as characther separated strings
+// Format as character separated strings
 func (f *SeparatorFormatter) Format(columns Columns, values []string) string {
 	return strings.Join(values, f.Separator)
 }
@@ -28,25 +28,31 @@ type SQLFormatter struct {
 
 // Format as SQL statements
 func (f *SQLFormatter) Format(columns Columns, values []string) string {
-	sql := bytes.NewBufferString(fmt.Sprintf("INSERT INTO %s (", f.Table))
+	sql := &bytes.Buffer{}
+	names := make([]string, len(columns))
 
-	sql.WriteString(strings.Join(columns.names(), ","))
-	sql.WriteString(") VALUES (")
+	for i, field := range columns {
+		names[i] = field.Name
+	}
 
 	formattedValues := make([]string, len(columns))
 	for i, value := range values {
 		formattedValues[i] = fmt.Sprintf("'%s'", value)
 	}
-	sql.WriteString(strings.Join(formattedValues, ","))
 
-	sql.WriteString(");")
+	fmt.Fprintf(sql,
+		"INSERT INTO %s (%s) VALUES (%s);",
+		f.Table,
+		strings.Join(names, ","),
+		strings.Join(formattedValues, ","),
+	)
+
 	return sql.String()
 }
 
 // NewSeparatorFormatter returns a SeparatorFormatter using the sep string as a separator
 func NewSeparatorFormatter(sep string) (f *SeparatorFormatter) {
 	return &SeparatorFormatter{Separator: sep}
-
 }
 
 // NewSQLFormatter returns a SQLFormatter using the table string for table name generation

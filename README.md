@@ -2,7 +2,12 @@
 
 `fakedata` is a small command line utility that generates random data.
 
-For questions join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in the [Gophers Slack](https://invite.slack.golangbridge.org/).
+Please **note** you're reading the documentation of an unreleased version of
+`fakedata` which differs quite a lot from the latest stable release. We're about
+to release version [1.0.0](https://github.com/lucapette/fakedata/issues/44) that
+has some breaking changes. If you're running `fakedata v0.6.0` (you can find out
+with `fakedata --version`, then please refer to its
+[docs](https://github.com/lucapette/fakedata/tree/v0.6.0).
 
 # Table Of Contents
 
@@ -16,7 +21,9 @@ For questions join the [#fakedata](https://gophers.slack.com/messages/fakedata/)
 
 # Overview
 
-Here is a list of examples to get a feeling of how `fakedata` works
+Here is a list of examples to get a feeling of how `fakedata` works.
+
+You can specify the name of generators you want to use:
 
 ```sh
 $ fakedata email country
@@ -80,9 +87,9 @@ Some generators allow you to pass in a range to constraint the output to a
 subset of values:
 
 ```sh
-$ fakedata int,1..100 # will generate only integers between 1 and 100
-$ fakedata int,50.. # specifying only min number works too
-$ fakedata int,50 # also works
+$ fakedata int:1,100 # will generate only integers between 1 and 100
+$ fakedata int:50, # specifying only min number works too
+$ fakedata int:50 # also works
 ```
 
 The `enum` generator allows you to specify a set of values. It comes handy when
@@ -95,7 +102,7 @@ baz
 foo
 foo
 baz
-$ fakedata --limit 5 enum,bug..feature..question..duplicate
+$ fakedata --limit 5 enum:bug,feature,question,duplicate
 question
 duplicate
 duplicate
@@ -106,7 +113,7 @@ feature
 When passing a single value `enum` can be used to repeat a value in every line:
 
 ```sh
-$ fakedata --limit 5 enum,one..two enum,repeat
+$ fakedata --limit 5 enum:one,two enum,repeat
 two repeat
 one repeat
 two repeat
@@ -118,7 +125,7 @@ The `file` generator can be use to read custom values from a file:
 
 ```sh
 $ printf "one\ntwo\nthree" > values.txt
-$ fakedata -l5 file,values.txt
+$ fakedata -l5 file:values.txt
 three
 two
 two
@@ -153,102 +160,116 @@ INSERT INTO users (login,referral) VALUES ('mikema@example.com' 'test.us');
 
 # Templates
 
-`fakedata` supports parsing and executing template files for generating customized output formats. `fakedata` executes the provided template a number of times based on the limit flag (`-l`, `--limit`) and writes the output to `stdout`, exactly like using inline generators.
+`fakedata` supports parsing and executing template files for generating
+customized output formats. `fakedata` executes the provided template a number of
+times based on the limit flag (`-l`, `--limit`) and writes the output to
+`stdout`, exactly like using inline generators.
 
-The template functionality can be used in one of two ways:
+`fakedata` can read templates from disk:
 
-### Template file
+```sh
+$ echo "{{Email}}--{{Int}}" > /tmp/template.tmpl
+$ fakedata --template /tmp/template.tmpl
+ademilter@test.school--214
+Silveredge9@example.anquan--379
+plbabin@example.here--902
+silvanmuhlemann@test.aero--412
+ivanfilipovbg@test.bmw--517
+robbschiller@example.feedback--471
+rickdt@example.vista--963
+rmlewisuk@test.info--101
+linux29@example.archi--453
+g3d@test.pl--921
+```
 
-To read an parse an actual template file from disk, run `fakedata --template template.tmpl` which will read in the file `template.tmpl` and execute it 10 times (default of `--limit`). If there's an error reading, `fakedata` exits with status code 1 and prints the error.
-
-### Shell Pipes
-
-You can also pipe a template to `fakedata`. For example you can run the following `echo` command with a pipe to pass a template to fakedata.
+Or you can pipe the template into `fakedata`:
 
 ```sh
 $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
+#56 Dannie Martin <bassamology@test.th>
+#89 Moshe Walsh <baires@example.autos>
+#48 Buck Reid <syropian@test.cg>
+#55 Rico Powell <findingjenny@example.pohl>
+#92 Luise Wood <91bilal@example.link>
+#30 Isreal Henderson <thierrykoblentz@test.scb>
+#96 Josphine Patton <abelcabans@test.wtf>
+#95 Jetta Blair <tgerken@example.jewelry>
+#10 Clorinda Parsons <roybarberuk@test.gives>
+#0 Dionna Bates <jefffis@test.flights>
 ```
 
-`fakedata` will read the template from `stdout` and execute it.
+### Generators
 
-### Loops
+All the generators listed under `fakedata -g` are available as functions into
+the templates. If the generator name is a single word, then it's available as a
+function with the same name capitalized (example: `int` becomes `Int`). If the
+generator name is composed by multiple words joined by dots, then the function
+name is again capitalized by the first letter of the word and joined together
+(example: `product.name` becomes `Product.Name`).
 
+`fakedata` provides the following custom generators:
 
-By default the templates loop based on the `--limit` flag. If you want to execute your template 50 times, add `--limit 50` to the command. When using the Template function `Loop` (see below), you should specify `--limit 1` to avoid running you template multiple times.
-
-Each generator is available as a named function. The generator function names are as follows:
-
-```
-Date
-DomainTld
-DomainName
-Country
-CountryCode
-State
-Timezone
-Username
-NameFirst
-NameLast
-Color
-ProductCategory
-ProductName
-EventAction
-HTTPMethod
-Name
-Email
-Domain
-IPv4
-IPv6
-MacAddress
-Latitude
-Longitude
-Double
-Int
-Enum
-File
-```
-
-All the generators return a string and take no arguments, expect for:`Enum`, `File` and `Int`. Parameters for these functions are described below.
+- `Enum` 
+- `File`
+- `Int`
+- `Date`
 
 ### `Enum`
 
-Enum takes one or more strings and returns a random string on each run. Strings are passed to Enum like so:
+Enum takes one or more strings and returns a random string on each run. Strings
+are passed to Enum like so:
 
 ```html
 {{ Enum "feature" "bug" "documentation" }}
 ```
 
-This Enum will return either the string `feature`, `bug`, or `documentation` for each run.
+This Enum will return either the string `feature`, `bug`, or `documentation` for
+each run.
 
 ### `File`
 
-File reads a file from disk and returns a random line on each run. It takes one parameter which is the path to the file on disk.
+File reads a file from disk and returns a random line on each run. It takes one
+parameter which is the path to the file on disk.
 
-```html
+```
 {{ File "/var/data/dummy/dummy.txt" }}
 ```
 
 ### `Int`
 
-Int takes one or two integer values and returns a number within this range. By default it returns a number between 0 and 1000.
+Int takes one or two integer values and returns a number within this range. By
+default it returns a number between `0` and `1000`.
 
-```html
-{{ Int 15 20 }}
+```
+echo "{{ Int 15 20 }}" | fakedata -l5
+15
+20
+15
+15
+17
 ```
 
-The above function call returns a number between 15 and 20 for each run.
+### `Date`
 
-### Additional template helpers
+Date takes one or two dates and returns a date within this range. By default, it
+returns a date between one year ago and today.
 
-Beside the generator functions, the `fakedata` template implementation provides a set of helper functions:
+### Helpers
+
+Beside the generator functions, the `fakedata` template implementation provides
+a set of helper functions:
 
 - `Loop`
 - `Odd`
 - `Even`
 
-When using a custom loop make sure to use `--limit 1`, otherwise the loop will run multiple times! Running a template with `{{ range Loop 5}}` and `--limit 5` will execute 25 times.
+When using a custom loop make sure to use `--limit 1`, otherwise the loop will
+run multiple times! Running a template with `{{ range Loop 5}}` and `--limit 5`
+will execute 25 times.
 
-If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function. This function takes a single integer as parameter which is the number of iterations. `Loop` has to be used with `range` e.g.
+If you need to create your own loop for advanced templates you can use the `{{
+Loop }}` function. This function takes a single integer as parameter which is
+the number of iterations. `Loop` has to be used with `range` e.g.
 
 ```html
 {{ range Loop 10 }}
@@ -256,7 +277,9 @@ If you need to create your own loop for advanced templates you can use the `{{ L
 {{ end }}
 ```
 
-In combination with `Loop` and `range` you can use `Odd` and `Even` to determine if the current iteration is odd or even. This is especially helpful when creating HTML tables, for example:
+In combination with `Loop` and `range` you can use `Odd` and `Even` to determine
+if the current iteration is odd or even. This is especially helpful when
+creating HTML tables:
 
 ```html
 {{ range $i, $j := Loop 5 }}
@@ -272,15 +295,19 @@ In combination with `Loop` and `range` you can use `Odd` and `Even` to determine
 {{ end }}
 ```
 
-By using `Odd` we can create tables with a class name of  `odd` and `even` when generating our HTML. Odd takes an integer as parameter which is why we need to assign the return values of `Loop 5` to the variables `$i` and `$j`.
+By using `Odd` we can create tables with a class name of  `odd` and `even` when
+generating our HTML. Odd takes an integer as parameter which is why we need to
+assign the return values of `Loop 5` to the variables `$i` and `$j`.
 
-Beside the helper function `Loop`, `Odd`, and `Even` Go templates also support manipulation with `printf`. By using `printf` we can create a custom output, for example to display a full name in the format `Lastname Firstname` instead of `Firstname Lastname`.
+Beside the helper function `Loop`, `Odd`, and `Even` templates also support
+manipulation with `printf`. By using `printf` we can create a custom output, for
+example to display a full name in the format `Lastname Firstname` instead of
+`Firstname Lastname`.
 
 ```html
 {{ printf "%s %s" NameLast NameFirst }}
 ```
 
-This `printf` will return a name displayed as `LastName FirstName` for each run.
 # How to install
 
 ## Homebrew
@@ -293,9 +320,9 @@ $ brew install lucapette/tap/fakedata
 
 ## Standalone
 
-`fakedata` can be installed as an executable. Download the latest
-[compiled binaries](https://github.com/lucapette/fakedata/releases) and put it
-anywhere in your executable path.
+`fakedata` can be installed as an executable. Download the latest [compiled
+binary](https://github.com/lucapette/fakedata/releases) and put it anywhere in
+your executable path.
 
 ## Source
 
@@ -311,10 +338,12 @@ We love every form of contribution! Good entry points to the project are:
   [gardening](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3Agardening)
 - Issues with the tag [good first
   patch](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+patch%22)
+- Join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in
+the [Gophers Slack](https://invite.slack.golangbridge.org/).
 
-If you're still not sure where to start, please open a [new
-issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly
-help you get started.
+If you're not sure where to start, please open a [new
+issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly help
+you get started.
 
 # Code of Conduct
 

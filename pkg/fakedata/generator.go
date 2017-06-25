@@ -3,9 +3,7 @@ package fakedata
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math/rand"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -16,30 +14,24 @@ import (
 
 // A Generator is a func that generates random data along with its description
 type Generator struct {
-	Func func(Column) string
-	Desc string
-	Name string
+	Func       func() string
+	CustomFunc func(string) (func() string, error)
+	Desc       string
+	Name       string
 }
 
-var generators map[string]Generator
-
-func (g Generator) String() string {
-	return fmt.Sprintf("%s\t%s", g.Name, g.Desc)
+// IsCustom returns a bool indicating whether the generator has a CustomFunc or
+// not
+func (g Generator) IsCustom() bool {
+	return g.CustomFunc != nil
 }
 
-func generate(column Column) string {
-	if gen, ok := generators[column.Key]; ok {
-		return gen.Func(column)
-	}
-
-	return ""
-}
-
-// Generators returns all the available generators
+// Generators returns available generators
 func Generators() []Generator {
+	f := newFactory()
 	gens := make([]Generator, 0)
 
-	for _, v := range generators {
+	for _, v := range f.generators {
 		gens = append(gens, v)
 	}
 
@@ -47,35 +39,47 @@ func Generators() []Generator {
 	return gens
 }
 
-func withList(list []string) func(Column) string {
-	return func(c Column) string {
+func withList(list []string) func() string {
+	return func() string {
 		return list[rand.Intn(len(list))]
 	}
 }
 
-func withSep(left, right Column, sep string) func(column Column) string {
-	return func(column Column) string {
-		return fmt.Sprintf("%s%s%s", generate(left), sep, generate(right))
-	}
+func ipv4() string {
+	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
 }
 
-func withEnum(enum []string) func(column Column) string {
-	return func(column Column) string {
-		return enum[rand.Intn(len(enum))]
-	}
+func ipv6() string {
+	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
-var date = func(column Column) string {
+func mac() string {
+	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+}
+
+func latitude() string {
+	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
+}
+
+func longitude() string {
+	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
+}
+
+func double() string {
+	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
+}
+
+func date(options string) (f func() string, err error) {
+	var min, max string
+
 	endDate := time.Now()
 	startDate := endDate.AddDate(-1, 0, 0)
 
-	var min, max string
+	dateRange := strings.Split(options, ",")
+	min = dateRange[0]
 
-	rng := strings.Split(column.Constraints, "..")
-	min = rng[0]
-
-	if len(rng) > 1 {
-		max = rng[1]
+	if len(dateRange) > 1 {
+		max = dateRange[1]
 	}
 
 	if len(min) > 0 {
@@ -84,7 +88,7 @@ var date = func(column Column) string {
 
 			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
 			if err != nil {
-				log.Fatalf("Problem with Max: %s", err.Error())
+				return nil, fmt.Errorf("problem parsing max date: %v", err)
 			}
 
 			endDate = date
@@ -94,68 +98,44 @@ var date = func(column Column) string {
 
 		date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
 		if err != nil {
-			log.Fatal(err.Error())
+			return nil, fmt.Errorf("problem parsing mix date: %v", err)
 		}
 
 		startDate = date
 	}
 
 	if startDate.After(endDate) {
-		log.Fatalf("%v is after %v", startDate, endDate)
+		return nil, fmt.Errorf("%v is after %v", startDate, endDate)
 	}
 
-	return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+	return func() string {
+		return startDate.Add(time.Duration(rand.Intn(int(endDate.Sub(startDate))))).Format("2006-01-02")
+	}, err
 }
 
-var ipv4 = func(column Column) string {
-	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
-}
-
-var ipv6 = func(column Column) string {
-	return fmt.Sprintf("2001:cafe:%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
-}
-
-var mac = func(column Column) string {
-	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
-}
-
-var latitude = func(column Column) string {
-	return strconv.FormatFloat((rand.Float64()*180)-90, 'f', 6, 64)
-}
-
-var longitude = func(column Column) string {
-	return strconv.FormatFloat((rand.Float64()*360)-180, 'f', 6, 64)
-}
-
-var double = func(column Column) string {
-	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
-}
-
-var integer = func(column Column) string {
+func integer(options string) (func() string, error) {
 	min := 0
 	max := 1000
+	var low, high string
+	intRange := strings.Split(options, ",")
+	low = intRange[0]
 
-	var _min, _max string
-	rng := strings.Split(column.Constraints, "..")
-	_min = rng[0]
-
-	if len(rng) > 1 {
-		_max = rng[1]
+	if len(intRange) > 1 {
+		high = intRange[1]
 	}
 
-	if len(_min) > 0 {
-		m, err := strconv.Atoi(_min)
+	if len(low) > 0 {
+		m, err := strconv.Atoi(low)
 		if err != nil {
-			log.Fatalf("could not convert min: %v", err)
+			return nil, fmt.Errorf("could not convert min: %v", err)
 		}
 
 		min = m
 
-		if len(_max) > 0 {
-			m, err := strconv.Atoi(_max)
+		if len(high) > 0 {
+			m, err := strconv.Atoi(high)
 			if err != nil {
-				log.Fatalf("could not convert max: %v", err)
-
+				return nil, fmt.Errorf("could not convert max: %v", err)
 			}
 
 			max = m
@@ -163,54 +143,59 @@ var integer = func(column Column) string {
 	}
 
 	if min > max {
-		log.Fatalf("max(%d) is smaller than min(%d) in %v", max, min, column)
+		return nil, fmt.Errorf("max(%d) is smaller than min(%d)", max, min)
 	}
 
-	return strconv.Itoa(min + rand.Intn(max+1-min))
+	return func() string { return strconv.Itoa(min + rand.Intn(max+1-min)) }, nil
 }
 
-var enum = func(column Column) string {
-	enum := []string{"foo", "bar", "baz"}
-
-	if len(column.Constraints) > 1 {
-		enum = strings.Split(column.Constraints, "..")
+func file(path string) (func() string, error) {
+	if path == "" {
+		return nil, fmt.Errorf("no file path given")
 	}
 
-	return withEnum(enum)(column)
+	filePath := strings.Trim(path, "'\"")
+
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("could not read file %s: %v", filePath, err)
+	}
+	list := strings.Split(string(content), "\n")
+
+	return func() string { return withList(list)() }, nil
 }
 
-var fileCache map[string][]string
-
-var file = func(column Column) string {
-	constraint := column.Constraints
-	if len(constraint) == 0 {
-		fmt.Printf("%s: no file path given", column.Name)
-		os.Exit(1)
+func enum(options string) (func() string, error) {
+	list := []string{"foo", "bar", "baz"}
+	if options != "" {
+		list = strings.Split(options, ",")
 	}
+	return func() string { return withList(list)() }, nil
+}
 
-	filePath := strings.Trim(constraint, "'\"")
+type factory struct {
+	generators map[string]Generator
+}
 
-	list, ok := fileCache[filePath]
+func (f factory) extractFunc(key, options string) (fn func() string, err error) {
+	gen, ok := f.generators[key]
 	if !ok {
-		content, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			fmt.Printf("could not read file %s: %v", filePath, err)
-			os.Exit(1)
-		}
-		list = strings.Split(string(content), "\n")
+		return nil, fmt.Errorf("unknown generator: %s", key)
 	}
 
-	return list[rand.Intn(len(list))]
+	if gen.IsCustom() {
+		return gen.CustomFunc(options)
+	}
+
+	return gen.Func, nil
 }
 
-func init() {
-	generators = make(map[string]Generator)
+func domain() string {
+	return withList([]string{"test", "example"})() + "." + withList(data.TLDs)()
+}
 
-	generators["date"] = Generator{
-		Name: "date",
-		Desc: "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD..YYYY-MM-DD. By default, it generates dates in the last year.",
-		Func: date,
-	}
+func newFactory() (f factory) {
+	generators := make(map[string]Generator)
 
 	generators["domain.tld"] = Generator{
 		Name: "domain.tld",
@@ -221,7 +206,7 @@ func init() {
 	generators["domain.name"] = Generator{
 		Name: "domain.name",
 		Desc: "example|test",
-		Func: withEnum([]string{"example", "test"}),
+		Func: withList([]string{"example", "test"}),
 	}
 
 	generators["country"] = Generator{
@@ -293,31 +278,35 @@ func init() {
 	generators["event.action"] = Generator{
 		Name: "event.action",
 		Desc: `clicked|purchased|viewed|watched`,
-		Func: withEnum([]string{"clicked", "purchased", "viewed", "watched"}),
+		Func: withList([]string{"clicked", "purchased", "viewed", "watched"}),
 	}
 
 	generators["http.method"] = Generator{
 		Name: "http.method",
 		Desc: `DELETE|GET|HEAD|OPTION|PATCH|POST|PUT`,
-		Func: withEnum([]string{"DELETE", "GET", "HEAD", "OPTION", "PATCH", "POST", "PUT"}),
+		Func: withList([]string{"DELETE", "GET", "HEAD", "OPTION", "PATCH", "POST", "PUT"}),
 	}
 
 	generators["name"] = Generator{
 		Name: "name",
 		Desc: `name.first + " " + name.last`,
-		Func: withSep(Column{Key: "name.first"}, Column{Key: "name.last"}, " "),
+		Func: func() string {
+			return withList(data.Firstnames)() + " " + withList(data.Lastnames)()
+		},
 	}
 
 	generators["email"] = Generator{
 		Name: "email",
 		Desc: "email",
-		Func: withSep(Column{Key: "username"}, Column{Key: "domain"}, "@"),
+		Func: func() string {
+			return withList(data.Usernames)() + "@" + domain()
+		},
 	}
 
 	generators["domain"] = Generator{
 		Name: "domain",
 		Desc: "domain",
-		Func: withSep(Column{Key: "domain.name"}, Column{Key: "domain.tld"}, "."),
+		Func: domain,
 	}
 
 	generators["ipv4"] = Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4}
@@ -327,7 +316,8 @@ func init() {
 	generators["mac.address"] = Generator{
 		Name: "mac.address",
 		Desc: "mac address",
-		Func: mac}
+		Func: mac,
+	}
 
 	generators["latitude"] = Generator{
 		Name: "latitude",
@@ -345,24 +335,6 @@ func init() {
 		Name: "double",
 		Desc: "double number",
 		Func: double,
-	}
-
-	generators["int"] = Generator{
-		Name: "int",
-		Desc: "positive integer. Accepts range min..max (default: 1..1000).",
-		Func: integer,
-	}
-
-	generators["enum"] = Generator{
-		Name: "enum",
-		Desc: `a random value from an enum. Defaults to "foo..bar..baz"`,
-		Func: enum,
-	}
-
-	generators["file"] = Generator{
-		Name: "file",
-		Desc: `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
-		Func: file,
 	}
 
 	generators["noun"] = Generator{
@@ -388,4 +360,31 @@ func init() {
 		Desc: "random cat breed",
 		Func: withList(data.Cats),
 	}
+
+	// custom generators
+	generators["date"] = Generator{
+		Name:       "date",
+		Desc:       "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
+		CustomFunc: date,
+	}
+
+	generators["int"] = Generator{
+		Name:       "int",
+		Desc:       "positive integer. Accepts range min..max (default: 1,1000).",
+		CustomFunc: integer,
+	}
+
+	generators["enum"] = Generator{
+		Name:       "enum",
+		Desc:       `a random value from an enum. Defaults to "foo,bar,baz"`,
+		CustomFunc: enum,
+	}
+
+	generators["file"] = Generator{
+		Name:       "file",
+		Desc:       `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		CustomFunc: file,
+	}
+
+	return factory{generators: generators}
 }

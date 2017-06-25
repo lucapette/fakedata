@@ -76,76 +76,90 @@ func (tf *testFile) load() string {
 	return string(content)
 }
 
-func TestCliArgs(t *testing.T) {
+func TestCLI(t *testing.T) {
 	tests := []struct {
-		name   string
-		args   []string
-		golden string
+		name    string
+		args    []string
+		golden  string
+		wantErr bool
 	}{
 		{
-			name:   "no arguments",
-			args:   []string{},
-			golden: "help.golden",
+			"no arguments",
+			[]string{},
+			"help.golden",
+			false,
 		},
 		{
-			name:   "list generators",
-			args:   []string{"-g"},
-			golden: "generators.golden",
+			"list generators",
+			[]string{"-g"},
+			"generators.golden",
+			false,
 		},
 		{
-			name:   "default format",
-			args:   []string{"int,42..42", "enum,foo..foo"},
-			golden: "default-format.golden",
+			"default format",
+			[]string{"int:42,42", "enum:foo,foo"},
+			"default-format.golden",
+			false,
 		},
 		{
-			name:   "unknown generators",
-			args:   []string{"madeupgenerator", "anothermadeupgenerator"},
-			golden: "unknown-generators.golden",
+			"unknown generators",
+			[]string{"madeupgenerator", "anothermadeupgenerator"},
+			"unknown-generators.golden",
+			true,
 		},
 		{
-			name:   "default format with limit short",
-			args:   []string{"-l=5", "int,42..42", "enum,foo..foo"},
-			golden: "default-format-with-limit.golden",
+			"default format with limit short",
+			[]string{"-l=5", "int:42,42", "enum:foo,foo"},
+			"default-format-with-limit.golden",
+			false,
 		},
 		{
-			name:   "default format with limit",
-			args:   []string{"--limit=5", "int,42..42", "enum,foo..foo"},
-			golden: "default-format-with-limit.golden",
+			"default format with limit",
+			[]string{"--limit=5", "int:42,42", "enum:foo,foo"},
+			"default-format-with-limit.golden",
+			false,
 		},
 		{
-			name:   "csv format short",
-			args:   []string{"-f=csv", "int,42..42", "enum,foo..foo"},
-			golden: "csv-format.golden",
+			"csv format short",
+			[]string{"-f=csv", "int:42,42", "enum:foo,foo"},
+			"csv-format.golden",
+			false,
 		},
 		{
-			name:   "csv format",
-			args:   []string{"--format=csv", "int,42..42", "enum,foo..foo"},
-			golden: "csv-format.golden",
+			"csv format",
+			[]string{"--format=csv", "int:42,42", "enum:foo,foo"},
+			"csv-format.golden",
+			false,
 		},
 		{
-			name:   "tab format",
-			args:   []string{"-f=tab", "int,42..42", "enum,foo..foo"},
-			golden: "tab-format.golden",
+			"tab format",
+			[]string{"-f=tab", "int:42,42", "enum:foo,foo"},
+			"tab-format.golden",
+			false,
 		},
 		{
-			name:   "sql format",
-			args:   []string{"-f=sql", "int,42..42", "enum,foo..foo"},
-			golden: "sql-format.golden",
+			"sql format",
+			[]string{"-f=sql", "int:42,42", "enum:foo,foo"},
+			"sql-format.golden",
+			false,
 		},
 		{
-			name:   "sql format with keys",
-			args:   []string{"-f=sql", "age=int,42..42", "name=enum,foo..foo"},
-			golden: "sql-format-with-keys.golden",
+			"sql format with keys",
+			[]string{"-f=sql", "age=int:42,42", "name=enum:foo,foo"},
+			"sql-format-with-keys.golden",
+			false,
 		},
 		{
-			name:   "sql format with table name",
-			args:   []string{"-f=sql", "-t=USERS", "int,42..42", "enum,foo..foo"},
-			golden: "sql-format-with-table-name.golden",
+			"sql format with table name",
+			[]string{"-f=sql", "-t=USERS", "int:42,42", "enum:foo,foo"},
+			"sql-format-with-table-name.golden",
+			false,
 		},
 		{
-			name:   "unknown format",
-			args:   []string{"-f=sqll", "-t=USERS", "int,42..42", "enum,foo..foo"},
-			golden: "unknown-format.golden",
+			"unknown format",
+			[]string{"-f=sqll", "-t=USERS", "int:42,42", "enum:foo,foo"},
+			"unknown-format.golden",
+			false,
 		},
 	}
 
@@ -153,8 +167,8 @@ func TestCliArgs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := exec.Command(binaryPath, tt.args...)
 			output, err := cmd.CombinedOutput()
-			if err != nil {
-				t.Fatalf("output: %s\nerr: %v", output, err)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
 			actual := string(output)
 
@@ -180,10 +194,9 @@ func TestFileGenerator(t *testing.T) {
 		wantErr bool
 	}{
 		{"no file", []string{"file"}, "path-empty.golden", true},
-		{"no file,", []string{"file,"}, "path-empty.golden", true},
-		{"file does not exist", []string{`file,'this file does not exist.txt'`}, "file-empty.golden", true},
-		{"file exists", []string{`file,integration/fixtures/file.txt`}, "file-exist.golden", false},
-		{"file exists with quotes", []string{`file,'integration/fixtures/file.txt'`}, "file-exist.golden", false},
+		{"file does not exist", []string{`file:'this file does not exist.txt'`}, "file-does-not-exist.golden", true},
+		{"file exists", []string{`file:integration/fixtures/file.txt`}, "file-exist.golden", false},
+		{"file exists with quotes", []string{`file:'integration/fixtures/file.txt'`}, "file-exist.golden", false},
 	}
 
 	for _, tt := range tests {
