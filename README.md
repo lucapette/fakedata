@@ -2,6 +2,13 @@
 
 `fakedata` is a small command line utility that generates random data.
 
+Please **note** you're reading the documentation of an unreleased version of
+`fakedata` which differs quite a lot from the latest stable release. We're about
+to release version [1.0.0](https://github.com/lucapette/fakedata/issues/44) that
+has some breaking changes. If you're running `fakedata v0.6.0` (you can find out
+with `fakedata --version`, then please refer to its
+[docs](https://github.com/lucapette/fakedata/tree/v0.6.0).
+
 # Table Of Contents
 
 - [Overview](#overview)
