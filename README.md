@@ -193,7 +193,12 @@ $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 
 ### Generators
 
-All the generators listed under `fakedata -g` are available into templates.
+All the generators listed under `fakedata -g` are available as functions into
+the templates. If the generator name is a single word, then it's available as a
+function with the same name capitalized (example: `int` becomes `Int`). If the
+generator name is composed by multiple words joined by dots, then the function
+name is again capitalized by the first letter of the word and joined together
+(example: `product.name` becomes `Product.Name`).
 
 `fakedata` provides the following custom generators:
 
@@ -229,10 +234,18 @@ Int takes one or two integer values and returns a number within this range. By
 default it returns a number between `0` and `1000`.
 
 ```
-{{ Int 15 20 }}
+echo "{{ Int 15 20 }}" | fakedata -l5
+15
+20
+15
+15
+17
 ```
 
-The above function call returns a number between 15 and 20 for each run.
+### `Date`
+
+Date takes one or two dates and returns a date within this range. By default, it
+returns a date between one year ago and today.
 
 ### Helpers
 
@@ -287,8 +300,6 @@ example to display a full name in the format `Lastname Firstname` instead of
 ```html
 {{ printf "%s %s" NameLast NameFirst }}
 ```
-
-This `printf` will return a name displayed as `LastName FirstName` for each run.
 
 # How to install
 
