@@ -1,19 +1,14 @@
 # fakedata
 
-`fakedata` is a small command line utility that generates random data.
-
-Please **note** you're reading the documentation of an unreleased version of
-`fakedata` which differs quite a lot from the latest stable release. We're about
-to release version [1.0.0](https://github.com/lucapette/fakedata/issues/44) that
-has some breaking changes. If you're running `fakedata v0.6.0` (you can find out
-with `fakedata --version`, then please refer to its
-[docs](https://github.com/lucapette/fakedata/tree/v0.6.0).
+`fakedata` is a small program that generates random data on the command line.
 
 # Table Of Contents
 
 - [Overview](#overview)
+  - [Quick Start](#quick-start)
+  - [Why another random data generator?](#why-another-random-data-generator)
 - [Generators](#generators)
-- [Formatters](#formatters)
+  -[Constraints](#constraints)
 - [Templates](#templates)
 - [How to install](#how-to-install)
 - [How to contribute](#how-to-contribute)
@@ -21,9 +16,10 @@ with `fakedata --version`, then please refer to its
 
 # Overview
 
-Here is a list of examples to get a feeling of how `fakedata` works.
+## Quick Start
 
-You can specify the name of generators you want to use:
+`fakedata` helps you generate random data in various ways. You can generate data
+by specifying on the command line the kind of data you need:
 
 ```sh
 $ fakedata email country
@@ -38,19 +34,8 @@ bermonpainter@test.us Haiti
 opnsrce@example.name Malaysia
 ankitind@test.info Virgin Islands, British
 ```
-
-Limit the number of rows:
-
-```sh
-$ fakedata --limit 5 country.code
-SH
-CF
-GQ
-PE
-FO
-```
-
-Choose a different output format:
+Be default, `fakedata` generates data using a space as a separator. You can
+choose a different output format like CSV:
 
 ```sh
 $ fakedata --format=csv product.category product.name
@@ -66,13 +51,48 @@ Shoes,Freetop
 Tools,Domnix
 ```
 
+or SQL insert statements:
+
+```sh
+$ fakedata --format=sql --limit 1 email domain
+INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
+```
+
+You can specify the name of the column using a field with the following format
+`column_name=generator`:
+
+```sh
+$ fakedata --format=sql --limit 1 login=email referral=domain
+INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
+```
+
+If you need some control over the output, you can use templates:
+
+```sh
+$ echo '{{Email}}--{{Int}}--{{Color}}' | fakedata -l5
+antonyzotov@test.george--967--azure
+Skyhartman@test.xn--mgbaam7a8h--238--cyan
+syropian@example.jlc--566--black
+catadeleon@example.sohu--60--white
+kennyadr@test.best--899--red
+```
+
+## Why another random data generator?
+
+`fakedata` focuses on a simple UI (if you think it could be simpler, please [let
+us know!](https://github.com/lucapette/fakedata/issues/new) We :heart:
+feedback!) and the ability to fully control both the output format (using
+[templates](#templates)) and the set of values a generator will pick from. We
+call this feature "generators' constraints" and it's explained in detail
+[here](#constraints).
+
 # Generators
 
 `fakedata` provides a number of generators. You can see the full list running
 the following command:
 
 ```sh
-$ fakedata --generators
+$ fakedata --generators # or -G
 color             one word color
 country           Full country name
 country.code      2-digit country code
@@ -83,8 +103,30 @@ domain.tld        example|test
 # It's a long list :)
 ```
 
+You can use the `-g` (or `--generator`) option to see an example:
+
+```sh
+$ fakedata -g sentence
+Description: sentence
+
+Example:
+
+Jerk the dart from the cork target.
+Drop the ashes on the worn old rug.
+The sense of smell is better than that of touch.
+Tin cans are absent from store shelves.
+Shut the hatch before the waves push it in.
+```
+
+## Constraints
+
 Some generators allow you to pass in a range to constraint the output to a
-subset of values:
+subset of values. To find out which generators support constraints:
+
+```sh
+$ fakedata --constraints
+
+```
 
 ```sh
 $ fakedata int:1,100 # will generate only integers between 1 and 100
@@ -93,7 +135,7 @@ $ fakedata int:50 # also works
 ```
 
 The `enum` generator allows you to specify a set of values. It comes handy when
-you need random data from a small subset of values:
+you need random data from a small set of values:
 
 ```sh
 $ fakedata --limit 5 enum
@@ -131,31 +173,6 @@ two
 two
 one
 two
-```
-
-# Formatters
-
-### SQL formatter
-
-`fakedata` can generate insert statements. By default, it uses the name of the
-generators as column names:
-
-```sh
-$ fakedata --format=sql --limit 1 email domain
-INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
-```
-
-You can specify the name of the column using a field with the following format
-`column_name=generator`:
-
-```sh
-$ fakedata --format=sql --limit 1 login=email referral=domain
-INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
-```
-
-```sh
-fakedata --format=sql --limit=1 --table=users login=email referral=domain
-INSERT INTO users (login,referral) VALUES ('mikema@example.com' 'test.us');
 ```
 
 # Templates

@@ -90,12 +90,6 @@ func TestCLI(t *testing.T) {
 			false,
 		},
 		{
-			"list generators",
-			[]string{"-g"},
-			"generators.golden",
-			false,
-		},
-		{
 			"default format",
 			[]string{"int:42,42", "enum:foo,foo"},
 			"default-format.golden",
