@@ -349,6 +349,35 @@ func newFactory() (f factory) {
 		Func: withList(data.Cats),
 	}
 
+	generators["animal.dog"] = Generator{
+		Name: "animal.dog",
+		Desc: "dog breed",
+		Func: withList(data.Dogs),
+	}
+
+	generators["adjective"] = Generator{
+		Name: "adjectives",
+		Desc: "adjective",
+		Func: withList(data.Adjectives),
+	}
+
+	generators["industry"] = Generator{
+		Name: "industries",
+		Desc: "industries",
+		Func: withList(data.Industries),
+	}
+
+	generators["occupation"] = Generator{
+		Name: "occupation",
+		Desc: "occupation",
+		Func: withList(data.Occupations),
+	}
+
+	generators["sentence"] = Generator{
+		Name: "sentence",
+		Desc: "sentence",
+		Func: withList(data.Sentences),
+	}
 	// custom generators
 	generators["date"] = Generator{
 		Name:       "date",
