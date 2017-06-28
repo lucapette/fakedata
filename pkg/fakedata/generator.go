@@ -263,18 +263,6 @@ func newFactory() (f factory) {
 		Func: withList(data.Colors),
 	}
 
-	generators["product.category"] = Generator{
-		Name: "product.category",
-		Desc: "Beauty|Games|Movies|Tools|..",
-		Func: withList(data.ProductCategories),
-	}
-
-	generators["product.name"] = Generator{
-		Name: "product.name",
-		Desc: "invented product name",
-		Func: withList(data.ProductNames),
-	}
-
 	generators["event.action"] = Generator{
 		Name: "event.action",
 		Desc: `clicked|purchased|viewed|watched`,
