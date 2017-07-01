@@ -20,23 +20,45 @@ type Generator struct {
 	Name       string
 }
 
+// Generators is an array of Generator
+type Generators []Generator
+
 // IsCustom returns a bool indicating whether the generator has a CustomFunc or
 // not
 func (g Generator) IsCustom() bool {
 	return g.CustomFunc != nil
 }
 
-// Generators returns available generators
-func Generators() []Generator {
+// NewGenerators returns the available generators
+func NewGenerators() (gens Generators) {
 	f := newFactory()
-	gens := make([]Generator, 0)
 
-	for _, v := range f.generators {
-		gens = append(gens, v)
+	for _, gen := range f.generators {
+		gens = append(gens, gen)
 	}
 
 	sort.Slice(gens, func(i, j int) bool { return strings.Compare(gens[i].Name, gens[j].Name) < 0 })
 	return gens
+}
+
+// WithConstraints returns only the generators that accept constraints
+func (gens Generators) WithConstraints() (newGens Generators) {
+	for _, gen := range gens {
+		if gen.IsCustom() {
+			newGens = append(newGens, gen)
+		}
+	}
+	return newGens
+}
+
+// FindByName returns, if present, the generator with the name string
+func (gens Generators) FindByName(name string) (gen *Generator) {
+	for _, g := range gens {
+		if g.Name == name {
+			return &g
+		}
+	}
+	return gen
 }
 
 func withList(list []string) func() string {
@@ -67,6 +89,10 @@ func longitude() string {
 
 func double() string {
 	return strconv.FormatFloat(rand.NormFloat64()*1000, 'f', 4, 64)
+}
+
+func domain() string {
+	return withList([]string{"test", "example"})() + "." + withList(data.TLDs)()
 }
 
 func date(options string) (f func() string, err error) {
@@ -190,23 +216,13 @@ func (f factory) extractFunc(key, options string) (fn func() string, err error) 
 	return gen.Func, nil
 }
 
-func domain() string {
-	return withList([]string{"test", "example"})() + "." + withList(data.TLDs)()
-}
-
 func newFactory() (f factory) {
 	generators := make(map[string]Generator)
 
 	generators["domain.tld"] = Generator{
 		Name: "domain.tld",
-		Desc: "name|info|com|org|me|us",
+		Desc: "valid TLD name from https://data.iana.org/TLD/tlds-alpha-by-domain.txt",
 		Func: withList(data.TLDs),
-	}
-
-	generators["domain.name"] = Generator{
-		Name: "domain.name",
-		Desc: "example|test",
-		Func: withList([]string{"example", "test"}),
 	}
 
 	generators["country"] = Generator{
@@ -327,19 +343,19 @@ func newFactory() (f factory) {
 
 	generators["noun"] = Generator{
 		Name: "noun",
-		Desc: "random noun",
+		Desc: "noun from https://github.com/dariusk/corpora/blob/master/data/words/nouns.json",
 		Func: withList(data.Nouns),
 	}
 
 	generators["emoji"] = Generator{
 		Name: "emoji",
-		Desc: "random emoji",
+		Desc: "emoji from https://github.com/dariusk/corpora/blob/master/data/words/emojis.json",
 		Func: withList(data.Emoji),
 	}
 
 	generators["animal"] = Generator{
 		Name: "animal",
-		Desc: "random animal name",
+		Desc: "animal breed",
 		Func: withList(data.Animals),
 	}
 
@@ -381,25 +397,25 @@ func newFactory() (f factory) {
 	// custom generators
 	generators["date"] = Generator{
 		Name:       "date",
-		Desc:       "YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.",
+		Desc:       `random date in the format YYYY-MM-DD. By default, it generates dates in the last year`,
 		CustomFunc: date,
 	}
 
 	generators["int"] = Generator{
 		Name:       "int",
-		Desc:       "positive integer. Accepts range min..max (default: 1,1000).",
+		Desc:       "positive integer between 1 and 1000",
 		CustomFunc: integer,
 	}
 
 	generators["enum"] = Generator{
 		Name:       "enum",
-		Desc:       `a random value from an enum. Defaults to "foo,bar,baz"`,
+		Desc:       `value from an enum. By default, the enum is foo,bar,baz. It accepts a list of comma-separated values`,
 		CustomFunc: enum,
 	}
 
 	generators["file"] = Generator{
 		Name:       "file",
-		Desc:       `Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.`,
+		Desc:       `random value from a file. It accepts a file path. It can be either relative or absolute. The file must contain a value per line`,
 		CustomFunc: file,
 	}
 

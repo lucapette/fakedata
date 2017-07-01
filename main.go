@@ -30,17 +30,15 @@ func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	return f, err
 }
 
-func generatorsHelp() string {
-	generators := fakedata.Generators()
-	buffer := &bytes.Buffer{}
+func generatorsHelp(generators fakedata.Generators) string {
 	max := 0
-
 	for _, gen := range generators {
 		if len(gen.Name) > max {
 			max = len(gen.Name)
 		}
 	}
 
+	buffer := &bytes.Buffer{}
 	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
 	for _, gen := range generators {
 		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
@@ -52,7 +50,7 @@ func generatorsHelp() string {
 func isPipe() bool {
 	stat, err := os.Stdin.Stat()
 	if err != nil {
-		fmt.Printf("Error checking shell pipe: %s", err)
+		fmt.Printf("error checking shell pipe: %v", err)
 	}
 	// Check if template data is piped to fakedata
 	return (stat.Mode() & os.ModeCharDevice) == 0
@@ -84,15 +82,17 @@ func findTemplate(path string) string {
 
 func main() {
 	var (
-		generatorsFlag = flag.BoolP("generators", "g", false, "lists available generators")
-		limitFlag      = flag.IntP("limit", "l", 10, "limits rows up to n")
-		formatFlag     = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
-		versionFlag    = flag.BoolP("version", "v", false, "shows version information")
-		tableFlag      = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-		templateFlag   = flag.StringP("template", "T", "", "Use template as input")
+		generatorsFlag  = flag.BoolP("generators", "G", false, "lists available generators")
+		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
+		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
+		limitFlag       = flag.IntP("limit", "l", 10, "limits rows up to n")
+		formatFlag      = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
+		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
+		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
+		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
 	)
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: fakedata [option ...] field...\n\n")
+		fmt.Fprintf(os.Stdout, "Usage: fakedata [option ...] field...\n\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -102,8 +102,25 @@ func main() {
 		os.Exit(0)
 	}
 
+	generators := fakedata.NewGenerators()
+
 	if *generatorsFlag {
-		fmt.Print(generatorsHelp())
+		fmt.Print(generatorsHelp(generators))
+		os.Exit(0)
+	}
+
+	if *generatorFlag != "" {
+		if generator := generators.FindByName(*generatorFlag); generator != nil {
+			fmt.Printf("Description: %s\n\nExample:\n\n", generator.Desc)
+			for i := 0; i < 5; i++ {
+				fmt.Println(generator.Func())
+			}
+		}
+		os.Exit(0)
+	}
+
+	if *constraintsFlag {
+		fmt.Print(generatorsHelp(generators.WithConstraints()))
 		os.Exit(0)
 	}
 
