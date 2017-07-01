@@ -124,15 +124,19 @@ Some generators allow you to pass in a range to constraint the output to a
 subset of values. To find out which generators support constraints:
 
 ```sh
-$ fakedata --constraints
-
+$ fakedata -c # or fakedata --generators-with-constraints
 ```
+
+### Int
+
+Here is how you can use constraints with the `int` generator:
 
 ```sh
 $ fakedata int:1,100 # will generate only integers between 1 and 100
 $ fakedata int:50, # specifying only min number works too
 $ fakedata int:50 # also works
 ```
+### Enum
 
 The `enum` generator allows you to specify a set of values. It comes handy when
 you need random data from a small set of values:
@@ -162,6 +166,8 @@ two repeat
 one repeat
 one repeat
 ```
+
+### File
 
 The `file` generator can be use to read custom values from a file:
 
@@ -224,12 +230,8 @@ generator name is composed by multiple words joined by dots, then the function
 name is again capitalized by the first letter of the word and joined together
 (example: `product.name` becomes `Product.Name`).
 
-`fakedata` provides the following custom generators:
-
-- `Enum` 
-- `File`
-- `Int`
-- `Date`
+Each generator with [constraints](#constraints) is available in templates as a
+function with arguments.
 
 ### `Enum`
 
