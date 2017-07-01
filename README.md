@@ -8,7 +8,7 @@
   - [Quick Start](#quick-start)
   - [Why another random data generator?](#why-another-random-data-generator)
 - [Generators](#generators)
-  -[Constraints](#constraints)
+  - [Constraints](#constraints)
 - [Templates](#templates)
 - [How to install](#how-to-install)
 - [How to contribute](#how-to-contribute)
