@@ -1,32 +1,35 @@
-animal            random animal name
-animal.cat        random cat breed
-color             one word color
-country           Full country name
-country.code      2-digit country code
-date              YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.
-domain            domain
-domain.name       example|test
-domain.tld        name|info|com|org|me|us
-double            double number
-email             email
-emoji             random emoji
-enum              a random value from an enum. Defaults to "foo,bar,baz"
-event.action      clicked|purchased|viewed|watched
-file              Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.
-http.method       DELETE|GET|HEAD|OPTION|PATCH|POST|PUT
-int               positive integer. Accepts range min..max (default: 1,1000).
-ipv4              ipv4
-ipv6              ipv6
-latitude          latitude
-longitude         longitude
-mac.address       mac address
-name              name.first + " " + name.last
-name.first        capitalized first name
-name.last         capitalized last name
-noun              random noun
-product.category  Beauty|Games|Movies|Tools|..
-product.name      invented product name
-state             Full US state name
-state.code        2-digit US state name
-timezone          tz in the form Area/City
-username          username using the pattern \w+
+adjectives    adjective
+animal        random animal name
+animal.cat    random cat breed
+animal.dog    dog breed
+color         one word color
+country       Full country name
+country.code  2-digit country code
+date          YYYY-MM-DD. Accepts a range in the format YYYY-MM-DD,YYYY-MM-DD. By default, it generates dates in the last year.
+domain        domain
+domain.name   example|test
+domain.tld    name|info|com|org|me|us
+double        double number
+email         email
+emoji         random emoji
+enum          a random value from an enum. Defaults to "foo,bar,baz"
+event.action  clicked|purchased|viewed|watched
+file          Read a random line from a file. Pass filepath with 'file,path/to/file.txt'.
+http.method   DELETE|GET|HEAD|OPTION|PATCH|POST|PUT
+industries    industries
+int           positive integer. Accepts range min..max (default: 1,1000).
+ipv4          ipv4
+ipv6          ipv6
+latitude      latitude
+longitude     longitude
+mac.address   mac address
+name          name.first + " " + name.last
+name.first    capitalized first name
+name.last     capitalized last name
+noun          random noun
+occupation    occupation
+sentence      sentence
+state         Full US state name
+state.code    2-digit US state name
+timezone      tz in the form Area/City
+username      username using the pattern \w+

@@ -263,18 +263,6 @@ func newFactory() (f factory) {
 		Func: withList(data.Colors),
 	}
 
-	generators["product.category"] = Generator{
-		Name: "product.category",
-		Desc: "Beauty|Games|Movies|Tools|..",
-		Func: withList(data.ProductCategories),
-	}
-
-	generators["product.name"] = Generator{
-		Name: "product.name",
-		Desc: "invented product name",
-		Func: withList(data.ProductNames),
-	}
-
 	generators["event.action"] = Generator{
 		Name: "event.action",
 		Desc: `clicked|purchased|viewed|watched`,
@@ -361,6 +349,35 @@ func newFactory() (f factory) {
 		Func: withList(data.Cats),
 	}
 
+	generators["animal.dog"] = Generator{
+		Name: "animal.dog",
+		Desc: "dog breed",
+		Func: withList(data.Dogs),
+	}
+
+	generators["adjective"] = Generator{
+		Name: "adjectives",
+		Desc: "adjective",
+		Func: withList(data.Adjectives),
+	}
+
+	generators["industry"] = Generator{
+		Name: "industries",
+		Desc: "industries",
+		Func: withList(data.Industries),
+	}
+
+	generators["occupation"] = Generator{
+		Name: "occupation",
+		Desc: "occupation",
+		Func: withList(data.Occupations),
+	}
+
+	generators["sentence"] = Generator{
+		Name: "sentence",
+		Desc: "sentence",
+		Func: withList(data.Sentences),
+	}
 	// custom generators
 	generators["date"] = Generator{
 		Name:       "date",

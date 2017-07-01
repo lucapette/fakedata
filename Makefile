@@ -21,8 +21,8 @@ ci: lint test ## Run all the tests and code checks
 build: ## Build a dev version of fakedata
 	go build
 
-corpora: ## Import the latest data from dariusk/corpora
-	go run cmd/importcorpora/main.go
+import: ## Import or update data from dariusk/corpora
+	go run cmd/import/main.go
 
 # Absolutely awesome: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
