@@ -2,6 +2,7 @@ could not read file this file does not exist.txt: open this file does not exist.
 
 Usage: fakedata [option ...] field...
 
+  -C, --completion string             print bash/zsh completion function, pass shell as argument ("bash" or "zsh")
   -f, --format string                 generators rows in f format. Available formats: csv|tab|sql
   -g, --generator string              show help for a specific generator
   -G, --generators                    lists available generators

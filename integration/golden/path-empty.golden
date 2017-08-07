@@ -2,6 +2,7 @@ no file path given
 
 Usage: fakedata [option ...] field...
 
+  -C, --completion string             print bash/zsh completion function, pass shell as argument ("bash" or "zsh")
   -f, --format string                 generators rows in f format. Available formats: csv|tab|sql
   -g, --generator string              show help for a specific generator
   -G, --generators                    lists available generators
