@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kevingimbel/fakedata/pkg/fakedata"
 	"github.com/spf13/pflag"
 )
 
@@ -36,8 +35,6 @@ _fakedata () {
 compdef _fakedata fakedata`
 )
 
-var allCliArgs bytes.Buffer
-
 func findCompletionTemplate(sh string) (string, error) {
 	switch sh {
 	case "bash":
@@ -50,13 +47,15 @@ func findCompletionTemplate(sh string) (string, error) {
 }
 
 func PrintShellCompletionFunction(sh string) (completion string, err error) {
-	var gens bytes.Buffer
-	for _, gen := range fakedata.Generators() {
-		gens.WriteString(gen.Name + " ")
+	gens := &bytes.Buffer{}
+	allCliArgs := &bytes.Buffer{}
+
+	for _, gen := range NewGenerators() {
+		fmt.Fprintf(gens, gen.Name+" ")
 	}
 
 	pflag.VisitAll(func(f *pflag.Flag) {
-		allCliArgs.WriteString(fmt.Sprintf("-%s --%s ", f.Shorthand, f.Name))
+		fmt.Fprintf(allCliArgs, "-%s --%s ", f.Shorthand, f.Name)
 	})
 
 	t, err := findCompletionTemplate(sh)
