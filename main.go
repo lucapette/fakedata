@@ -82,7 +82,6 @@ func findTemplate(path string) string {
 
 func main() {
 	var (
-		completionFlag  string
 		generatorsFlag  = flag.BoolP("generators", "G", false, "lists available generators")
 		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
 		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
@@ -91,8 +90,8 @@ func main() {
 		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
 		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
 		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
+		completionFlag  = flag.StringP("completion", "C", "", "print bash/zsh completion function, pass shell as argument (\"bash\" or \"zsh\")")
 	)
-	flag.StringVarP(&completionFlag, "completion", "C", "", "print bash/zsh completion function, pass shell as argument (\"bash\" or \"zsh\")")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stdout, "Usage: fakedata [option ...] field...\n\n")
@@ -100,8 +99,8 @@ func main() {
 	}
 	flag.Parse()
 
-	if completionFlag != "" {
-		completion, err := fakedata.PrintShellCompletionFunction(completionFlag)
+	if *completionFlag != "" {
+		completion, err := fakedata.PrintShellCompletionFunction(*completionFlag)
 		if err != nil {
 			fmt.Println(err)
 		}
