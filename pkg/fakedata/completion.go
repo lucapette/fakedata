@@ -43,7 +43,7 @@ func findCompletionTemplate(sh string) (string, error) {
 	case "zsh":
 		return zshTemplate, nil
 	}
-	return "", errors.New("Shell could not be found.\nPlease set the $SHELL environment variable and make sure you use one of the supported shells.")
+	return "", errors.New("Shell is not supported. See https://github.com/lucapette/fakedata#completion")
 }
 
 func PrintShellCompletionFunction(sh string) (completion string, err error) {

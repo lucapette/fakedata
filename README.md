@@ -10,6 +10,7 @@
 - [Generators](#generators)
   - [Constraints](#constraints)
 - [Templates](#templates)
+- [Completion](#completion)
 - [How to install](#how-to-install)
 - [How to contribute](#how-to-contribute)
 - [Code of conduct](#code-of-conduct)
@@ -326,6 +327,24 @@ example to display a full name in the format `Lastname Firstname` instead of
 ```html
 {{ printf "%s %s" NameLast NameFirst }}
 ```
+
+# Completion
+
+`fakedata` supports shell tab completion for bash and zsh shells. To enable completion execute one of the following commands
+ to append the completion function to your `.bashrc` or `.zshrc` file.
+
+```sh
+$ fakedata --completion bash >> $HOME/.bashrc
+$ fakedata --completion zsh >> $HOME/.zshrc
+```
+
+Alternatively for bash you can also add a file to `/etc/bash_completion.d/` named `fakedata` like so.
+
+```sh
+$ fakedata --completion bash >> /etc/bash_completion.d/fakedata
+```
+
+As of now you'll need to update the `/etc/bash_completion.d/fakedata` file or the function inside `.bashrc` / `.zshrc` when you update fakedata.
 
 # How to install
 
