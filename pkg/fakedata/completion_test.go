@@ -1,14 +1,16 @@
-package fakedata
+package fakedata_test
 
 import (
 	"testing"
+
+	"github.com/lucapette/fakedata/pkg/fakedata"
 )
 
 func TestPrintShellCompletionFunction(t *testing.T) {
-	var tests = []struct {
-		Name    string
-		Input   string
-		WantErr bool
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
 	}{
 		{"zsh shell", "zsh", false},
 		{"bash shell", "bash", false},
@@ -17,11 +19,10 @@ func TestPrintShellCompletionFunction(t *testing.T) {
 		{"empty", "", true},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.Name, func(t *testing.T) {
-			_, err := PrintShellCompletionFunction(tt.Input)
-			if err != nil && !tt.WantErr {
-				t.Errorf("Shell Completion error. Got %v but want %v", err, tt.WantErr)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if _, err := fakedata.GetCompletionFunc(tc.input); err != nil && !tc.wantErr {
+				t.Errorf("expected err to be %v but got %v", tc.wantErr, err)
 			}
 		})
 	}

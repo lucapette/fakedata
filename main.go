@@ -100,7 +100,7 @@ func main() {
 	flag.Parse()
 
 	if *completionFlag != "" {
-		completion, err := fakedata.PrintShellCompletionFunction(*completionFlag)
+		completion, err := fakedata.GetCompletionFunc(*completionFlag)
 		if err != nil {
 			fmt.Println(err)
 		}

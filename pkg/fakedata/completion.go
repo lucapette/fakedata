@@ -2,14 +2,12 @@ package fakedata
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 
 	"github.com/spf13/pflag"
 )
 
-const (
-	bashTemplate = `
+const bashTemplate = `
 _fakedata()
 {
     local cur prev opts
@@ -25,7 +23,7 @@ _fakedata()
 }
 complete -F _fakedata fakedata`
 
-	zshTemplate = `
+const zshTemplate = `
 _fakedata () {
     local -a commands
     IFS=$'\n'
@@ -33,20 +31,23 @@ _fakedata () {
     _describe 'arguments' commands
 }
 compdef _fakedata fakedata`
-)
 
-func findCompletionTemplate(sh string) (string, error) {
+func getTemplate(sh string) (string, error) {
 	switch sh {
 	case "bash":
 		return bashTemplate, nil
-
 	case "zsh":
 		return zshTemplate, nil
 	}
-	return "", errors.New("Shell is not supported. See https://github.com/lucapette/fakedata#completion")
+	return "", fmt.Errorf("shell %s not supported. See https://github.com/lucapette/fakedata#completion", sh)
 }
 
-func PrintShellCompletionFunction(sh string) (completion string, err error) {
+func GetCompletionFunc(shell string) (string, error) {
+	t, err := getTemplate(shell)
+	if err != nil {
+		return "", err
+	}
+
 	gens := &bytes.Buffer{}
 	allCliArgs := &bytes.Buffer{}
 
@@ -57,12 +58,6 @@ func PrintShellCompletionFunction(sh string) (completion string, err error) {
 	pflag.VisitAll(func(f *pflag.Flag) {
 		fmt.Fprintf(allCliArgs, "-%s --%s ", f.Shorthand, f.Name)
 	})
-
-	t, err := findCompletionTemplate(sh)
-
-	if err != nil {
-		return "", err
-	}
 
 	cmdList := gens.String() + " " + allCliArgs.String()
 	return fmt.Sprintf(t, cmdList), nil
