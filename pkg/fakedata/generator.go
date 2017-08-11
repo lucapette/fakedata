@@ -199,8 +199,14 @@ func enum(options string) (func() string, error) {
 	return func() string { return withList(list)() }, nil
 }
 
+type generatorsMap map[string]Generator
+
+func (gM generatorsMap) addGen(g Generator) {
+	gM[g.Name] = g
+}
+
 type factory struct {
-	generators map[string]Generator
+	generators generatorsMap
 }
 
 func (f factory) extractFunc(key, options string) (fn func() string, err error) {
@@ -217,207 +223,124 @@ func (f factory) extractFunc(key, options string) (fn func() string, err error) 
 }
 
 func newFactory() (f factory) {
-	generators := make(map[string]Generator)
+	generators := make(generatorsMap)
 
-	generators["domain.tld"] = Generator{
+	generators.addGen(Generator{
 		Name: "domain.tld",
 		Desc: "valid TLD name from https://data.iana.org/TLD/tlds-alpha-by-domain.txt",
 		Func: withList(data.TLDs),
-	}
+	})
 
-	generators["country"] = Generator{
-		Name: "country",
-		Desc: "Full country name",
-		Func: withList(data.Countries),
-	}
+	generators.addGen(Generator{Name: "country", Desc: "Full country name", Func: withList(data.Countries)})
 
-	generators["country.code"] = Generator{
-		Name: "country.code",
-		Desc: "2-digit country code",
-		Func: withList(data.CountryCodes),
-	}
+	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withList(data.CountryCodes)})
 
-	generators["state"] = Generator{
-		Name: "state",
-		Desc: "Full US state name",
-		Func: withList(data.States),
-	}
+	generators.addGen(Generator{Name: "state", Desc: "Full US state name", Func: withList(data.States)})
 
-	generators["state.code"] = Generator{
-		Name: "state.code",
-		Desc: "2-digit US state name",
-		Func: withList(data.StateCodes),
-	}
+	generators.addGen(Generator{Name: "state.code", Desc: "2-digit US state name", Func: withList(data.StateCodes)})
 
-	generators["timezone"] = Generator{
-		Name: "timezone",
-		Desc: "tz in the form Area/City",
-		Func: withList(data.Timezones),
-	}
+	generators.addGen(Generator{Name: "timezone", Desc: "tz in the form Area/City", Func: withList(data.Timezones)})
 
-	generators["username"] = Generator{
-		Name: "username",
-		Desc: `username using the pattern \w+`,
-		Func: withList(data.Usernames),
-	}
+	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: withList(data.Usernames)})
 
-	generators["name.first"] = Generator{
-		Name: "name.first",
-		Desc: "capitalized first name",
-		Func: withList(data.Firstnames),
-	}
+	generators.addGen(Generator{Name: "name.first", Desc: "capitalized first name", Func: withList(data.Firstnames)})
 
-	generators["name.last"] = Generator{
-		Name: "name.last",
-		Desc: "capitalized last name",
-		Func: withList(data.Lastnames),
-	}
+	generators.addGen(Generator{Name: "name.last", Desc: "capitalized last name", Func: withList(data.Lastnames)})
 
-	generators["color"] = Generator{
-		Name: "color",
-		Desc: "one word color",
-		Func: withList(data.Colors),
-	}
+	generators.addGen(Generator{Name: "color", Desc: "one word color", Func: withList(data.Colors)})
 
-	generators["event.action"] = Generator{
+	generators.addGen(Generator{
 		Name: "event.action",
 		Desc: `clicked|purchased|viewed|watched`,
 		Func: withList([]string{"clicked", "purchased", "viewed", "watched"}),
-	}
+	})
 
-	generators["http.method"] = Generator{
+	generators.addGen(Generator{
 		Name: "http.method",
 		Desc: `DELETE|GET|HEAD|OPTION|PATCH|POST|PUT`,
 		Func: withList([]string{"DELETE", "GET", "HEAD", "OPTION", "PATCH", "POST", "PUT"}),
-	}
+	})
 
-	generators["name"] = Generator{
+	generators.addGen(Generator{
 		Name: "name",
 		Desc: `name.first + " " + name.last`,
 		Func: func() string {
 			return withList(data.Firstnames)() + " " + withList(data.Lastnames)()
 		},
-	}
+	})
 
-	generators["email"] = Generator{
+	generators.addGen(Generator{
 		Name: "email",
 		Desc: "email",
 		Func: func() string {
 			return withList(data.Usernames)() + "@" + domain()
 		},
-	}
+	})
 
-	generators["domain"] = Generator{
-		Name: "domain",
-		Desc: "domain",
-		Func: domain,
-	}
+	generators.addGen(Generator{Name: "domain", Desc: "domain", Func: domain})
 
-	generators["ipv4"] = Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4}
+	generators.addGen(Generator{Name: "ipv4", Desc: "ipv4", Func: ipv4})
 
-	generators["ipv6"] = Generator{Name: "ipv6", Desc: "ipv6", Func: ipv6}
+	generators.addGen(Generator{Name: "ipv6", Desc: "ipv6", Func: ipv6})
 
-	generators["mac.address"] = Generator{
-		Name: "mac.address",
-		Desc: "mac address",
-		Func: mac,
-	}
+	generators.addGen(Generator{Name: "mac.address", Desc: "mac address", Func: mac})
 
-	generators["latitude"] = Generator{
-		Name: "latitude",
-		Desc: "latitude",
-		Func: latitude,
-	}
+	generators.addGen(Generator{Name: "latitude", Desc: "latitude", Func: latitude})
 
-	generators["longitude"] = Generator{
-		Name: "longitude",
-		Desc: "longitude",
-		Func: longitude,
-	}
+	generators.addGen(Generator{Name: "longitude", Desc: "longitude", Func: longitude})
 
-	generators["double"] = Generator{
-		Name: "double",
-		Desc: "double number",
-		Func: double,
-	}
+	generators.addGen(Generator{Name: "double", Desc: "double number", Func: double})
 
-	generators["noun"] = Generator{
+	generators.addGen(Generator{
 		Name: "noun",
 		Desc: "noun from https://github.com/dariusk/corpora/blob/master/data/words/nouns.json",
 		Func: withList(data.Nouns),
-	}
+	})
 
-	generators["emoji"] = Generator{
+	generators.addGen(Generator{
 		Name: "emoji",
 		Desc: "emoji from https://github.com/dariusk/corpora/blob/master/data/words/emojis.json",
 		Func: withList(data.Emoji),
-	}
+	})
 
-	generators["animal"] = Generator{
-		Name: "animal",
-		Desc: "animal breed",
-		Func: withList(data.Animals),
-	}
+	generators.addGen(Generator{Name: "animal", Desc: "animal breed", Func: withList(data.Animals)})
 
-	generators["animal.cat"] = Generator{
-		Name: "animal.cat",
-		Desc: "random cat breed",
-		Func: withList(data.Cats),
-	}
+	generators.addGen(Generator{Name: "animal.cat", Desc: "random cat breed", Func: withList(data.Cats)})
 
-	generators["animal.dog"] = Generator{
-		Name: "animal.dog",
-		Desc: "dog breed",
-		Func: withList(data.Dogs),
-	}
+	generators.addGen(Generator{Name: "animal.dog", Desc: "dog breed", Func: withList(data.Dogs)})
 
-	generators["adjective"] = Generator{
-		Name: "adjectives",
-		Desc: "adjective",
-		Func: withList(data.Adjectives),
-	}
+	generators.addGen(Generator{Name: "adjectives", Desc: "adjective", Func: withList(data.Adjectives)})
 
-	generators["industry"] = Generator{
-		Name: "industries",
-		Desc: "industries",
-		Func: withList(data.Industries),
-	}
+	generators.addGen(Generator{Name: "industry", Desc: "industry", Func: withList(data.Industries)})
 
-	generators["occupation"] = Generator{
-		Name: "occupation",
-		Desc: "occupation",
-		Func: withList(data.Occupations),
-	}
+	generators.addGen(Generator{Name: "occupation", Desc: "occupation", Func: withList(data.Occupations)})
 
-	generators["sentence"] = Generator{
-		Name: "sentence",
-		Desc: "sentence",
-		Func: withList(data.Sentences),
-	}
+	generators.addGen(Generator{Name: "sentence", Desc: "sentence", Func: withList(data.Sentences)})
+
 	// custom generators
-	generators["date"] = Generator{
+	generators.addGen(Generator{
 		Name:       "date",
 		Desc:       `random date in the format YYYY-MM-DD. By default, it generates dates in the last year`,
 		CustomFunc: date,
-	}
+	})
 
-	generators["int"] = Generator{
+	generators.addGen(Generator{
 		Name:       "int",
 		Desc:       "positive integer between 1 and 1000",
 		CustomFunc: integer,
-	}
+	})
 
-	generators["enum"] = Generator{
+	generators.addGen(Generator{
 		Name:       "enum",
 		Desc:       `value from an enum. By default, the enum is foo,bar,baz. It accepts a list of comma-separated values`,
 		CustomFunc: enum,
-	}
+	})
 
-	generators["file"] = Generator{
+	generators.addGen(Generator{
 		Name:       "file",
 		Desc:       `random value from a file. It accepts a file path. It can be either relative or absolute. The file must contain a value per line`,
 		CustomFunc: file,
-	}
+	})
 
 	return factory{generators: generators}
 }
