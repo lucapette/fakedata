@@ -330,24 +330,11 @@ example to display a full name in the format `Lastname Firstname` instead of
 
 # Completion
 
-`fakedata` supports shell tab completion for bash and zsh shells. To enable
- completion execute one of the following commands to append the completion
- function to your `.bashrc` or `.zshrc` file.
+`fakedata` supports shell tab completion for bash and zsh shells:
 
 ```sh
-$ fakedata --completion bash >> $HOME/.bashrc
-$ fakedata --completion zsh >> $HOME/.zshrc
+$ eval "$(fakedata --completion zsh)" # or bash
 ```
-
-Alternatively for bash you can also add a file to `/etc/bash_completion.d/`
-named `fakedata`:
-
-```sh
-$ fakedata --completion bash >> /etc/bash_completion.d/fakedata
-```
-
-As of now you'll need to update the `/etc/bash_completion.d/fakedata` file or
-the function inside `.bashrc` / `.zshrc` when you update fakedata.
 
 # How to install
 

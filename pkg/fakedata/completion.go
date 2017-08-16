@@ -56,7 +56,7 @@ func GetCompletionFunc(shell string) (string, error) {
 	}
 
 	pflag.VisitAll(func(f *pflag.Flag) {
-		fmt.Fprintf(allCliArgs, "-%s --%s ", f.Shorthand, f.Name)
+		fmt.Fprintf(allCliArgs, "--%s ", f.Name)
 	})
 
 	cmdList := gens.String() + " " + allCliArgs.String()
