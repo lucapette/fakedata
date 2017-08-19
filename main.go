@@ -90,7 +90,7 @@ func main() {
 		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
 		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
 		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
-		completionFlag  = flag.StringP("completion", "C", "", "print bash/zsh completion function, pass shell as argument (\"bash\" or \"zsh\")")
+		completionFlag  = flag.StringP("completion", "C", "", "print shell completion function, pass shell name as argument (\"bash\", \"zsh\" or \"fish\")")
 	)
 
 	flag.Usage = func() {

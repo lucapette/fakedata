@@ -14,7 +14,7 @@ func TestPrintShellCompletionFunction(t *testing.T) {
 	}{
 		{"zsh shell", "zsh", false},
 		{"bash shell", "bash", false},
-		{"fish shell", "fish", true},
+		{"fish shell", "fish", false},
 		{"bsh shell (spelling mistake)", "bsh", true},
 		{"empty", "", true},
 	}
