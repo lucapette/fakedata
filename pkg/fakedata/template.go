@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"math/rand"
 )
 
 type templateFactory struct {
@@ -17,7 +18,17 @@ func newTemplateFactory() *templateFactory {
 
 func (tf templateFactory) getFunctions() template.FuncMap {
 	funcMap := template.FuncMap{
-		"Loop": func(i int) []int { return make([]int, i) },
+		"Loop": func(min int, max int) []int {
+			var size int;
+
+			if max == 0 {
+				size = min;
+			} else {
+				size = rand.Intn(max - min) + min;
+			}
+
+			return make([]int, size)
+		},
 		"Odd":  func(i int) bool { return i%2 != 0 },
 		"Even": func(i int) bool { return i%2 == 0 },
 	}
