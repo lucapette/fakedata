@@ -330,10 +330,12 @@ example to display a full name in the format `Lastname Firstname` instead of
 
 # Completion
 
-`fakedata` supports shell tab completion for bash and zsh shells:
+`fakedata` supports basic shell tab completion for bash, zsh, and fish shells:
 
 ```sh
-$ eval "$(fakedata --completion zsh)" # or bash
+$ eval "$(fakedata --completion zsh)"
+$ eval "$(fakedata --completion bash)"
+$ eval (fakedata --completion fish)
 ```
 
 # How to install
