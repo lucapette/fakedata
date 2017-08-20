@@ -32,12 +32,18 @@ _fakedata () {
 }
 compdef _fakedata fakedata`
 
+const fishTemplate = `
+complete -c fakedata -a '%s'
+`
+
 func getTemplate(sh string) (string, error) {
 	switch sh {
 	case "bash":
 		return bashTemplate, nil
 	case "zsh":
 		return zshTemplate, nil
+	case "fish":
+		return fishTemplate, nil
 	}
 	return "", fmt.Errorf("shell %s not supported. See https://github.com/lucapette/fakedata#completion", sh)
 }

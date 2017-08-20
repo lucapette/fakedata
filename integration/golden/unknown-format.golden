@@ -2,7 +2,7 @@ unknown format: sqll
 
 Usage: fakedata [option ...] field...
 
-  -C, --completion string             print bash/zsh completion function, pass shell as argument ("bash" or "zsh")
+  -C, --completion string             print shell completion function, pass shell name as argument ("bash", "zsh" or "fish")
   -f, --format string                 generators rows in f format. Available formats: csv|tab|sql
   -g, --generator string              show help for a specific generator
   -G, --generators                    lists available generators
