@@ -2,10 +2,10 @@ package fakedata
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"text/template"
-	"math/rand"
 )
 
 type templateFactory struct {
@@ -19,14 +19,14 @@ func newTemplateFactory() *templateFactory {
 func (tf templateFactory) getFunctions() template.FuncMap {
 	funcMap := template.FuncMap{
 		"Loop": func(minmax ...int) []int {
-			var size int;
+			var size int
 
 			if len(minmax) == 1 {
-				size = minmax[0];
+				size = minmax[0]
 			} else {
-				min := minmax[0];
-				max := minmax[1];
-				size = rand.Intn(max - min) + min;
+				min := minmax[0]
+				max := minmax[1]
+				size = rand.Intn(max-min) + min
 			}
 
 			return make([]int, size)
