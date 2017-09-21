@@ -1,4 +1,4 @@
-SOURCE_FILES?=$$(go list ./... | grep -v '/fakedata/vendor/')
+SOURCE_FILES?=$$(go list ./...)
 TEST_PATTERN?=.
 TEST_OPTIONS?=
 
@@ -14,6 +14,7 @@ lint: ## Run all the linters
 	--enable=vet \
 	--enable=gofmt \
 	--enable=errcheck \
+	--enable=golint \
 	./...
 
 ci: lint test ## Run all the tests and code checks
