@@ -1,24 +1,24 @@
 # Contributing
 
-We love every form of contribution. By participating to this project, you
-agree to abide to the `fakedata` [code of conduct](/CODE_OF_CONDUCT.md).
+We love every form of contribution. By participating to this project, you agree
+to abide to the `fakedata` [code of conduct](/CODE_OF_CONDUCT.md).
 
 ## Setup your machine
 
-Our [Makefile](/Makefile) is the entry point for most of the activities you
-will run into as a contributor. To get a basic understanding of what you can
-do with it, you can run:
+Our [Makefile](/Makefile) is the entry point for most of the activities you will
+run into as a contributor. To get a basic understanding of what you can do with
+it, you can run:
 
 ```sh
 $ make help
 ```
 
 Which shows all the documented targets. `fakedata` is written in
-[Go](https://golang.org/). Here is a list of prerequisites to
-build and test the code:
+[Go](https://golang.org/). Here is a list of prerequisites to build and test the
+code:
 
 * `make`
-* [Go 1.8+](http://golang.org/doc/install)
+* [Go 1.9+](http://golang.org/doc/install)
 
 Clone `fakedata` from source:
 
@@ -39,8 +39,8 @@ A good way of making sure everything is all right is running the test suite:
 $ make test
 ```
 
-Please open an [issue](https://github.com/lucapette/fakedata/issues/new)
-if you run into any problem.
+Please open an [issue](https://github.com/lucapette/fakedata/issues/new) if you
+run into any problem.
 
 ## Building and running fakedata
 
@@ -108,9 +108,10 @@ When you are satisfied with the changes, we suggest running:
 $ make ci
 ```
 
-This command runs all the linters and runs all the tests.
+This command runs the linters and the tests the same way we run them in our CI
+system.
 
 ## Submit a pull request
 
-Push your branch to your `fakedata` fork and open a pull request against
-the master branch.
+Push your branch to your `fakedata` fork and open a pull request against the
+master branch.

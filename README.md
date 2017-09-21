@@ -379,7 +379,8 @@ you get started.
 
 You are expected to follow our [code of conduct](/CODE_OF_CONDUCT.md) when
 interacting with the project via issues, pull requests or in any other form.
-Many thanks to the awesome [contributor covenant](http://contributor-covenant.org/) initiative!
+Many thanks to the awesome [contributor
+covenant](http://contributor-covenant.org/) initiative!
 
 # License
 

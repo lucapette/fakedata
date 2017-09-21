@@ -45,6 +45,7 @@ func newGoldenFile(t *testing.T, name string) *testFile {
 }
 
 func (tf *testFile) path() string {
+	tf.t.Helper()
 	_, filename, _, ok := runtime.Caller(0)
 	if !ok {
 		tf.t.Fatal("problems recovering caller information")
@@ -54,6 +55,7 @@ func (tf *testFile) path() string {
 }
 
 func (tf *testFile) write(content string) {
+	tf.t.Helper()
 	err := ioutil.WriteFile(tf.path(), []byte(content), 0644)
 	if err != nil {
 		tf.t.Fatalf("could not write %s: %v", tf.name, err)
@@ -61,6 +63,7 @@ func (tf *testFile) write(content string) {
 }
 
 func (tf *testFile) asFile() *os.File {
+	tf.t.Helper()
 	file, err := os.Open(tf.path())
 	if err != nil {
 		tf.t.Fatalf("could not open %s: %v", tf.name, err)
@@ -69,6 +72,8 @@ func (tf *testFile) asFile() *os.File {
 }
 
 func (tf *testFile) load() string {
+	tf.t.Helper()
+
 	content, err := ioutil.ReadFile(tf.path())
 	if err != nil {
 		tf.t.Fatalf("could not read file %s: %v", tf.name, err)

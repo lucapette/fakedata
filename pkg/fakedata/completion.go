@@ -36,18 +36,21 @@ const fishTemplate = `
 complete -c fakedata -a '%s'
 `
 
-func getTemplate(sh string) (string, error) {
-	switch sh {
+func getTemplate(shell string) (string, error) {
+	switch shell {
 	case "bash":
 		return bashTemplate, nil
 	case "zsh":
 		return zshTemplate, nil
 	case "fish":
 		return fishTemplate, nil
+	default:
+		return "", fmt.Errorf("shell %s not supported. See https://github.com/lucapette/fakedata#completion", shell)
 	}
-	return "", fmt.Errorf("shell %s not supported. See https://github.com/lucapette/fakedata#completion", sh)
 }
 
+// GetCompletionFunc returns a string representing a completion function for the
+// given shell. It returns an error for unsupported shell.
 func GetCompletionFunc(shell string) (string, error) {
 	t, err := getTemplate(shell)
 	if err != nil {
