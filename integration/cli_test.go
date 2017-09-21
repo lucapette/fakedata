@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"testing"
 
@@ -153,7 +154,7 @@ func TestCLI(t *testing.T) {
 			"unknown format",
 			[]string{"-f=sqll", "-t=USERS", "int:42,42", "enum:foo,foo"},
 			"unknown-format.golden",
-			false,
+			true,
 		},
 	}
 
@@ -173,8 +174,38 @@ func TestCLI(t *testing.T) {
 			}
 			expected := golden.load()
 
-			if !reflect.DeepEqual(actual, expected) {
+			if !reflect.DeepEqual(expected, actual) {
 				t.Fatalf("diff: %v", diff(expected, actual))
+			}
+		})
+	}
+}
+
+func TestGeneratorDescription(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+	}{
+		{"simple generator", []string{"-g", "name.first"}},
+		{"custom generator", []string{"-g", "int"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := exec.Command(binaryPath, tt.args...)
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				t.Fatalf("test run returned an error: %v\n%s", err, output)
+			}
+
+			actual := string(output)
+			matched, err := regexp.MatchString("Description:", actual)
+			if err != nil {
+				t.Fatalf("could not match actual: %v", err)
+			}
+
+			if !matched {
+				t.Fatalf("expected %s to match description, but did not", actual)
 			}
 		})
 	}
