@@ -124,7 +124,17 @@ func main() {
 		if generator := generators.FindByName(*generatorFlag); generator != nil {
 			fmt.Printf("Description: %s\n\nExample:\n\n", generator.Desc)
 			for i := 0; i < 5; i++ {
-				fmt.Println(generator.Func())
+				fn := generator.Func
+				if generator.IsCustom() {
+					custom, err := generator.CustomFunc("")
+					if err != nil {
+						fmt.Printf("could not generate example: %v", err)
+						os.Exit(1)
+					}
+
+					fn = custom
+				}
+				fmt.Println(fn())
 			}
 		}
 		os.Exit(0)
@@ -162,7 +172,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("%v\n\n", err)
 		flag.Usage()
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	for i := 0; i < *limitFlag; i++ {
