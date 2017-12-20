@@ -3,8 +3,10 @@ TEST_PATTERN?=.
 TEST_OPTIONS?=
 
 setup: ## Install all the build and lint dependencies
+	go get -u --insecure github.com/golang/dep/cmd/dep
 	go get -u github.com/alecthomas/gometalinter
 	gometalinter --install
+	dep ensure
 
 test: ## Run all the tests
 	go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=30s
