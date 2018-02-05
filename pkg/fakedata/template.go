@@ -2,6 +2,7 @@ package fakedata
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"text/template"
@@ -17,7 +18,23 @@ func newTemplateFactory() *templateFactory {
 
 func (tf templateFactory) getFunctions() template.FuncMap {
 	funcMap := template.FuncMap{
-		"Loop": func(i int) []int { return make([]int, i) },
+		"Loop": func(minmax ...int) []int {
+			var n int
+
+			if len(minmax) == 1 {
+				n = minmax[0]
+			} else {
+				min := minmax[0]
+				max := minmax[1]
+				if min == max {
+					n = min
+				} else {
+					n = rand.Intn(max-min) + min
+				}
+			}
+
+			return make([]int, n)
+		},
 		"Odd":  func(i int) bool { return i%2 != 0 },
 		"Even": func(i int) bool { return i%2 == 0 },
 	}
