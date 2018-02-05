@@ -224,8 +224,8 @@ $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 
 ### Generators
 
-All the generators listed under `fakedata -g` are available as functions into
-the templates. If the generator name is a single word, then it's available as a
+The generators listed under `fakedata -g` are available as functions into the
+templates. If the generator name is a single word, then it's available as a
 function with the same name capitalized (example: `int` becomes `Int`). If the
 generator name is composed by multiple words joined by dots, then the function
 name is again capitalized by the first letter of the word and joined together
@@ -276,16 +276,12 @@ returns a date between one year ago and today.
 
 ### Helpers
 
-Beside the generator functions, the `fakedata` template implementation provides
-a set of helper functions:
+Beside the generator functions, `fakedata` templates provide a set of helper
+functions:
 
 - `Loop`
 - `Odd`
 - `Even`
-
-When using a custom loop make sure to use `--limit 1`, otherwise the loop will
-run multiple times! Running a template with `{{ range Loop 5}}` and `--limit 5`
-will execute 25 times.
 
 If you need to create your own loop for advanced templates you can use the `{{
 Loop }}` function. This function takes a single integer as parameter which is
@@ -295,6 +291,14 @@ the number of iterations. `Loop` has to be used with `range` e.g.
 {{ range Loop 10 }}
   I am printed 10 times!
 {{ end }}
+```
+
+`Loop` can take a second argument, so that you can specify a range and
+`fakedata` will generate a random number of interations in that range. For
+example:
+
+```html
+{{ range Loop 1 5 }}42{{ end }}
 ```
 
 In combination with `Loop` and `range` you can use `Odd` and `Even` to determine

@@ -222,6 +222,7 @@ var templateTests = []struct {
 	wantErr bool
 }{
 	{"simple.tmpl", "simple-template.golden", false},
+	{"loop.tmpl", "loop.golden", false},
 	{"broken.tmpl", "broken-template.golden", true},
 	{"unknown-function.tmpl", "unknown-function.golden", true},
 }

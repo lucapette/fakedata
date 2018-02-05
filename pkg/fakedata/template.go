@@ -19,17 +19,21 @@ func newTemplateFactory() *templateFactory {
 func (tf templateFactory) getFunctions() template.FuncMap {
 	funcMap := template.FuncMap{
 		"Loop": func(minmax ...int) []int {
-			var size int
+			var n int
 
 			if len(minmax) == 1 {
-				size = minmax[0]
+				n = minmax[0]
 			} else {
 				min := minmax[0]
 				max := minmax[1]
-				size = rand.Intn(max-min) + min
+				if min == max {
+					n = min
+				} else {
+					n = rand.Intn(max-min) + min
+				}
 			}
 
-			return make([]int, size)
+			return make([]int, n)
 		},
 		"Odd":  func(i int) bool { return i%2 != 0 },
 		"Even": func(i int) bool { return i%2 == 0 },
