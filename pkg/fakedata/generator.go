@@ -186,7 +186,7 @@ func file(path string) (func() string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not read file %s: %v", filePath, err)
 	}
-	list := strings.Split(string(content), "\n")
+	list := strings.Split(strings.Trim(string(content), "\n"), "\n")
 
 	return func() string { return withList(list)() }, nil
 }

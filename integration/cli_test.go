@@ -157,7 +157,7 @@ func TestCLI(t *testing.T) {
 		},
 		{
 			"unknown format",
-			[]string{"-f=sqll", "-t=USERS", "int:42,42", "enum:foo,foo"},
+			[]string{"-f=no-format", "-t=USERS", "int:42,42", "enum:foo,foo"},
 			"unknown-format.golden",
 			true,
 		},
