@@ -40,7 +40,7 @@ func (f *SQLFormatter) Format(columns Columns, values []string) string {
 		formattedValues[i] = fmt.Sprintf("'%s'", value)
 	}
 
-	fmt.Fprintf(sql,
+	fmt.Fprintf(sql, // nolint: errcheck
 		"INSERT INTO %s (%s) VALUES (%s);",
 		f.Table,
 		strings.Join(names, ","),

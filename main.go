@@ -41,7 +41,7 @@ func generatorsHelp(generators fakedata.Generators) string {
 	buffer := &bytes.Buffer{}
 	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
 	for _, gen := range generators {
-		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
+		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc) // nolint: errcheck
 	}
 
 	return buffer.String()
@@ -94,7 +94,7 @@ func main() {
 	)
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stdout, "Usage: fakedata [option ...] field...\n\n")
+		fmt.Print("Usage: fakedata [option ...] field...\n\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()

@@ -64,7 +64,7 @@ func (columns Columns) GenerateRow(formatter Formatter) string {
 		values[i] = column.Generate()
 	}
 
-	fmt.Fprintf(row, "%s", formatter.Format(columns, values))
+	fmt.Fprintf(row, "%s", formatter.Format(columns, values)) // nolint: errcheck
 
 	return row.String()
 }

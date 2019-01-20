@@ -61,11 +61,11 @@ func GetCompletionFunc(shell string) (string, error) {
 	allCliArgs := &bytes.Buffer{}
 
 	for _, gen := range NewGenerators() {
-		fmt.Fprintf(gens, gen.Name+" ")
+		fmt.Fprintf(gens, gen.Name+" ") // nolint: errcheck
 	}
 
 	pflag.VisitAll(func(f *pflag.Flag) {
-		fmt.Fprintf(allCliArgs, "--%s ", f.Name)
+		fmt.Fprintf(allCliArgs, "--%s ", f.Name) // nolint: errcheck
 	})
 
 	cmdList := gens.String() + " " + allCliArgs.String()
