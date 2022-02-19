@@ -388,4 +388,4 @@ covenant](http://contributor-covenant.org/) initiative!
 
 # License
 
-[MIT License](/LICENSE) Copyright (c) [2017] [Luca Pette](http://lucapette.me)
+[MIT License](/LICENSE) Copyright (c) [2022] [Luca Pette](https://lucapette.me)

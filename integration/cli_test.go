@@ -18,7 +18,7 @@ import (
 
 // In the following tests, there's a lot going on.
 // Please have a look at the following article for a longer explanation:
-// http://lucapette.me/writing-integration-tests-for-a-go-cli-application
+// https://lucapette.me/writing-integration-tests-for-a-go-cli-application
 
 var update = flag.Bool("update", false, "update golden files")
 
