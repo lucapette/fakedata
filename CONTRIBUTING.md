@@ -18,19 +18,13 @@ Which shows all the documented targets. `fakedata` is written in
 code:
 
 * `make`
-* [Go 1.9+](http://golang.org/doc/install)
+* [Go 1.16+](http://golang.org/doc/install)
 
 Clone `fakedata` from source:
 
 ```sh
 $ git clone https://github.com/lucapette/fakedata.git
 $ cd fakedata
-```
-
-Install the build and lint dependencies:
-
-```sh
-$ make setup
 ```
 
 A good way of making sure everything is all right is running the test suite:

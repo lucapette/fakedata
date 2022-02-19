@@ -2,22 +2,11 @@ SOURCE_FILES?=$$(go list ./...)
 TEST_PATTERN?=.
 TEST_OPTIONS?=
 
-setup: ## Install all the build and lint dependencies
-	go get -u --insecure github.com/golang/dep/cmd/dep
-	go get -u github.com/alecthomas/gometalinter
-	gometalinter --install
-	dep ensure
-
 test: ## Run all the tests
 	go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=30s
 
 lint: ## Run all the linters
-	gometalinter --vendor --disable-all \
-	--enable=vet \
-	--enable=gofmt \
-	--enable=errcheck \
-	--enable=golint \
-	./...
+	golangci-lint run
 
 ci: lint test ## Run all the tests and code checks
 
