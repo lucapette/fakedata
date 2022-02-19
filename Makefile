@@ -8,8 +8,6 @@ test: ## Run all the tests
 lint: ## Run all the linters
 	golangci-lint run
 
-ci: lint test ## Run all the tests and code checks
-
 build: ## Build a dev version of fakedata
 	go build
 

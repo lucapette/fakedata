@@ -18,5 +18,8 @@ jobs:
       with:
         go-version: 1.17
 
-    - name: ci
-      run: make ci
+    - name: build
+      run: make build
+
+    - name: test
+      run: make test
