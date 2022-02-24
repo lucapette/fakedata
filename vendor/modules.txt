@@ -1,3 +1,6 @@
+# github.com/gofrs/uuid v4.2.0+incompatible
+## explicit
+github.com/gofrs/uuid
 # github.com/kr/pretty v0.0.0-20160823170715-cfb55aafdaf3
 ## explicit
 github.com/kr/pretty

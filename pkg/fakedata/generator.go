@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/lucapette/fakedata/pkg/data"
 )
 
@@ -199,6 +201,24 @@ func enum(options string) (func() string, error) {
 	return func() string { return withList(list)() }, nil
 }
 
+func uuidv1() string {
+	u1, err := uuid.NewV1()
+	if err != nil {
+		fmt.Printf("failed to generate UUID: %v\n", err)
+		os.Exit(1)
+	}
+	return u1.String()
+}
+
+func uuidv4() string {
+	u1, err := uuid.NewV4()
+	if err != nil {
+		fmt.Printf("failed to generate UUID: %v\n", err)
+		os.Exit(1)
+	}
+	return u1.String()
+}
+
 type generatorsMap map[string]Generator
 
 func (gM generatorsMap) addGen(g Generator) {
@@ -341,6 +361,9 @@ func newFactory() (f factory) {
 		Desc:       `random value from a file. It accepts a file path. It can be either relative or absolute. The file must contain a value per line`,
 		CustomFunc: file,
 	})
+
+	generators.addGen(Generator{Name: "uuidv1", Desc: "uuidv1", Func: uuidv1})
+	generators.addGen(Generator{Name: "uuidv4", Desc: "uuidv4", Func: uuidv4})
 
 	return factory{generators: generators}
 }
