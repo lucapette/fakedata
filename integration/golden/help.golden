@@ -1,11 +1,12 @@
 Usage: fakedata [option ...] field...
 
   -C, --completion string             print shell completion function, pass shell name as argument ("bash", "zsh" or "fish")
-  -f, --format string                 generators rows in f format. Available formats: csv|tab|sql
+  -f, --format string                 generates rows in f format. Available formats: column|sql (default "column")
   -g, --generator string              show help for a specific generator
   -G, --generators                    lists available generators
   -c, --generators-with-constraints   lists available generators with constraints
   -l, --limit int                     limits rows up to n (default 10)
+  -s, --separator string              specifies separator for the column format (default " ")
   -t, --table string                  table name of the sql format (default "TABLE")
   -T, --template string               Use template as input
   -v, --version                       shows version information

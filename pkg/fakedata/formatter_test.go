@@ -10,7 +10,7 @@ import (
 var columns = fakedata.Columns{{Name: "name", Key: "name"}, {Name: "domain", Key: "domain"}}
 var values = []string{"Grace Hopper", "example.com"}
 
-func TestSeparatorFormatter(t *testing.T) {
+func TestColumnFormatter(t *testing.T) {
 	tests := []struct {
 		name string
 		sep  string
@@ -18,13 +18,13 @@ func TestSeparatorFormatter(t *testing.T) {
 	}{
 		{"default", " ", "Grace Hopper example.com"},
 		{"csv", ",", "Grace Hopper,example.com"},
-		{"tab", "\t", "Grace Hopper\texample.com"},
+		{"tab", "\t", "Grace Hopper	example.com"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &fakedata.SeparatorFormatter{Separator: tt.sep}
+			f := &fakedata.ColumnFormatter{Separator: tt.sep}
 			if got := f.Format(columns, values); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SeparatorFormatter.Format() = %v, want %v", got, tt.want)
+				t.Errorf("ColumnFormatter.Format() = %v, want %v", got, tt.want)
 			}
 		})
 	}
