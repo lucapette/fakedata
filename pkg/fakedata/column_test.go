@@ -103,9 +103,9 @@ func TestNewColumnsWithName(t *testing.T) {
 	}
 }
 
-var csv = fakedata.NewSeparatorFormatter(",")
-var def = fakedata.NewSeparatorFormatter(" ")
-var tab = fakedata.NewSeparatorFormatter("\t")
+var csv = fakedata.NewColumnFormatter(",")
+var def = fakedata.NewColumnFormatter(" ")
+var tab = fakedata.NewColumnFormatter("\t")
 
 type args struct {
 	input     []string

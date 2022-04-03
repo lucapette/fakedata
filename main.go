@@ -14,22 +14,6 @@ import (
 
 var version = "main"
 
-func getFormatter(format, table string) (f fakedata.Formatter, err error) {
-	switch format {
-	case "csv":
-		f = fakedata.NewSeparatorFormatter(",")
-	case "tab":
-		f = fakedata.NewSeparatorFormatter("\t")
-	case "sql":
-		f = fakedata.NewSQLFormatter(table)
-	case "":
-		f = fakedata.NewSeparatorFormatter(" ")
-	default:
-		err = fmt.Errorf("unknown format: %s", format)
-	}
-	return f, err
-}
-
 func generatorsHelp(generators fakedata.Generators) string {
 	max := 0
 	for _, gen := range generators {
@@ -86,11 +70,12 @@ func main() {
 		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
 		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
 		limitFlag       = flag.IntP("limit", "l", 10, "limits rows up to n")
-		formatFlag      = flag.StringP("format", "f", "", "generators rows in f format. Available formats: csv|tab|sql")
-		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
+		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|sql")
 		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
+		separatorFlag   = flag.StringP("separator", "s", " ", "specifies separator for the column format")
 		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
 		completionFlag  = flag.StringP("completion", "C", "", "print shell completion function, pass shell name as argument (\"bash\", \"zsh\" or \"fish\")")
+		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
 	)
 
 	flag.Usage = func() {
@@ -168,9 +153,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	formatter, err := getFormatter(*formatFlag, *tableFlag)
-	if err != nil {
-		fmt.Printf("%v\n\n", err)
+	var formatter fakedata.Formatter
+	if *formatFlag == "column" {
+		formatter = fakedata.NewColumnFormatter(*separatorFlag)
+	} else if *formatFlag == "sql" {
+		formatter = fakedata.NewSQLFormatter(*tableFlag)
+	} else {
+		fmt.Printf("unknown format: %s\n\n", *formatFlag)
 		flag.Usage()
 		os.Exit(1)
 	}

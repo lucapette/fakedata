@@ -16,9 +16,9 @@ import (
 	"github.com/kr/pretty"
 )
 
-// In the following tests, there's a lot going on.
-// Please have a look at the following article for a longer explanation:
-// https://lucapette.me/writing-integration-tests-for-a-go-cli-application
+// In the following tests, there's a lot going on. Please have a look at the
+// following article for a longer explanation:
+// https://lucapette.me/writing/writing-integration-tests-for-a-go-cli-application
 
 var update = flag.Bool("update", false, "update golden files")
 
@@ -121,19 +121,19 @@ func TestCLI(t *testing.T) {
 		},
 		{
 			"csv format short",
-			[]string{"-f=csv", "int:42,42", "enum:foo,foo"},
+			[]string{"-s=,", "int:42,42", "enum:foo,foo"},
 			"csv-format.golden",
 			false,
 		},
 		{
 			"csv format",
-			[]string{"--format=csv", "int:42,42", "enum:foo,foo"},
+			[]string{"--separator=,", "int:42,42", "enum:foo,foo"},
 			"csv-format.golden",
 			false,
 		},
 		{
 			"tab format",
-			[]string{"-f=tab", "int:42,42", "enum:foo,foo"},
+			[]string{"--separator=\t", "int:42,42", "enum:foo,foo"},
 			"tab-format.golden",
 			false,
 		},

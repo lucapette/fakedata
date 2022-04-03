@@ -11,13 +11,13 @@ type Formatter interface {
 	Format(Columns, []string) string
 }
 
-// SeparatorFormatter is a Formatter for character separated formats
-type SeparatorFormatter struct {
+// ColumnFormatter is a Formatter for character separated formats
+type ColumnFormatter struct {
 	Separator string
 }
 
 // Format as character separated strings
-func (f *SeparatorFormatter) Format(columns Columns, values []string) string {
+func (f *ColumnFormatter) Format(columns Columns, values []string) string {
 	return strings.Join(values, f.Separator)
 }
 
@@ -50,9 +50,9 @@ func (f *SQLFormatter) Format(columns Columns, values []string) string {
 	return sql.String()
 }
 
-// NewSeparatorFormatter returns a SeparatorFormatter using the sep string as a separator
-func NewSeparatorFormatter(sep string) (f *SeparatorFormatter) {
-	return &SeparatorFormatter{Separator: sep}
+// NewColumnFormatter returns a ColumnFormatter using the sep string as a separator
+func NewColumnFormatter(sep string) (f *ColumnFormatter) {
+	return &ColumnFormatter{Separator: sep}
 }
 
 // NewSQLFormatter returns a SQLFormatter using the table string for table name generation
