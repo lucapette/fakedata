@@ -5,8 +5,10 @@ build:
     - linux
   goarch:
     - amd64
-brew:
-  github:
-    owner: lucapette
-    name: homebrew-tap
-  homepage: https://github.com/lucapette/fakedata
+brews:
+  -
+    name: fakedata
+    tap:
+      owner: lucapette
+      name: homebrew-tap
+    homepage: https://github.com/lucapette/fakedata
