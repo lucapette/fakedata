@@ -2,8 +2,8 @@
 
 # Quick Start
 
-`fakedata` helps you generate random data in a number of ways. You can generate
-data by specifying on the command line the kind of data you need:
+`fakedata` helps you generate random data in a number of ways. By default
+`fakedata` uses a column formatter with space separator:
 
 ```sh
 $ fakedata email country
@@ -19,11 +19,10 @@ opnsrce@example.name Malaysia
 ankitind@test.info Virgin Islands, British
 ```
 
-By default `fakedata` uses a space separator. You can choose a different output
-format:
+You can choose a different separator:
 
 ```sh
-$ fakedata --format=csv product.category product.name
+$ fakedata --separator=, product.category product.name
 Shoes,Rankfix
 Automotive,Namis
 Movies,Matquadfax
@@ -34,16 +33,27 @@ Home,Sil-Home
 Health,Toughwarm
 Shoes,Freetop
 Tools,Domnix
+# tab is a little tricky to type, but works
+$ fakedata emoji industry -s=$'\t'
+👦	Electrical & Electronic Manufacturing
+🆘	Investment Banking/Venture
+📦	Computer Hardware
+♐	Computer & Network Security
+🔠	Religious Institutions
+💷	Automotive
+🇱	Capital Markets
+㊙	Public Relations
+☺	Alternative Dispute Resoluti
 ```
 
-or SQL insert statements:
+You can also specify a SQL formatter:
 
 ```sh
 $ fakedata --format=sql --limit 1 email domain
 INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
 ```
 
-You can specify the name of the column using a field with the following format
+You can change the name of the table column using a field with the following syntax
 `column_name=generator`:
 
 ```sh
@@ -51,16 +61,7 @@ $ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 ```
 
-If you need more control over the output, you can use templates:
-
-```sh
-$ echo '{{Email}}--{{Int}}--{{Color}}' | fakedata -l5
-antonyzotov@test.george--967--azure
-Skyhartman@test.xn--mgbaam7a8h--238--cyan
-syropian@example.jlc--566--black
-catadeleon@example.sohu--60--white
-kennyadr@test.best--899--red
-```
+If you need more control over the output, you can use [templates](/templates).
 
 # Generators
 
@@ -75,7 +76,9 @@ country.code      2-digit country code
 date              date
 domain            domain
 domain.tld        example|test
-# ...It's a long list :)
+#...
+#...
+#It's a long list :)
 ```
 
 You can use the `-g` (or `--generator`) option to see an example:
