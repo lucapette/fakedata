@@ -12,7 +12,7 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-var version = "master"
+var version = "main"
 
 func getFormatter(format, table string) (f fakedata.Formatter, err error) {
 	switch format {

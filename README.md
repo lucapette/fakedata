@@ -1,26 +1,9 @@
-# fakedata
+`fakedata` is a small program that generates test data on the command line.
 
-`fakedata` is a small program that generates random data on the command line.
+# Quick Start
 
-# Table Of Contents
-
-- [Overview](#overview)
-  - [Quick Start](#quick-start)
-  - [Why another random data generator?](#why-another-random-data-generator)
-- [Generators](#generators)
-  - [Constraints](#constraints)
-- [Templates](#templates)
-- [Completion](#completion)
-- [How to install](#how-to-install)
-- [How to contribute](#how-to-contribute)
-- [Code of conduct](#code-of-conduct)
-
-# Overview
-
-## Quick Start
-
-`fakedata` helps you generate random data in various ways. You can generate data
-by specifying on the command line the kind of data you need:
+`fakedata` helps you generate random data in a number of ways. You can generate
+data by specifying on the command line the kind of data you need:
 
 ```sh
 $ fakedata email country
@@ -35,8 +18,9 @@ bermonpainter@test.us Haiti
 opnsrce@example.name Malaysia
 ankitind@test.info Virgin Islands, British
 ```
-Be default, `fakedata` generates data using a space as a separator. You can
-choose a different output format like CSV:
+
+By default `fakedata` uses a space separator. You can choose a different output
+format:
 
 ```sh
 $ fakedata --format=csv product.category product.name
@@ -67,7 +51,7 @@ $ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 ```
 
-If you need some control over the output, you can use templates:
+If you need more control over the output, you can use templates:
 
 ```sh
 $ echo '{{Email}}--{{Int}}--{{Color}}' | fakedata -l5
@@ -77,15 +61,6 @@ syropian@example.jlc--566--black
 catadeleon@example.sohu--60--white
 kennyadr@test.best--899--red
 ```
-
-## Why another random data generator?
-
-`fakedata` focuses on a simple UI (if you think it could be simpler, please [let
-us know!](https://github.com/lucapette/fakedata/issues/new) We :heart:
-feedback!) and the ability to fully control both the output format (using
-[templates](#templates)) and the set of values a generator will pick from. We
-call this feature "generators' constraints" and it's explained in detail
-[here](#constraints).
 
 # Generators
 
@@ -100,8 +75,7 @@ country.code      2-digit country code
 date              date
 domain            domain
 domain.tld        example|test
-# ...
-# It's a long list :)
+# ...It's a long list :)
 ```
 
 You can use the `-g` (or `--generator`) option to see an example:
@@ -137,6 +111,7 @@ $ fakedata int:1,100 # will generate only integers between 1 and 100
 $ fakedata int:50, # specifying only min number works too
 $ fakedata int:50 # also works
 ```
+
 ### Enum
 
 The `enum` generator allows you to specify a set of values. It comes handy when
@@ -206,7 +181,7 @@ linux29@example.archi--453
 g3d@test.pl--921
 ```
 
-Or you can pipe the template into `fakedata`:
+You can also pipe a template into `fakedata`:
 
 ```sh
 $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
@@ -222,8 +197,6 @@ $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 #0 Dionna Bates <jefffis@test.flights>
 ```
 
-### Generators
-
 The generators listed under `fakedata -g` are available as functions into the
 templates. If the generator name is a single word, then it's available as a
 function with the same name capitalized (example: `int` becomes `Int`). If the
@@ -232,7 +205,7 @@ name is again capitalized by the first letter of the word and joined together
 (example: `product.name` becomes `Product.Name`).
 
 Each generator with [constraints](#constraints) is available in templates as a
-function with arguments.
+function that takes arguments.
 
 ### `Enum`
 
@@ -276,21 +249,18 @@ returns a date between one year ago and today.
 
 ### Helpers
 
-Beside the generator functions, `fakedata` templates provide a set of helper
+Beside the generator functions, `fakedata` templates provide a number of helper
 functions:
 
 - `Loop`
 - `Odd`
 - `Even`
 
-If you need to create your own loop for advanced templates you can use the `{{
-Loop }}` function. This function takes a single integer as parameter which is
-the number of iterations. `Loop` has to be used with `range` e.g.
+If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function. This function takes a single integer as parameter which is
+the number of iterations. `Loop` must be used with `range` e.g.
 
 ```html
-{{ range Loop 10 }}
-  I am printed 10 times!
-{{ end }}
+{{ range Loop 10 }} You're going to see this 10 times! {{ end }}
 ```
 
 `Loop` can take a second argument, so that you can specify a range and
@@ -309,27 +279,22 @@ creating HTML tables:
 {{ range $i, $j := Loop 5 }}
 <tr>
   {{ if Odd $i -}}
-  <td class="odd">
-    {{- else -}}
-  <td class="even">
-    {{- end -}}
-    {{ Name }}
-  </td>
+  <td class="odd">{{- else -}}</td>
+
+  <td class="even">{{- end -}} {{ Name }}</td>
 </tr>
 {{ end }}
 ```
 
-By using `Odd` we can create tables with a class name of  `odd` and `even` when
-generating our HTML. Odd takes an integer as parameter which is why we need to
-assign the return values of `Loop 5` to the variables `$i` and `$j`.
+`Odd` takes an integer as parameter which is why we need to assign the return
+values of `Loop 5` to the variables `$i` and `$j`.
 
-Beside the helper function `Loop`, `Odd`, and `Even` templates also support
-manipulation with `printf`. By using `printf` we can create a custom output, for
-example to display a full name in the format `Lastname Firstname` instead of
-`Firstname Lastname`.
+Templates also support string manipulation via the `printf` function. Using
+`printf` we can create custom output. For example to display a full name in the
+format `Lastname Firstname` instead of `Firstname Lastname`.
 
 ```html
-{{ printf "%s %s" NameLast NameFirst }}
+{{ printf "%s %s" Name.Last Name.First }}
 ```
 
 # Completion
@@ -348,7 +313,7 @@ $ eval (fakedata --completion fish)
 
 `fakedata` can be installed through Homebrew:
 
-``` sh
+```sh
 $ brew install lucapette/tap/fakedata
 ```
 
@@ -372,8 +337,6 @@ We love every form of contribution! Good entry points to the project are:
   [gardening](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3Agardening)
 - Issues with the tag [good first
   patch](https://github.com/lucapette/fakedata/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+patch%22)
-- Join the [#fakedata](https://gophers.slack.com/messages/fakedata/) channel in
-the [Gophers Slack](https://invite.slack.golangbridge.org/).
 
 If you're not sure where to start, please open a [new
 issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly help
@@ -382,7 +345,7 @@ you get started.
 # Code of Conduct
 
 You are expected to follow our [code of conduct](/CODE_OF_CONDUCT.md) when
-interacting with the project via issues, pull requests or in any other form.
+interacting with the project via issues, pull requests, or in any other form.
 Many thanks to the awesome [contributor
 covenant](http://contributor-covenant.org/) initiative!
 
