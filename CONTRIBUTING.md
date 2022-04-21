@@ -17,8 +17,8 @@ Which shows all the documented targets. `fakedata` is written in
 [Go](https://golang.org/). Here is a list of prerequisites to build and test the
 code:
 
-* `make`
-* [Go 1.16+](http://golang.org/doc/install)
+- `make`
+- [Go 1.16+](http://golang.org/doc/install)
 
 Clone `fakedata` from source:
 
@@ -92,14 +92,14 @@ $ make test TEST_OPTIONS=-v TEST_PATTERN=TheAnswerIsFortyTwo
 You can create a branch for your changes and try to build from the source as
 you go:
 
-``` sh
+```sh
 $ make build
 ```
 
 When you are satisfied with the changes, we suggest running:
 
-``` sh
-$ make ci
+```sh
+$ make lint
 ```
 
 This command runs the linters and the tests the same way we run them in our CI
@@ -108,4 +108,4 @@ system.
 ## Submit a pull request
 
 Push your branch to your `fakedata` fork and open a pull request against the
-master branch.
+main branch.
