@@ -6,6 +6,9 @@ import (
 	"os"
 	"strings"
 	"text/template"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type templateFactory struct {
@@ -39,8 +42,10 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 		"Even": func(i int) bool { return i%2 == 0 },
 	}
 
+	c := cases.Title(language.English)
+
 	for _, gen := range tf.factory.generators {
-		name := strings.Replace(strings.Title(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
+		name := strings.Replace(c.String(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
 		if !gen.IsCustom() {
 			funcMap[name] = gen.Func
 		}

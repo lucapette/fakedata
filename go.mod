@@ -8,4 +8,7 @@ require (
 	github.com/spf13/pflag v1.0.0
 )
 
-require github.com/kr/text v0.0.0-20160504234017-7cafcd837844 // indirect
+require (
+	github.com/kr/text v0.0.0-20160504234017-7cafcd837844 // indirect
+	golang.org/x/text v0.3.7 // indirect
+)
