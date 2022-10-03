@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -56,7 +55,7 @@ func (tf *testFile) path() string {
 
 func (tf *testFile) write(content string) {
 	tf.t.Helper()
-	err := ioutil.WriteFile(tf.path(), []byte(content), 0644)
+	err := os.WriteFile(tf.path(), []byte(content), 0644)
 	if err != nil {
 		tf.t.Fatalf("could not write %s: %v", tf.name, err)
 	}
@@ -74,7 +73,7 @@ func (tf *testFile) asFile() *os.File {
 func (tf *testFile) load() string {
 	tf.t.Helper()
 
-	content, err := ioutil.ReadFile(tf.path())
+	content, err := os.ReadFile(tf.path())
 	if err != nil {
 		tf.t.Fatalf("could not read file %s: %v", tf.name, err)
 	}

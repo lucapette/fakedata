@@ -7,6 +7,7 @@ Usage: fakedata [option ...] field...
   -c, --generators-with-constraints   lists available generators with constraints
   -l, --limit int                     limits rows up to n (default 10)
   -s, --separator string              specifies separator for the column format (default " ")
+  -S, --stream                        streams rows till the end of time
   -t, --table string                  table name of the sql format (default "TABLE")
   -T, --template string               Use template as input
   -v, --version                       shows version information

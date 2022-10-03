@@ -267,7 +267,7 @@ the number of iterations. `Loop` must be used with `range` e.g.
 ```
 
 `Loop` can take a second argument, so that you can specify a range and
-`fakedata` will generate a random number of interations in that range. For
+`fakedata` will generate a random number of iterations in that range. For
 example:
 
 ```html

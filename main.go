@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"os"
 	"time"
@@ -42,7 +42,7 @@ func isPipe() bool {
 
 func findTemplate(path string) string {
 	if path != "" {
-		tp, err := ioutil.ReadFile(path)
+		tp, err := os.ReadFile(path)
 		if err != nil {
 			fmt.Printf("unable to read input: %s", err)
 			os.Exit(1)
@@ -52,7 +52,7 @@ func findTemplate(path string) string {
 	}
 
 	if isPipe() {
-		tp, err := ioutil.ReadAll(os.Stdin)
+		tp, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			fmt.Printf("unable to read input: %s", err)
 			os.Exit(1)
@@ -70,6 +70,7 @@ func main() {
 		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
 		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
 		limitFlag       = flag.IntP("limit", "l", 10, "limits rows up to n")
+		streamFlag      = flag.BoolP("stream", "S", false, "streams rows till the end of time")
 		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|sql")
 		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
 		separatorFlag   = flag.StringP("separator", "s", " ", "specifies separator for the column format")
@@ -164,6 +165,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *streamFlag {
+		for {
+			fmt.Println(columns.GenerateRow(formatter))
+		}
+	}
 	for i := 0; i < *limitFlag; i++ {
 		fmt.Println(columns.GenerateRow(formatter))
 	}

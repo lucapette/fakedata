@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -119,7 +118,7 @@ func main() {
 		content := fmt.Sprintf(fileTemplate, task.Var, task.Key, task.Var, data)
 
 		// Write to Go file
-		if err := ioutil.WriteFile(file, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(file, []byte(content), 0644); err != nil {
 			log.Fatal(err)
 		}
 	}

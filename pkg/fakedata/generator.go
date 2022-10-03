@@ -2,7 +2,6 @@ package fakedata
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"sort"
@@ -184,7 +183,7 @@ func file(path string) (func() string, error) {
 
 	filePath := strings.Trim(path, "'\"")
 
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not read file %s: %v", filePath, err)
 	}
