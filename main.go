@@ -134,7 +134,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	if tmpl := findTemplate(*templateFlag); tmpl != "" {
-		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag); err != nil {
+		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag, *streamFlag); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}

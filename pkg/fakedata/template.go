@@ -84,12 +84,21 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 }
 
 // ExecuteTemplate takes a tmpl string and a n int and generates n rows of based
-// on the specified tmpl
-func ExecuteTemplate(tmpl string, n int) (err error) {
+// on the specified tmpl. Will loop forever if streamMode is true
+func ExecuteTemplate(tmpl string, n int, streamMode bool) (err error) {
 	f := newTemplateFactory()
 	t, err := template.New("template").Funcs(f.getFunctions()).Parse(tmpl)
 	if err != nil {
 		return err
+	}
+
+	if streamMode {
+		for {
+			err = t.Execute(os.Stdout, nil)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	for i := 1; i <= n; i++ {
