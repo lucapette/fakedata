@@ -1,6 +1,6 @@
 no file path given
 
-Usage: fakedata [option ...] field...
+Usage: fakedata [option ...] generator...
 
   -C, --completion string             print shell completion function, pass shell name as argument ("bash", "zsh" or "fish")
   -f, --format string                 generates rows in f format. Available formats: column|sql (default "column")

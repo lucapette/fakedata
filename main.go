@@ -80,7 +80,7 @@ func main() {
 	)
 
 	flag.Usage = func() {
-		fmt.Print("Usage: fakedata [option ...] field...\n\n")
+		fmt.Print("Usage: fakedata [option ...] generator...\n\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
