@@ -5,21 +5,24 @@ IFS=$'\n\t'
 
 ROWS=${ROWS:-100000000}
 
-echo "tick,rows_done" > template.perf
+# https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-echo "{{Noun}}" | fakedata -l ${ROWS} | pv -b -l -a -t -n > /dev/null 2>> template.perf
+echo "tick,rows_done" > ${SCRIPT_DIR}/template.perf
 
-sed -i -e 's/ /,/g' template.perf
+echo "{{Noun}}" | ${SCRIPT_DIR}/../fakedata -l ${ROWS} | pv -b -l -a -t -n > /dev/null 2>> ${SCRIPT_DIR}/template.perf
 
-echo "tick,rows_done" > generator.perf
+sed -i -e 's/ /,/g' ${SCRIPT_DIR}/template.perf
 
-fakedata noun -l ${ROWS} | pv -b -l -a -t -n > /dev/null 2>> generator.perf
+echo "tick,rows_done" > ${SCRIPT_DIR}/generator.perf
 
-sed -i -e 's/ /,/g' generator.perf
+${SCRIPT_DIR}/../fakedata noun -l ${ROWS} | pv -b -l -a -t -n > /dev/null 2>> ${SCRIPT_DIR}/generator.perf
 
-cat generator.perf | sqlite-utils insert -d --csv perf.db generator -
-cat template.perf | sqlite-utils insert -d --csv perf.db template -
+sed -i -e 's/ /,/g' ${SCRIPT_DIR}/generator.perf
 
-rm template.perf-e generator.perf-e
+cat generator.perf | sqlite-utils insert -d --csv ${SCRIPT_DIR}/perf.db generator -
+cat template.perf | sqlite-utils insert -d --csv ${SCRIPT_DIR}/perf.db template -
 
-cat queries.csv | sqlite-utils insert --csv perf.db saved_queries  -
+rm ${SCRIPT_DIR}/template.perf-e ${SCRIPT_DIR}/generator.perf-e
+
+cat ${SCRIPT_DIR}/queries.csv | sqlite-utils insert --csv perf.db saved_queries  -
