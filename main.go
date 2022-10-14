@@ -77,6 +77,7 @@ func main() {
 		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
 		completionFlag  = flag.StringP("completion", "C", "", "print shell completion function, pass shell name as argument (\"bash\", \"zsh\" or \"fish\")")
 		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
+		helpFlag        = flag.BoolP("help", "h", false, "shows help")
 	)
 
 	flag.Usage = func() {
@@ -84,6 +85,11 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
+	if *helpFlag {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	if *completionFlag != "" {
 		completion, err := fakedata.GetCompletionFunc(*completionFlag)
