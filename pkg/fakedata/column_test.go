@@ -1,6 +1,7 @@
 package fakedata_test
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -166,15 +167,16 @@ func TestGenerateRow(t *testing.T) {
 			if err != nil {
 				t.Error(err.Error())
 			}
-			actual := strings.TrimRight(columns.GenerateRow(tt.args.formatter), "\n")
+			actual := bytes.Buffer{}
+			columns.GenerateRow(&actual, tt.args.formatter)
 
-			matched, err := regexp.MatchString(tt.expected, actual)
+			matched, err := regexp.MatchString(tt.expected, strings.TrimRight(actual.String(), "\n"))
 			if err != nil {
 				t.Error(err.Error())
 			}
 
 			if !matched {
-				t.Errorf("expected %s to match '%s', but did not", tt.expected, actual)
+				t.Errorf("expected %s to match '%s', but did not", tt.expected, actual.String())
 			}
 		})
 	}
@@ -209,8 +211,9 @@ func TestGenerateRowWithIntRanges(t *testing.T) {
 				if err != nil {
 					t.Fatal(err.Error())
 				}
-				row := strings.Split(columns.GenerateRow(tt.args.formatter), " ")
-				actual, err := strconv.Atoi(strings.TrimRight(row[0], "\n"))
+				row := bytes.Buffer{}
+				columns.GenerateRow(&row, tt.args.formatter)
+				actual, err := strconv.Atoi(strings.TrimRight(row.String(), "\n"))
 				if err != nil {
 					t.Fatal(err.Error())
 				}
@@ -259,9 +262,11 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 					t.Fatal(err.Error())
 				}
 
-				row := strings.Split(columns.GenerateRow(tt.args.formatter), " ")
+				row := bytes.Buffer{}
 
-				formattedDate := fmt.Sprintf("%sT00:00:00.000Z", strings.TrimRight(row[0], "\n"))
+				columns.GenerateRow(&row, tt.args.formatter)
+
+				formattedDate := fmt.Sprintf("%sT00:00:00.000Z", strings.TrimRight(row.String(), "\n"))
 
 				actual, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", formattedDate, time.UTC)
 				if err != nil {
@@ -303,18 +308,19 @@ func TestGenerateRowWithEnum(t *testing.T) {
 				if err != nil {
 					t.Fatal(err.Error())
 				}
-				row := strings.TrimRight(columns.GenerateRow(tt.args.formatter), "\n")
+				row := bytes.Buffer{}
+				columns.GenerateRow(&row, tt.args.formatter)
 
 				var found bool
 				for _, ex := range tt.expected {
-					if strings.Compare(ex, row) == 0 {
+					if strings.Compare(ex, strings.TrimRight(row.String(), "\n")) == 0 {
 						found = true
 						break
 					}
 				}
 
 				if !found {
-					t.Fatalf("expected to find %s in %v, but did not", row, tt.expected)
+					t.Fatalf("expected to find %s in %v, but did not", row.String(), tt.expected)
 				}
 			}
 		})

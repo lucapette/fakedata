@@ -1,6 +1,7 @@
 package fakedata
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand"
 	"os"
@@ -86,6 +87,9 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 // ExecuteTemplate takes a tmpl string and a n int and generates n rows of based
 // on the specified tmpl. Will loop forever if streamMode is true
 func ExecuteTemplate(tmpl string, n int, streamMode bool) (err error) {
+	fOut := bufio.NewWriter(os.Stdout)
+	defer fOut.Flush()
+
 	f := newTemplateFactory()
 	t, err := template.New("template").Funcs(f.getFunctions()).Parse(tmpl)
 	if err != nil {
@@ -94,7 +98,7 @@ func ExecuteTemplate(tmpl string, n int, streamMode bool) (err error) {
 
 	if streamMode {
 		for {
-			err = t.Execute(os.Stdout, nil)
+			err = t.Execute(fOut, nil)
 			if err != nil {
 				return err
 			}
@@ -102,7 +106,7 @@ func ExecuteTemplate(tmpl string, n int, streamMode bool) (err error) {
 	}
 
 	for i := 1; i <= n; i++ {
-		err = t.Execute(os.Stdout, nil)
+		err = t.Execute(fOut, nil)
 		if err != nil {
 			return err
 		}

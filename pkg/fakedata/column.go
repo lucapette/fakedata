@@ -1,8 +1,8 @@
 package fakedata
 
 import (
-	"bytes"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -56,15 +56,11 @@ func NewColumns(keys []string) (cols Columns, err error) {
 
 // GenerateRow generates a row of fake data using columns
 // in the specified format
-func (columns Columns) GenerateRow(formatter Formatter) string {
-	row := &bytes.Buffer{}
-
+func (columns Columns) GenerateRow(f io.Writer, formatter Formatter) {
 	values := make([]string, len(columns))
 	for i, column := range columns {
 		values[i] = column.Generate()
 	}
 
-	fmt.Fprintf(row, "%s", formatter.Format(columns, values)) // nolint: errcheck
-
-	return row.String()
+	fmt.Fprintf(f, "%s\n", formatter.Format(columns, values))
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -171,12 +172,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	fOut := bufio.NewWriter(os.Stdout)
+	defer fOut.Flush()
+
 	if *streamFlag {
 		for {
-			fmt.Println(columns.GenerateRow(formatter))
+			columns.GenerateRow(fOut, formatter)
 		}
 	}
 	for i := 0; i < *limitFlag; i++ {
-		fmt.Println(columns.GenerateRow(formatter))
+		columns.GenerateRow(fOut, formatter)
 	}
 }
