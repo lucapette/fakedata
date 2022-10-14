@@ -1,3 +1,4 @@
 /fakedata
 .vscode
 /dist
+*.perf
