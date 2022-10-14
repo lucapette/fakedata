@@ -3,8 +3,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# ROWS=100000000
-ROWS=1000
+ROWS=100000000
 
 echo "tick,rows_done" > template.perf
 
