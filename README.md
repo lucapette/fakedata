@@ -1,9 +1,26 @@
+# fakedata
+
 `fakedata` is a small program that generates test data on the command line.
 
-# Quick Start
+## How to install
 
-`fakedata` helps you generate random data in a number of ways. By default
-`fakedata` uses a column formatter with space separator:
+If you use [Homebrew](https://brew.sh/):
+
+```sh
+brew install lucapette/tap/fakedata
+```
+
+Or you can download the latest [compiled
+binary](https://github.com/lucapette/fakedata/releases) and put it anywhere in
+your executable path.
+
+To install from source, refer to our [contributing
+guidelines](/CONTRIBUTING.md).
+
+## Quick Start
+
+`fakedata` helps you generate random data in a number of ways. By default, it
+uses a column formatter with space separator:
 
 ```sh
 $ fakedata email country
@@ -33,6 +50,7 @@ Home,Sil-Home
 Health,Toughwarm
 Shoes,Freetop
 Tools,Domnix
+
 # tab is a little tricky to type, but works
 $ fakedata emoji industry -s=$'\t'
 👦	Electrical & Electronic Manufacturing
@@ -63,7 +81,7 @@ INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 
 If you need more control over the output, you can use [templates](/templates).
 
-# Generators
+## Generators
 
 `fakedata` provides a number of generators. You can see the full list running
 the following command:
@@ -96,26 +114,26 @@ Tin cans are absent from store shelves.
 Shut the hatch before the waves push it in.
 ```
 
-## Constraints
+### Constraints
 
 Some generators allow you to pass in a range to constraint the output to a
 subset of values. To find out which generators support constraints:
 
 ```sh
-$ fakedata -c # or fakedata --generators-with-constraints
+fakedata -c # or fakedata --generators-with-constraints
 ```
 
-### Int
+#### Int
 
 Here is how you can use constraints with the `int` generator:
 
 ```sh
-$ fakedata int:1,100 # will generate only integers between 1 and 100
-$ fakedata int:50, # specifying only min number works too
-$ fakedata int:50 # also works
+fakedata int:1,100 # will generate only integers between 1 and 100
+fakedata int:50, # specifying only min number works too
+fakedata int:50 # also works
 ```
 
-### Enum
+#### Enum
 
 The `enum` generator allows you to specify a set of values. It comes handy when
 you need random data from a small set of values:
@@ -138,7 +156,7 @@ feature
 When passing a single value `enum` can be used to repeat a value in every line:
 
 ```sh
-$ fakedata --limit 5 enum:one,two enum,repeat
+$ fakedata --limit 5 enum:one,two enum:repeat
 two repeat
 one repeat
 two repeat
@@ -146,7 +164,7 @@ one repeat
 one repeat
 ```
 
-### File
+#### File
 
 The `file` generator can be use to read custom values from a file:
 
@@ -160,7 +178,7 @@ one
 two
 ```
 
-# Templates
+## Templates
 
 `fakedata` supports parsing and executing template files for generating
 customized output formats. `fakedata` executes the provided template a number of
@@ -201,11 +219,14 @@ $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 ```
 
 The generators listed under `fakedata -g` are available as functions into the
-templates. If the generator name is a single word, then it's available as a
-function with the same name capitalized (example: `int` becomes `Int`). If the
-generator name is composed by multiple words joined by dots, then the function
-name is again capitalized by the first letter of the word and joined together
-(example: `product.name` becomes `Product.Name`).
+templates.
+
+If the generator name is a single word, then it's available as a function with
+the same name capitalized (example: `int` becomes `Int`).
+
+If the generator name is composed by multiple words joined by dots, then the
+function name is again capitalized by the first letter of the word and joined
+together (example: `product.name` becomes `Product.Name`).
 
 Each generator with [constraints](#constraints) is available in templates as a
 function that takes arguments.
@@ -227,7 +248,7 @@ each run.
 File reads a file from disk and returns a random line on each run. It takes one
 parameter which is the path to the file on disk.
 
-```
+```html
 {{ File "/var/data/dummy/dummy.txt" }}
 ```
 
@@ -236,8 +257,8 @@ parameter which is the path to the file on disk.
 Int takes one or two integer values and returns a number within this range. By
 default it returns a number between `0` and `1000`.
 
-```
-echo "{{ Int 15 20 }}" | fakedata -l5
+```sh
+$ echo "{{ Int 15 20 }}" | fakedata -l5
 15
 20
 15
@@ -300,38 +321,17 @@ format `Lastname Firstname` instead of `Firstname Lastname`.
 {{ printf "%s %s" Name.Last Name.First }}
 ```
 
-# Completion
+## Completion
 
 `fakedata` supports basic shell tab completion for bash, zsh, and fish shells:
 
 ```sh
-$ eval "$(fakedata --completion zsh)"
-$ eval "$(fakedata --completion bash)"
-$ eval (fakedata --completion fish)
+eval "$(fakedata --completion zsh)"
+eval "$(fakedata --completion bash)"
+eval (fakedata --completion fish)
 ```
 
-# How to install
-
-## Homebrew
-
-`fakedata` can be installed through Homebrew:
-
-```sh
-$ brew install lucapette/tap/fakedata
-```
-
-## Standalone
-
-`fakedata` can be installed as an executable. Download the latest [compiled
-binary](https://github.com/lucapette/fakedata/releases) and put it anywhere in
-your executable path.
-
-## Source
-
-Please refer to our [contributing guidelines](/CONTRIBUTING.md) to build and
-install `fakedata` from the source.
-
-# How to contribute
+## How to contribute
 
 We love every form of contribution! Good entry points to the project are:
 
@@ -345,13 +345,13 @@ If you're not sure where to start, please open a [new
 issue](https://github.com/lucapette/fakedata/issues/new) and we'll gladly help
 you get started.
 
-# Code of Conduct
+## Code of Conduct
 
 You are expected to follow our [code of conduct](/CODE_OF_CONDUCT.md) when
 interacting with the project via issues, pull requests, or in any other form.
 Many thanks to the awesome [contributor
 covenant](http://contributor-covenant.org/) initiative!
 
-# License
+## License
 
 [MIT License](/LICENSE) Copyright (c) [2022] [Luca Pette](https://lucapette.me)

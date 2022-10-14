@@ -10,31 +10,33 @@ run into as a contributor. To get a basic understanding of what you can do with
 it, you can run:
 
 ```sh
-$ make help
+make help
 ```
 
-Which shows all the documented targets. `fakedata` is written in
+Which shows documented targets. `fakedata` is written in
 [Go](https://golang.org/). Here is a list of prerequisites to build and test the
 code:
 
 - `make`
-- [Go 1.16+](http://golang.org/doc/install)
+- [Go 1.19+](http://golang.org/doc/install)
 
 Clone `fakedata` from source:
 
 ```sh
 $ git clone https://github.com/lucapette/fakedata.git
+# Cloning into 'fakedata'...
+# etc..
 $ cd fakedata
 ```
 
 A good way of making sure everything is all right is running the test suite:
 
 ```sh
-$ make test
+make test
 ```
 
-Please open an [issue](https://github.com/lucapette/fakedata/issues/new) if you
-run into any problem.
+Open an [issue](https://github.com/lucapette/fakedata/issues/new) if you run
+into any problem.
 
 ## Building and running fakedata
 
@@ -49,8 +51,11 @@ since `build` is the default target.
 You can run `fakedata` following the steps:
 
 ```sh
-$ make
-$ ./fakedata username
+make
+$ ./fakedata username -l 3
+RussellBishop
+g3d
+rude
 ```
 
 ## Testing
@@ -65,26 +70,26 @@ Once you are [setup](#setup-your-machine), you can run the test suite with one
 command:
 
 ```sh
-$ make test
+make test
 ```
 
 You can run only a subset of the tests using the `TEST_PATTERN` variable:
 
 ```sh
-$ make test TEST_PATTERN=TheAnswerIsFortyTwo
+make test TEST_PATTERN=TheAnswerIsFortyTwo
 ```
 
 You can use pass options to `go test` through the `TEST_OPTIONS` variable:
 
 ```sh
-$ make test TEST_OPTIONS=-v
+make test TEST_OPTIONS=-v
 ```
 
 You can combine the two options which is very helpful if you are working on a
 specific feature and want immediate feedback. Like so:
 
 ```sh
-$ make test TEST_OPTIONS=-v TEST_PATTERN=TheAnswerIsFortyTwo
+make test TEST_OPTIONS=-v TEST_PATTERN=TheAnswerIsFortyTwo
 ```
 
 ## Test your change
@@ -93,13 +98,13 @@ You can create a branch for your changes and try to build from the source as
 you go:
 
 ```sh
-$ make build
+make build
 ```
 
 When you are satisfied with the changes, we suggest running:
 
 ```sh
-$ make lint
+make lint
 ```
 
 This command runs the linters and the tests the same way we run them in our CI
