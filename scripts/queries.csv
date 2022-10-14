@@ -1,0 +1,3 @@
+"name","sql","author_id"
+"template","SELECT tick, rows_done - lag(rows_done, 1, 0) OVER (ORDER BY tick) rows_done_so_far FROM template ORDER BY tick","42"
+"generator","SELECT tick, rows_done - lag(rows_done, 1, 0) OVER (ORDER BY tick) rows_done_so_far FROM generator ORDER BY tick","42"
