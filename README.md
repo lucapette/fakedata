@@ -79,7 +79,7 @@ $ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 ```
 
-If you need more control over the output, you can use [templates](/templates).
+If you need more control over the output, you can use [templates](#templates).
 
 ## Generators
 
