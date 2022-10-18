@@ -15,8 +15,8 @@ import (
 	"github.com/kr/pretty"
 )
 
-// In the following tests, there's a lot going on. Please have a look at the
-// following article for a longer explanation:
+// In these tests, there's a lot going on. Have a look at this article for a
+// longer explanation:
 // https://lucapette.me/writing/writing-integration-tests-for-a-go-cli-application
 
 var update = flag.Bool("update", false, "update golden files")
@@ -98,6 +98,12 @@ func TestCLI(t *testing.T) {
 			"default format",
 			[]string{"int:42,42", "enum:foo,foo"},
 			"default-format.golden",
+			false,
+		},
+		{
+			"default format with headers",
+			[]string{"--header", "int:42,42", "enum:foo,foo"},
+			"default-format-with-headers.golden",
 			false,
 		},
 		{

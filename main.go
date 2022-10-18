@@ -67,18 +67,19 @@ func findTemplate(path string) string {
 
 func main() {
 	var (
-		generatorsFlag  = flag.BoolP("generators", "G", false, "lists available generators")
-		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
-		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
-		limitFlag       = flag.IntP("limit", "l", 10, "limits rows up to n")
-		streamFlag      = flag.BoolP("stream", "S", false, "streams rows till the end of time")
-		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|sql")
-		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
-		separatorFlag   = flag.StringP("separator", "s", " ", "specifies separator for the column format")
-		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
 		completionFlag  = flag.StringP("completion", "C", "", "print shell completion function, pass shell name as argument (\"bash\", \"zsh\" or \"fish\")")
-		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
+		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
+		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|sql")
+		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
+		generatorsFlag  = flag.BoolP("generators", "G", false, "lists available generators")
+		headerFlag      = flag.BoolP("header", "H", false, "adds headers row")
 		helpFlag        = flag.BoolP("help", "h", false, "shows help")
+		limitFlag       = flag.IntP("limit", "l", 10, "limits rows up to n")
+		separatorFlag   = flag.StringP("separator", "s", " ", "specifies separator for the column format")
+		streamFlag      = flag.BoolP("stream", "S", false, "streams rows till the end of time")
+		tableFlag       = flag.StringP("table", "t", "TABLE", "table name of the sql format")
+		templateFlag    = flag.StringP("template", "T", "", "Use template as input")
+		versionFlag     = flag.BoolP("version", "v", false, "shows version information")
 	)
 
 	flag.Usage = func() {
@@ -174,6 +175,10 @@ func main() {
 
 	fOut := bufio.NewWriter(os.Stdout)
 	defer fOut.Flush()
+
+	if *headerFlag {
+		columns.GenerateHeader(fOut, formatter)
+	}
 
 	if *streamFlag {
 		for {

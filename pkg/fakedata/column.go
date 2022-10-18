@@ -64,3 +64,14 @@ func (columns Columns) GenerateRow(f io.Writer, formatter Formatter) {
 
 	fmt.Fprintf(f, "%s\n", formatter.Format(columns, values))
 }
+
+// GenerateRow generates an header row using column names
+// in the specified format
+func (columns Columns) GenerateHeader(f io.Writer, formatter Formatter) {
+	values := make([]string, len(columns))
+	for i, column := range columns {
+		values[i] = column.Name
+	}
+
+	fmt.Fprintf(f, "%s\n", formatter.Format(columns, values))
+}
