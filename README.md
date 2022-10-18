@@ -108,7 +108,7 @@ domain.tld        example|test
 #...
 #...
 #It's a long list :)
-````
+```
 
 You can use the `-g` (or `--generator`) option to see an example:
 
@@ -365,3 +365,4 @@ covenant](http://contributor-covenant.org/) initiative!
 ## License
 
 [MIT License](/LICENSE) Copyright (c) [2022] [Luca Pette](https://lucapette.me)
+````
