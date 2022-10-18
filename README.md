@@ -82,13 +82,13 @@ INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 
 `fakedata` can also _stream_ rows of test data for you:
 
-````sh
+```sh
 $ fakedata --stream animal
 horse
 koala
 chameleon
 ## and so on...
-``
+```
 
 If you need more control over the output, you can use [templates](#templates).
 
@@ -365,4 +365,3 @@ covenant](http://contributor-covenant.org/) initiative!
 ## License
 
 [MIT License](/LICENSE) Copyright (c) [2022] [Luca Pette](https://lucapette.me)
-````
