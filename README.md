@@ -19,8 +19,9 @@ guidelines](/CONTRIBUTING.md).
 
 ## Quick Start
 
-`fakedata` helps you generate random data in a number of ways. By default, it
-uses a column formatter with space separator:
+`fakedata` helps you generate random data in a number of ways.
+
+By default, it uses a column formatter with space separator:
 
 ```sh
 $ fakedata email country
@@ -79,6 +80,16 @@ $ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
 ```
 
+`fakedata` can also _stream_ rows of test data for you:
+
+````sh
+$ fakedata --stream animal
+horse
+koala
+chameleon
+## and so on...
+``
+
 If you need more control over the output, you can use [templates](#templates).
 
 ## Generators
@@ -97,7 +108,7 @@ domain.tld        example|test
 #...
 #...
 #It's a long list :)
-```
+````
 
 You can use the `-g` (or `--generator`) option to see an example:
 
@@ -181,11 +192,29 @@ two
 ## Templates
 
 `fakedata` supports parsing and executing template files for generating
-customized output formats. `fakedata` executes the provided template a number of
-times based on the limit flag (`-l`, `--limit`) and writes the output to
-`stdout`, exactly like using inline generators.
+customized output formats.
 
-`fakedata` can read templates from disk:
+It executes the provided template a number of times based on the limit flag
+(`-l`, `--limit`) and writes the output to `stdout`, exactly like using inline
+generators.
+
+You pipe a template into `fakedata`:
+
+```sh
+$ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
+#56 Dannie Martin <bassamology@test.th>
+#89 Moshe Walsh <baires@example.autos>
+#48 Buck Reid <syropian@test.cg>
+#55 Rico Powell <findingjenny@example.pohl>
+#92 Luise Wood <91bilal@example.link>
+#30 Isreal Henderson <thierrykoblentz@test.scb>
+#96 Josphine Patton <abelcabans@test.wtf>
+#95 Jetta Blair <tgerken@example.jewelry>
+#10 Clorinda Parsons <roybarberuk@test.gives>
+#0 Dionna Bates <jefffis@test.flights>
+```
+
+Or you ask `fakedata` to read templates from disk:
 
 ```sh
 $ echo "{{Email}}--{{Int}}" > /tmp/template.tmpl
@@ -200,22 +229,6 @@ rickdt@example.vista--963
 rmlewisuk@test.info--101
 linux29@example.archi--453
 g3d@test.pl--921
-```
-
-You can also pipe a template into `fakedata`:
-
-```sh
-$ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
-#56 Dannie Martin <bassamology@test.th>
-#89 Moshe Walsh <baires@example.autos>
-#48 Buck Reid <syropian@test.cg>
-#55 Rico Powell <findingjenny@example.pohl>
-#92 Luise Wood <91bilal@example.link>
-#30 Isreal Henderson <thierrykoblentz@test.scb>
-#96 Josphine Patton <abelcabans@test.wtf>
-#95 Jetta Blair <tgerken@example.jewelry>
-#10 Clorinda Parsons <roybarberuk@test.gives>
-#0 Dionna Bates <jefffis@test.flights>
 ```
 
 The generators listed under `fakedata -g` are available as functions into the
@@ -239,9 +252,6 @@ are passed to Enum like so:
 ```html
 {{ Enum "feature" "bug" "documentation" }}
 ```
-
-This Enum will return either the string `feature`, `bug`, or `documentation` for
-each run.
 
 ### `File`
 
