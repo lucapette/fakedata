@@ -8,19 +8,17 @@ import (
 
 var gens = fakedata.NewGenerators()
 
-func BenchmarkNoun(b *testing.B) {
-	noun := gens.FindByName("noun")
+func BenchmarkGenerators(b *testing.B) {
+	for i := 0; i < len(gens); i++ {
+		g := gens[i]
 
-	for i := 0; i < b.N; i++ {
-		noun.Func()
-	}
-}
-
-func BenchmarkDomain(b *testing.B) {
-	domain := gens.FindByName("domain")
-
-	for i := 0; i < b.N; i++ {
-		domain.Func()
+		if !g.IsCustom() {
+			b.Run(g.Name, func(b *testing.B) {
+				for i := 0; i < b.N; i++ {
+					g.Func()
+				}
+			})
+		}
 	}
 }
 
@@ -34,22 +32,6 @@ func BenchmarkEnum(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		enumFunc()
-	}
-}
-
-func BenchmarkEmail(b *testing.B) {
-	email := gens.FindByName("email")
-
-	for i := 0; i < b.N; i++ {
-		email.Func()
-	}
-}
-
-func BenchmarkName(b *testing.B) {
-	name := gens.FindByName("name")
-
-	for i := 0; i < b.N; i++ {
-		name.Func()
 	}
 }
 

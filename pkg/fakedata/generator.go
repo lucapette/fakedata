@@ -208,10 +208,17 @@ func enum(options string) (func() string, error) {
 	return withList(list), nil
 }
 
+func timestamp() func() string {
+	now := time.Now()
+	return func() string {
+		return fmt.Sprintf("%d", rand.Int63n(now.Unix()))
+	}
+}
+
 func uuidv1() string {
 	u1, err := uuid.NewV1()
 	if err != nil {
-		fmt.Printf("failed to generate UUID: %v\n", err)
+		fmt.Printf("failed to generate uuidv1: %v\n", err)
 		os.Exit(1)
 	}
 	return u1.String()
@@ -220,10 +227,28 @@ func uuidv1() string {
 func uuidv4() string {
 	u4, err := uuid.NewV4()
 	if err != nil {
-		fmt.Printf("failed to generate UUID: %v\n", err)
+		fmt.Printf("failed to generate uuidv4: %v\n", err)
 		os.Exit(1)
 	}
 	return u4.String()
+}
+
+func uuidv6() string {
+	u6, err := uuid.NewV6()
+	if err != nil {
+		fmt.Printf("failed to generate uuidv6: %v\n", err)
+		os.Exit(1)
+	}
+	return u6.String()
+}
+
+func uuidv7() string {
+	u7, err := uuid.NewV6()
+	if err != nil {
+		fmt.Printf("failed to generate uuidv7: %v\n", err)
+		os.Exit(1)
+	}
+	return u7.String()
 }
 
 type generatorsMap map[string]Generator
@@ -374,6 +399,15 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "uuidv1", Desc: "uuidv1", Func: uuidv1})
 	generators.addGen(Generator{Name: "uuidv4", Desc: "uuidv4", Func: uuidv4})
+
+	generators.addGen(Generator{Name: "uuidv6", Desc: "uuidv6", Func: uuidv6})
+	generators.addGen(Generator{Name: "uuidv7", Desc: "uuidv7", Func: uuidv7})
+
+	generators.addGen(Generator{
+		Name: "timestamp",
+		Desc: "Unix timestamp between epoch and now",
+		Func: timestamp(),
+	})
 
 	return factory{generators: generators}
 }
