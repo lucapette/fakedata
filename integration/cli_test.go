@@ -7,12 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"testing"
 
 	"reflect"
 
-	"github.com/kr/pretty"
+	"github.com/lucapette/fakedata/testutil"
 )
 
 // In these tests, there's a lot going on. Have a look at this article for a
@@ -24,62 +23,6 @@ var update = flag.Bool("update", false, "update golden files")
 const binaryName = "fakedata"
 
 var binaryPath string
-
-func diff(expected, actual interface{}) []string {
-	return pretty.Diff(expected, actual)
-}
-
-type testFile struct {
-	t    *testing.T
-	name string
-	dir  string
-}
-
-func newFixture(t *testing.T, name string) *testFile {
-	return &testFile{t: t, name: name, dir: "fixtures"}
-}
-
-func newGoldenFile(t *testing.T, name string) *testFile {
-	return &testFile{t: t, name: name, dir: "golden"}
-}
-
-func (tf *testFile) path() string {
-	tf.t.Helper()
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		tf.t.Fatal("problems recovering caller information")
-	}
-
-	return filepath.Join(filepath.Dir(filename), tf.dir, tf.name)
-}
-
-func (tf *testFile) write(content string) {
-	tf.t.Helper()
-	err := os.WriteFile(tf.path(), []byte(content), 0644)
-	if err != nil {
-		tf.t.Fatalf("could not write %s: %v", tf.name, err)
-	}
-}
-
-func (tf *testFile) asFile() *os.File {
-	tf.t.Helper()
-	file, err := os.Open(tf.path())
-	if err != nil {
-		tf.t.Fatalf("could not open %s: %v", tf.name, err)
-	}
-	return file
-}
-
-func (tf *testFile) load() string {
-	tf.t.Helper()
-
-	content, err := os.ReadFile(tf.path())
-	if err != nil {
-		tf.t.Fatalf("could not read file %s: %v", tf.name, err)
-	}
-
-	return string(content)
-}
 
 func TestCLI(t *testing.T) {
 	tests := []struct {
@@ -177,15 +120,15 @@ func TestCLI(t *testing.T) {
 			}
 			actual := string(output)
 
-			golden := newGoldenFile(t, tt.golden)
+			golden := testutil.NewGoldenFile(t, tt.golden)
 
 			if *update {
-				golden.write(actual)
+				golden.Write(actual)
 			}
-			expected := golden.load()
+			expected := golden.Load()
 
 			if !reflect.DeepEqual(expected, actual) {
-				t.Fatalf("diff: %v", diff(expected, actual))
+				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
 			}
 		})
 	}
@@ -230,8 +173,8 @@ func TestFileGenerator(t *testing.T) {
 	}{
 		{"no file", []string{"file"}, "path-empty.golden", true},
 		{"file does not exist", []string{`file:'this file does not exist.txt'`}, "file-does-not-exist.golden", true},
-		{"file exists", []string{`file:integration/fixtures/file.txt`}, "file-exist.golden", false},
-		{"file exists with quotes", []string{`file:'integration/fixtures/file.txt'`}, "file-exist.golden", false},
+		{"file exists", []string{`file:testutil/fixtures/file.txt`}, "file-exist.golden", false},
+		{"file exists with quotes", []string{`file:'testutil/fixtures/file.txt'`}, "file-exist.golden", false},
 	}
 
 	for _, tt := range tests {
@@ -242,16 +185,16 @@ func TestFileGenerator(t *testing.T) {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
 
-			golden := newGoldenFile(t, tt.golden)
+			golden := testutil.NewGoldenFile(t, tt.golden)
 			actual := string(output)
 			if *update {
-				golden.write(actual)
+				golden.Write(actual)
 			}
 
-			expected := golden.load()
+			expected := golden.Load()
 
 			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", diff(expected, actual))
+				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
 			}
 		})
 	}
@@ -271,22 +214,22 @@ var templateTests = []struct {
 func TestTemplatesWithCLIArgs(t *testing.T) {
 	for _, tt := range templateTests {
 		t.Run(tt.tmpl, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("integration/fixtures/%s", tt.tmpl))
+			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("testutil/fixtures/%s", tt.tmpl))
 			output, err := cmd.CombinedOutput()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
 
-			golden := newGoldenFile(t, tt.golden)
+			golden := testutil.NewGoldenFile(t, tt.golden)
 			actual := string(output)
 			if *update {
-				golden.write(actual)
+				golden.Write(actual)
 			}
 
-			expected := golden.load()
+			expected := golden.Load()
 
 			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", diff(expected, actual))
+				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
 			}
 		})
 	}
@@ -295,24 +238,24 @@ func TestTemplatesWithCLIArgs(t *testing.T) {
 func TestTemplatesWithPipe(t *testing.T) {
 	for _, tt := range templateTests {
 		t.Run(tt.tmpl, func(t *testing.T) {
-			fixture := newFixture(t, tt.tmpl)
+			fixture := testutil.NewFixture(t, tt.tmpl)
 			cmd := exec.Command(binaryPath)
-			cmd.Stdin = fixture.asFile()
+			cmd.Stdin = fixture.AsFile()
 			output, err := cmd.CombinedOutput()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
 
-			golden := newGoldenFile(t, tt.golden)
+			golden := testutil.NewGoldenFile(t, tt.golden)
 			actual := string(output)
 			if *update {
-				golden.write(actual)
+				golden.Write(actual)
 			}
 
-			expected := golden.load()
+			expected := golden.Load()
 
 			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", diff(expected, actual))
+				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
 			}
 		})
 	}

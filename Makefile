@@ -2,10 +2,13 @@ SOURCE_FILES?=$$(go list ./...)
 TEST_PATTERN?=.
 TEST_OPTIONS?=
 
-test: ## Run all the tests
+test: ## Run tests
 	@go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=30s
 
-lint: ## Run all the linters
+bench: ## Run benchmarks
+	@go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -bench $(TEST_PATTERN) -timeout=30s
+
+lint: ## Run linters
 	@golangci-lint run
 
 build: ## Build a dev version of fakedata
