@@ -68,6 +68,12 @@ func withList(list []string) func() string {
 	}
 }
 
+var tdl = withList(data.TLDs)
+
+var host = withList([]string{"test", "example"})
+
+var usernames = withList(data.Usernames)
+
 func ipv4() string {
 	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
 }
@@ -93,7 +99,7 @@ func double() string {
 }
 
 func domain() string {
-	return withList([]string{"test", "example"})() + "." + withList(data.TLDs)()
+	return host() + "." + tdl()
 }
 
 func date(options string) (f func() string, err error) {
@@ -183,13 +189,15 @@ func file(path string) (func() string, error) {
 
 	filePath := strings.Trim(path, "'\"")
 
-	content, err := os.ReadFile(filePath)
+	file, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not read file %s: %v", filePath, err)
 	}
-	list := strings.Split(strings.Trim(string(content), "\n"), "\n")
 
-	return func() string { return withList(list)() }, nil
+	content := strings.Split(strings.Trim(string(file), "\n"), "\n")
+	list := withList(content)
+
+	return func() string { return list() }, nil
 }
 
 func enum(options string) (func() string, error) {
@@ -197,7 +205,7 @@ func enum(options string) (func() string, error) {
 	if options != "" {
 		list = strings.Split(options, ",")
 	}
-	return func() string { return withList(list)() }, nil
+	return withList(list), nil
 }
 
 func uuidv1() string {
@@ -210,12 +218,12 @@ func uuidv1() string {
 }
 
 func uuidv4() string {
-	u1, err := uuid.NewV4()
+	u4, err := uuid.NewV4()
 	if err != nil {
 		fmt.Printf("failed to generate UUID: %v\n", err)
 		os.Exit(1)
 	}
-	return u1.String()
+	return u4.String()
 }
 
 type generatorsMap map[string]Generator
@@ -247,7 +255,7 @@ func newFactory() (f factory) {
 	generators.addGen(Generator{
 		Name: "domain.tld",
 		Desc: "valid TLD name from https://data.iana.org/TLD/tlds-alpha-by-domain.txt",
-		Func: withList(data.TLDs),
+		Func: tdl,
 	})
 
 	generators.addGen(Generator{Name: "country", Desc: "Full country name", Func: withList(data.Countries)})
@@ -260,11 +268,14 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "timezone", Desc: "tz in the form Area/City", Func: withList(data.Timezones)})
 
-	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: withList(data.Usernames)})
+	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: usernames})
 
-	generators.addGen(Generator{Name: "name.first", Desc: "capitalized first name", Func: withList(data.Firstnames)})
+	firstNames := withList(data.Firstnames)
 
-	generators.addGen(Generator{Name: "name.last", Desc: "capitalized last name", Func: withList(data.Lastnames)})
+	generators.addGen(Generator{Name: "name.first", Desc: "capitalized first name", Func: firstNames})
+
+	lastNames := withList(data.Lastnames)
+	generators.addGen(Generator{Name: "name.last", Desc: "capitalized last name", Func: lastNames})
 
 	generators.addGen(Generator{Name: "color", Desc: "one word color", Func: withList(data.Colors)})
 
@@ -284,7 +295,7 @@ func newFactory() (f factory) {
 		Name: "name",
 		Desc: `name.first + " " + name.last`,
 		Func: func() string {
-			return withList(data.Firstnames)() + " " + withList(data.Lastnames)()
+			return firstNames() + " " + lastNames()
 		},
 	})
 
@@ -292,7 +303,7 @@ func newFactory() (f factory) {
 		Name: "email",
 		Desc: "email",
 		Func: func() string {
-			return withList(data.Usernames)() + "@" + domain()
+			return usernames() + "@" + domain()
 		},
 	})
 
