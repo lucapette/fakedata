@@ -47,3 +47,44 @@ func TestSQLFormatter(t *testing.T) {
 		})
 	}
 }
+
+func TestNdjsonFormatter(t *testing.T) {
+	tests := []struct {
+		name string
+		want string
+	}{
+		{"default", "{\"domain\":\"example.com\",\"name\":\"Grace Hopper\"}"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f := &fakedata.NdjsonFormatter{}
+			if got := f.Format(columns, values); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NdjsonFormatter.Format() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkFormatters(b *testing.B) {
+	column := &fakedata.ColumnFormatter{}
+	b.Run("ColumnFormatter", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			column.Format(columns, values)
+		}
+	})
+
+	ndjson := &fakedata.NdjsonFormatter{}
+	b.Run("NdjsonFormatter", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			ndjson.Format(columns, values)
+		}
+	})
+
+	sql := &fakedata.SQLFormatter{}
+	b.Run("SQLFormatter", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			sql.Format(columns, values)
+		}
+	})
+
+}

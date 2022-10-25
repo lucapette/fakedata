@@ -3,7 +3,7 @@ could not read file this file does not exist.txt: open this file does not exist.
 Usage: fakedata [option ...] generator...
 
   -C, --completion string             print shell completion function, pass shell name as argument ("bash", "zsh" or "fish")
-  -f, --format string                 generates rows in f format. Available formats: column|sql (default "column")
+  -f, --format string                 generates rows in f format. Available formats: column|ndjson|sql (default "column")
   -g, --generator string              show help for a specific generator
   -G, --generators                    lists available generators
   -c, --generators-with-constraints   lists available generators with constraints

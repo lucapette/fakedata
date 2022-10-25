@@ -69,7 +69,7 @@ func main() {
 	var (
 		completionFlag  = flag.StringP("completion", "C", "", "print shell completion function, pass shell name as argument (\"bash\", \"zsh\" or \"fish\")")
 		constraintsFlag = flag.BoolP("generators-with-constraints", "c", false, "lists available generators with constraints")
-		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|sql")
+		formatFlag      = flag.StringP("format", "f", "column", "generates rows in f format. Available formats: column|ndjson|sql")
 		generatorFlag   = flag.StringP("generator", "g", "", "show help for a specific generator")
 		generatorsFlag  = flag.BoolP("generators", "G", false, "lists available generators")
 		headerFlag      = flag.BoolP("header", "H", false, "adds headers row")
@@ -163,11 +163,15 @@ func main() {
 	}
 
 	var formatter fakedata.Formatter
-	if *formatFlag == "column" {
+
+	switch *formatFlag {
+	case "column":
 		formatter = fakedata.NewColumnFormatter(*separatorFlag)
-	} else if *formatFlag == "sql" {
+	case "sql":
 		formatter = fakedata.NewSQLFormatter(*tableFlag)
-	} else {
+	case "ndjson":
+		formatter = fakedata.NewNdjsonFormatter()
+	default:
 		fmt.Printf("unknown format: %s\n\n", *formatFlag)
 		flag.Usage()
 		os.Exit(1)

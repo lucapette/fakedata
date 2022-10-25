@@ -65,19 +65,29 @@ $ fakedata emoji industry -s=$'\t'
 ☺	Alternative Dispute Resoluti
 ```
 
-You can also specify a SQL formatter:
+You can specify a SQL formatter:
 
 ```sh
 $ fakedata --format=sql --limit 1 email domain
 INSERT INTO TABLE (email,domain) values ('yigitpinar@example.org','example.me');
 ```
 
-You can change the name of the table column using a field with the following syntax
-`column_name=generator`:
+Or a [ndjson](https://github.com/ndjson/ndjson-spec) one:
+
+```sh
+$ fakedata --format=ndjson --limit 1 noun country.code
+{"country.code":"PY","noun":"mainframe"}
+```
+
+You can change the name of the field column using a field with the syntax
+`column_name=generator`. It works with the SQL formatter as well the ndjson one:
 
 ```sh
 $ fakedata --format=sql --limit 1 login=email referral=domain
 INSERT INTO TABLE (login,referral) values ('calebogden@example.com','test.me');
+
+$ fakedata --format=ndjson --limit 1 login=email referral=domain
+{"login":"rmlewisuk@example.xn--80ao21a","referral":"example.ventures"}
 ```
 
 `fakedata` can also _stream_ rows of test data for you:
@@ -90,7 +100,7 @@ chameleon
 ## and so on...
 ```
 
-If you need more control over the output, you can use [templates](#templates).
+If you need more control over the output, use [templates](#templates).
 
 ## Generators
 
