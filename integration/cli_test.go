@@ -1,11 +1,7 @@
-package main
+package integration
 
 import (
-	"flag"
-	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"testing"
 
@@ -13,16 +9,6 @@ import (
 
 	"github.com/lucapette/fakedata/testutil"
 )
-
-// In these tests, there's a lot going on. Have a look at this article for a
-// longer explanation:
-// https://lucapette.me/writing/writing-integration-tests-for-a-go-cli-application
-
-var update = flag.Bool("update", false, "update golden files")
-
-const binaryName = "fakedata"
-
-var binaryPath string
 
 func TestCLI(t *testing.T) {
 	tests := []struct {
@@ -198,87 +184,4 @@ func TestFileGenerator(t *testing.T) {
 			}
 		})
 	}
-}
-
-var templateTests = []struct {
-	tmpl    string
-	golden  string
-	wantErr bool
-}{
-	{"simple.tmpl", "simple-template.golden", false},
-	{"loop.tmpl", "loop.golden", false},
-	{"broken.tmpl", "broken-template.golden", true},
-	{"unknown-function.tmpl", "unknown-function.golden", true},
-}
-
-func TestTemplatesWithCLIArgs(t *testing.T) {
-	for _, tt := range templateTests {
-		t.Run(tt.tmpl, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("testutil/fixtures/%s", tt.tmpl))
-			output, err := cmd.CombinedOutput()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
-			}
-
-			golden := testutil.NewGoldenFile(t, tt.golden)
-			actual := string(output)
-			if *update {
-				golden.Write(actual)
-			}
-
-			expected := golden.Load()
-
-			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
-			}
-		})
-	}
-}
-
-func TestTemplatesWithPipe(t *testing.T) {
-	for _, tt := range templateTests {
-		t.Run(tt.tmpl, func(t *testing.T) {
-			fixture := testutil.NewFixture(t, tt.tmpl)
-			cmd := exec.Command(binaryPath)
-			cmd.Stdin = fixture.AsFile()
-			output, err := cmd.CombinedOutput()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
-			}
-
-			golden := testutil.NewGoldenFile(t, tt.golden)
-			actual := string(output)
-			if *update {
-				golden.Write(actual)
-			}
-
-			expected := golden.Load()
-
-			if !reflect.DeepEqual(actual, expected) {
-				t.Fatalf("diff: %v", testutil.Diff(expected, actual))
-			}
-		})
-	}
-}
-
-func TestMain(m *testing.M) {
-	err := os.Chdir("..")
-	if err != nil {
-		fmt.Printf("could not change dir: %v", err)
-		os.Exit(1)
-	}
-
-	abs, err := filepath.Abs(binaryName)
-	if err != nil {
-		fmt.Printf("could not get abs path for %s: %v", binaryName, err)
-		os.Exit(1)
-	}
-
-	binaryPath = abs
-
-	if err := exec.Command("make").Run(); err != nil {
-		fmt.Printf("could not make binary for %s: %v", binaryName, err)
-		os.Exit(1)
-	}
-	os.Exit(m.Run())
 }

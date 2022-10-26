@@ -300,8 +300,10 @@ functions:
 - `Odd`
 - `Even`
 
-If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function. This function takes a single integer as parameter which is
-the number of iterations. `Loop` must be used with `range` e.g.
+If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function.
+
+This function takes a single integer as parameter which is the number of
+iterations. `Loop` must be used with `range` e.g.
 
 ```html
 {{ range Loop 10 }} You're going to see this 10 times! {{ end }}
@@ -316,11 +318,12 @@ example:
 ```
 
 In combination with `Loop` and `range` you can use `Odd` and `Even` to determine
-if the current iteration is odd or even. This is especially helpful when
-creating HTML tables:
+if the current iteration is odd or even.
+
+For example, this is helpful when creating HTML tables:
 
 ```html
-{{ range $i, $j := Loop 5 }}
+{{ range $i := Loop 5 }}
 <tr>
   {{ if Odd $i -}}
   <td class="odd">{{- else -}}</td>
@@ -334,8 +337,10 @@ creating HTML tables:
 values of `Loop 5` to the variables `$i` and `$j`.
 
 Templates also support string manipulation via the `printf` function. Using
-`printf` we can create custom output. For example to display a full name in the
-format `Lastname Firstname` instead of `Firstname Lastname`.
+`printf` we can create custom output.
+
+For example, to display a full name in the format `Lastname Firstname` instead
+of `Firstname Lastname`.
 
 ```html
 {{ printf "%s %s" Name.Last Name.First }}
