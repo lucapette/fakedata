@@ -37,7 +37,12 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 				}
 			}
 
-			return make([]int, n)
+			times := make([]int, n)
+			for i := 0; i < n; i++ {
+				times[i] = i
+			}
+
+			return times
 		},
 		"Odd":  func(i int) bool { return i%2 != 0 },
 		"Even": func(i int) bool { return i%2 == 0 },
