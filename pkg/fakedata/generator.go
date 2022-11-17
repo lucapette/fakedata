@@ -85,7 +85,7 @@ func ipv6() string {
 }
 
 func mac() string {
-	return fmt.Sprintf("%x:%x:%x:%x:%x:%x", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
+	return fmt.Sprintf("%X:%X:%X:%X:%X:%X", rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255), rand.Intn(255))
 }
 
 func latitude() string {
