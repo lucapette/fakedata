@@ -287,6 +287,8 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withList(data.CountryCodes)})
 
+	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: withList(data.PhoneCodes)})
+
 	generators.addGen(Generator{Name: "state", Desc: "Full US state name", Func: withList(data.States)})
 
 	generators.addGen(Generator{Name: "state.code", Desc: "2-digit US state name", Func: withList(data.StateCodes)})
