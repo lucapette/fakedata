@@ -72,7 +72,9 @@ var tdl = withList(data.TLDs)
 
 var host = withList([]string{"test", "example"})
 
-var usernames = withList(data.Usernames)
+var username = withList(data.Usernames)
+
+var phoneCode = withList(data.PhoneCodes)
 
 func ipv4() string {
 	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
@@ -251,6 +253,16 @@ func uuidv7() string {
 	return u7.String()
 }
 
+var localPhone, _ = integer("10000000,9999999999")
+
+func phone() string {
+	number := "+" + phoneCode() + localPhone()
+	if len(number) > 15 {
+		number = number[0:14]
+	}
+	return number
+}
+
 type generatorsMap map[string]Generator
 
 func (gM generatorsMap) addGen(g Generator) {
@@ -287,7 +299,9 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withList(data.CountryCodes)})
 
-	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: withList(data.PhoneCodes)})
+	generators.addGen(Generator{Name: "phone", Desc: "Phone number according to E.164", Func: phone})
+	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: phoneCode})
+	generators.addGen(Generator{Name: "phone.local", Desc: "Phone number without calling country code", Func: localPhone})
 
 	generators.addGen(Generator{Name: "state", Desc: "Full US state name", Func: withList(data.States)})
 
@@ -295,7 +309,7 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "timezone", Desc: "tz in the form Area/City", Func: withList(data.Timezones)})
 
-	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: usernames})
+	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: username})
 
 	firstNames := withList(data.Firstnames)
 
@@ -330,7 +344,7 @@ func newFactory() (f factory) {
 		Name: "email",
 		Desc: "email",
 		Func: func() string {
-			return usernames() + "@" + domain()
+			return username() + "@" + domain()
 		},
 	})
 
@@ -401,7 +415,6 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "uuidv1", Desc: "uuidv1", Func: uuidv1})
 	generators.addGen(Generator{Name: "uuidv4", Desc: "uuidv4", Func: uuidv4})
-
 	generators.addGen(Generator{Name: "uuidv6", Desc: "uuidv6", Func: uuidv6})
 	generators.addGen(Generator{Name: "uuidv7", Desc: "uuidv7", Func: uuidv7})
 

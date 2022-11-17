@@ -35,6 +35,19 @@ func BenchmarkEnum(b *testing.B) {
 	}
 }
 
+func BenchmarkInt(b *testing.B) {
+	integer := gens.FindByName("int")
+
+	integerFunc, err := integer.CustomFunc("10000000,9999999999")
+	if err != nil {
+		b.Fatalf("cannot create int: %s", err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		integerFunc()
+	}
+}
+
 func BenchmarkFile(b *testing.B) {
 	file := gens.FindByName("file")
 
