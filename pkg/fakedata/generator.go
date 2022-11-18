@@ -233,15 +233,15 @@ func enum(options string) (func() string, error) {
 }
 
 func localPhone(options string) (func() string, error) {
-	numDigits := 8
+	if len(options) == 0 {
+		return integer("10000000,99999999")
+	}
 	numDigits, err := strconv.Atoi(options)
 	if err != nil {
 		return nil, err
 	}
 
 	switch numDigits {
-	case 8:
-		return integer("10000000,99999999")
 	case 9:
 		return integer("100000000,999999999")
 	case 10:
