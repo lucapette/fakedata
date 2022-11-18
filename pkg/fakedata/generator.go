@@ -232,6 +232,29 @@ func enum(options string) (func() string, error) {
 	return withList(list), nil
 }
 
+func localPhone(options string) (func() string, error) {
+	numDigits := 8
+	numDigits, err := strconv.Atoi(options)
+	if err != nil {
+		return nil, err
+	}
+
+	switch numDigits {
+	case 8:
+		return integer("10000000,99999999")
+	case 9:
+		return integer("100000000,999999999")
+	case 10:
+		return integer("1000000000,9999999999")
+	case 11:
+		return integer("10000000000,99999999999")
+	case 12:
+		return integer("100000000000,999999999999")
+	default:
+		return nil, fmt.Errorf("digits must be >=8 and <=12")
+	}
+}
+
 func timestamp() func() string {
 	now := time.Now()
 	return func() string {
@@ -275,9 +298,8 @@ func uuidv7() string {
 	return u7.String()
 }
 
-var localPhone, _ = integer("10000000,9999999999")
-
 func phoneGenerator(phoneCodeFunc func() string) func() string {
+	var localPhone, _ = integer("10000000,9999999999")
 	return func() string {
 		number := "+" + phoneCodeFunc() + localPhone()
 		if len(number) > 15 {
@@ -345,7 +367,6 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "phone", Desc: "Phone number according to E.164", Func: phone})
 	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: phoneCode})
-	generators.addGen(Generator{Name: "phone.local", Desc: "Phone number without calling country code", Func: localPhone})
 
 	generators.addGen(Generator{Name: "state", Desc: "Full US state name", Func: withList(data.States)})
 
@@ -454,6 +475,12 @@ func newFactory() (f factory) {
 		Name:       "file",
 		Desc:       `random value from a file. It accepts a file path. It can be either relative or absolute. The file must contain a value per line`,
 		CustomFunc: file,
+	})
+
+	generators.addGen(Generator{
+		Name:       "phone.local",
+		Desc:       "phone number without calling country code. It accepts an integer N number of digits. Min: 8, Max: 12",
+		CustomFunc: localPhone,
 	})
 
 	generators.addGen(Generator{Name: "uuidv1", Desc: "uuidv1", Func: uuidv1})
