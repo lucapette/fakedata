@@ -19,6 +19,7 @@ type Generator struct {
 	CustomFunc func(string) (func() string, error)
 	Desc       string
 	Name       string
+	Hidden     bool
 }
 
 // Generators is an array of Generator
@@ -52,6 +53,16 @@ func (gens Generators) WithConstraints() (newGens Generators) {
 	return newGens
 }
 
+// Visible returns only the generators that should appear in the help list
+func (gens Generators) Visible() (newGens Generators) {
+	for _, gen := range gens {
+		if !gen.Hidden {
+			newGens = append(newGens, gen)
+		}
+	}
+	return newGens
+}
+
 // FindByName returns, if present, the generator with the name string
 func (gens Generators) FindByName(name string) (gen *Generator) {
 	for _, g := range gens {
@@ -66,17 +77,6 @@ func withList(list []string) func() string {
 	return func() string {
 		return list[rand.Intn(len(list))]
 	}
-}
-
-func withMapKeys(m map[string]string) func() string {
-	keys := make([]string, len(m))
-	i := 0
-	for k := range m {
-		keys[i] = k
-		i++
-	}
-
-	return withList(keys)
 }
 
 func withMapValues(m map[string]string) func() string {
@@ -277,12 +277,22 @@ func uuidv7() string {
 
 var localPhone, _ = integer("10000000,9999999999")
 
-func phone() string {
-	number := "+" + phoneCode() + localPhone()
-	if len(number) > 15 {
-		number = number[0:14]
+func phoneGenerator(phoneCodeFunc func() string) func() string {
+	return func() string {
+		number := "+" + phoneCodeFunc() + localPhone()
+		if len(number) > 15 {
+			number = number[0:14]
+		}
+		return number
 	}
-	return number
+}
+
+func phone() string {
+	return phoneGenerator(phoneCode)()
+}
+
+func countryPhone(countryCode string) func() string {
+	return phoneGenerator(func() string { return data.CountryCodes[countryCode] })
 }
 
 type generatorsMap map[string]Generator
@@ -317,9 +327,21 @@ func newFactory() (f factory) {
 		Func: tdl,
 	})
 
-	generators.addGen(Generator{Name: "country", Desc: "Full country name", Func: withList(data.Countries)})
+	countryCodes := make([]string, len(data.CountryCodes))
+	i := 0
+	for k := range data.CountryCodes {
+		countryCodes[i] = k
+		i++
+		generators.addGen(Generator{
+			Name:   "phone." + strings.ToLower(k),
+			Desc:   k + " phone number",
+			Func:   countryPhone(k),
+			Hidden: true,
+		})
+	}
 
-	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withMapKeys(data.CountryCodes)})
+	generators.addGen(Generator{Name: "country", Desc: "Full country name", Func: withList(data.Countries)})
+	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withList(countryCodes)})
 
 	generators.addGen(Generator{Name: "phone", Desc: "Phone number according to E.164", Func: phone})
 	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: phoneCode})
@@ -334,7 +356,6 @@ func newFactory() (f factory) {
 	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: username})
 
 	firstNames := withList(data.Firstnames)
-
 	generators.addGen(Generator{Name: "name.first", Desc: "capitalized first name", Func: firstNames})
 
 	lastNames := withList(data.Lastnames)

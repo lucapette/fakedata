@@ -110,7 +110,7 @@ func main() {
 	generators := fakedata.NewGenerators()
 
 	if *generatorsFlag {
-		fmt.Print(generatorsHelp(generators))
+		fmt.Print(generatorsHelp(generators.Visible()))
 		os.Exit(0)
 	}
 

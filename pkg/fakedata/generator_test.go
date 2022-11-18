@@ -12,7 +12,7 @@ func BenchmarkGenerators(b *testing.B) {
 	for i := 0; i < len(gens); i++ {
 		g := gens[i]
 
-		if !g.IsCustom() {
+		if !g.IsCustom() && !g.Hidden {
 			b.Run(g.Name, func(b *testing.B) {
 				for i := 0; i < b.N; i++ {
 					g.Func()

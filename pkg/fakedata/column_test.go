@@ -206,11 +206,12 @@ func TestGenerateRowWithIntRanges(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// this isn't an accurate way of testing random output
 			// but it serves a practical purpose
+			columns, err := fakedata.NewColumns(tt.args.input)
+			if err != nil {
+				t.Fatal(err.Error())
+			}
 			for index := 0; index < 10000; index++ {
-				columns, err := fakedata.NewColumns(tt.args.input)
-				if err != nil {
-					t.Fatal(err.Error())
-				}
+
 				row := bytes.Buffer{}
 				columns.GenerateRow(&row, tt.args.formatter)
 				actual, err := strconv.Atoi(strings.TrimRight(row.String(), "\n"))
@@ -256,11 +257,11 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// this isn't an accurate way of testing random output
 			// but it serves a practical purpose
+			columns, err := fakedata.NewColumns(tt.args.input)
+			if err != nil {
+				t.Fatal(err.Error())
+			}
 			for index := 0; index < 10000; index++ {
-				columns, err := fakedata.NewColumns(tt.args.input)
-				if err != nil {
-					t.Fatal(err.Error())
-				}
 
 				row := bytes.Buffer{}
 
@@ -303,11 +304,12 @@ func TestGenerateRowWithEnum(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// this isn't an accurate way of testing random output
 			// but it serves a practical purpose
+			columns, err := fakedata.NewColumns(tt.args.input)
+			if err != nil {
+				t.Fatal(err.Error())
+			}
 			for index := 0; index < 10000; index++ {
-				columns, err := fakedata.NewColumns(tt.args.input)
-				if err != nil {
-					t.Fatal(err.Error())
-				}
+
 				row := bytes.Buffer{}
 				columns.GenerateRow(&row, tt.args.formatter)
 
