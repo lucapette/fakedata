@@ -68,13 +68,35 @@ func withList(list []string) func() string {
 	}
 }
 
+func withMapKeys(m map[string]string) func() string {
+	keys := make([]string, len(m))
+	i := 0
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+
+	return withList(keys)
+}
+
+func withMapValues(m map[string]string) func() string {
+	values := make([]string, len(m))
+	i := 0
+	for _, v := range m {
+		values[i] = v
+		i++
+	}
+
+	return withList(values)
+}
+
 var tdl = withList(data.TLDs)
 
 var host = withList([]string{"test", "example"})
 
 var username = withList(data.Usernames)
 
-var phoneCode = withList(data.PhoneCodes)
+var phoneCode = withMapValues(data.CountryCodes)
 
 func ipv4() string {
 	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(253), rand.Intn(255), rand.Intn(255), 1+rand.Intn(253))
@@ -297,7 +319,7 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "country", Desc: "Full country name", Func: withList(data.Countries)})
 
-	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withList(data.CountryCodes)})
+	generators.addGen(Generator{Name: "country.code", Desc: "2-digit country code", Func: withMapKeys(data.CountryCodes)})
 
 	generators.addGen(Generator{Name: "phone", Desc: "Phone number according to E.164", Func: phone})
 	generators.addGen(Generator{Name: "phone.code", Desc: "Calling country code", Func: phoneCode})
