@@ -242,6 +242,8 @@ func localPhone(options string) (func() string, error) {
 	}
 
 	switch numDigits {
+	case 8:
+		return integer("10000000,99999999")
 	case 9:
 		return integer("100000000,999999999")
 	case 10:

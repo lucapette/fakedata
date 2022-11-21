@@ -51,14 +51,21 @@ func BenchmarkInt(b *testing.B) {
 func BenchmarkPhoneLocal(b *testing.B) {
 	phoneLocal := gens.FindByName("phone.local")
 
-	phoneLocalFunc, err := phoneLocal.CustomFunc("11")
-	if err != nil {
-		b.Fatalf("cannot create phone.local: %s", err)
+	digits := []string{"8", "9", "10", "11", "12"}
+
+	for _, digit := range digits {
+		b.Run("phone.local:"+digit, func(b *testing.B) {
+			phoneLocalFunc, err := phoneLocal.CustomFunc(digit)
+			if err != nil {
+				b.Fatalf("cannot create phone.local: %s", err)
+			}
+
+			for i := 0; i < b.N; i++ {
+				phoneLocalFunc()
+			}
+		})
 	}
 
-	for i := 0; i < b.N; i++ {
-		phoneLocalFunc()
-	}
 }
 
 func BenchmarkFile(b *testing.B) {
