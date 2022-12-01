@@ -12,7 +12,7 @@ brew install lucapette/tap/fakedata
 
 If you have [Go](https://go.dev/) installed:
 
-```ssh
+```sh
 go install github.com/lucapette/fakedata@latest
 ```
 
