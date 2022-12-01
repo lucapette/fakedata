@@ -10,11 +10,17 @@ If you use [Homebrew](https://brew.sh/):
 brew install lucapette/tap/fakedata
 ```
 
+If you have [Go](https://go.dev/) installed:
+
+```ssh
+go install github.com/lucapette/fakedata@latest
+```
+
 Or you can download the latest [compiled
 binary](https://github.com/lucapette/fakedata/releases) and put it anywhere in
 your executable path.
 
-To install from source, refer to our [contributing
+If you want to build it yourself, refer to our [contributing
 guidelines](/CONTRIBUTING.md).
 
 ## Quick Start
