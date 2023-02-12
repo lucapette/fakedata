@@ -265,8 +265,13 @@ function that takes arguments.
 Enum takes one or more strings and returns a random string on each run. Strings
 are passed to Enum like so:
 
-```html
-{{ Enum "feature" "bug" "documentation" }}
+```sh
+$ echo '{{ Enum "feature" "bug" "documentation" }}' | fakedata -l5
+feature
+bug
+documentation
+feature
+documentation
 ```
 
 ### `File`
@@ -274,8 +279,15 @@ are passed to Enum like so:
 File reads a file from disk and returns a random line on each run. It takes one
 parameter which is the path to the file on disk.
 
-```html
-{{ File "/var/data/dummy/dummy.txt" }}
+```sh
+$ echo "uno\ndue\ntre" > example.txt
+$ echo '{{ File "./example.txt" }}' | fakedata -l5
+tre
+uno
+due
+due
+due
+foo
 ```
 
 ### `Int`
