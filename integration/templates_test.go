@@ -24,8 +24,7 @@ var templateTests = []struct {
 func TestTemplatesWithCLIArgs(t *testing.T) {
 	for _, tt := range templateTests {
 		t.Run(tt.tmpl, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, "--template", fmt.Sprintf("testutil/fixtures/%s", tt.tmpl))
-			output, err := cmd.CombinedOutput()
+			output, err := runBinary("--template", fmt.Sprintf("testutil/fixtures/%s", tt.tmpl))
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
@@ -51,6 +50,7 @@ func TestTemplatesWithPipe(t *testing.T) {
 			fixture := testutil.NewFixture(t, tt.tmpl)
 			cmd := exec.Command(binaryPath)
 			cmd.Stdin = fixture.AsFile()
+			cmd.Env = append(cmd.Env, "GOCOVERDIR=.coverdata")
 			output, err := cmd.CombinedOutput()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)

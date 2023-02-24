@@ -1,5 +1,7 @@
 /fakedata
+/fakedata-with-cover
 .vscode
 /dist
 *.perf
 *.db
+.coverdata

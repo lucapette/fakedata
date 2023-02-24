@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"os/exec"
 	"regexp"
 	"testing"
 
@@ -99,8 +98,7 @@ func TestCLI(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, tt.args...)
-			output, err := cmd.CombinedOutput()
+			output, err := runBinary(tt.args...)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}
@@ -131,8 +129,7 @@ func TestGeneratorDescription(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, tt.args...)
-			output, err := cmd.CombinedOutput()
+			output, err := runBinary(tt.args...)
 			if err != nil {
 				t.Fatalf("test run returned an error: %v\n%s", err, output)
 			}
@@ -165,8 +162,7 @@ func TestFileGenerator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, tt.args...)
-			output, err := cmd.CombinedOutput()
+			output, err := runBinary(tt.args...)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("%s\nexpected (err != nil) to be %v, but got %v. err: %v", output, tt.wantErr, err != nil, err)
 			}

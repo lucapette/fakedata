@@ -9,13 +9,12 @@ import (
 	"testing"
 )
 
-// In these tests, there's a lot going on. Have a look at this article for a
-// longer explanation:
+// In these tests, there's a lot going on. See this blog post for more details:
 // https://lucapette.me/writing/writing-integration-tests-for-a-go-cli-application
 
 var update = flag.Bool("update", false, "update golden files")
 
-const binaryName = "fakedata"
+const binaryName = "fakedata-with-cover"
 
 var binaryPath string
 
@@ -34,9 +33,11 @@ func TestMain(m *testing.M) {
 
 	binaryPath = abs
 
-	if err := exec.Command("make").Run(); err != nil {
-		fmt.Printf("could not make binary for %s: %v", binaryName, err)
-		os.Exit(1)
-	}
 	os.Exit(m.Run())
+}
+
+func runBinary(args ...string) ([]byte, error) {
+	cmd := exec.Command(binaryPath, args...)
+	cmd.Env = append(os.Environ(), "GOCOVERDIR=.coverdata")
+	return cmd.CombinedOutput()
 }

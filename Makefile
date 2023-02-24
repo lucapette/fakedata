@@ -1,9 +1,15 @@
-SOURCE_FILES?=$$(go list ./...)
+SOURCE_FILES?=$$(go list ./pkg/...)
 TEST_PATTERN?=.
 TEST_OPTIONS?=
 
-test: ## Run tests
+unit: ## Run tests
 	@go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=30s
+
+integration: build-with-cover ## Run integration tests
+	@go test $(TEST_OPTIONS) $$(go list ./integration/...) -timeout=30s
+	@go tool covdata percent -i=.coverdata
+
+test: unit integration
 
 bench: ## Run benchmarks
 	@go test $(TEST_OPTIONS) -cover $(SOURCE_FILES) -bench $(TEST_PATTERN) -timeout=30s
@@ -14,12 +20,17 @@ lint: ## Run linters
 build: ## Build a dev version of fakedata
 	@go build
 
-import: ## Import or update data from dariusk/corpora
-	@go run cmd/import/main.go
-
 build-debug-image:
 	@GOOS=linux GOARCH=amd64 go build
 	docker build -t fakedata .
+
+build-with-cover: ## Build a cover version of fakedata
+	@rm .coverdata -fr
+	@mkdir .coverdata
+	@go build -cover -o ./fakedata-with-cover
+
+import: ## Import or update data from dariusk/corpora
+	@go run cmd/import/main.go
 
 # Absolutely awesome: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
