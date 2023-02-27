@@ -51,8 +51,8 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 	c := cases.Title(language.English)
 
 	for _, gen := range tf.factory.generators {
-		name := strings.Replace(c.String(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
 		if !gen.IsCustom() {
+			name := strings.Replace(c.String(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
 			funcMap[name] = gen.Func
 		}
 	}

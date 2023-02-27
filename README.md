@@ -255,7 +255,7 @@ the same name capitalized (example: `int` becomes `Int`).
 
 If the generator name is composed by multiple words joined by dots, then the
 function name is again capitalized by the first letter of the word and joined
-together (example: `product.name` becomes `Product.Name`).
+together (example: `product.name` becomes `ProductName`).
 
 Each generator with [constraints](#constraints) is available in templates as a
 function that takes arguments.
@@ -361,7 +361,7 @@ For example, to display a full name in the format `Lastname Firstname` instead
 of `Firstname Lastname`.
 
 ```html
-{{ printf "%s %s" Name.Last Name.First }}
+{{ printf "%s %s" NameLast NameFirst }}
 ```
 
 ## Completion
