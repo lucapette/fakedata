@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // relative package data dir
@@ -15,66 +16,56 @@ const targetDir = "pkg/data"
 // Content of a Go file
 const fileTemplate = `package data
 
-// %s is an array of %s
 var %s = %#v
 `
 
 var tasks = []struct {
-	URL, Key, Var, File string
+	URL, Key, Var string
 }{
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/nouns.json",
 		"nouns",
 		"Nouns",
-		"nouns.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/common.json",
 		"animals",
 		"Animals",
-		"animals.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/dogs.json",
 		"dogs",
 		"Dogs",
-		"dogs.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/cats.json",
 		"cats",
 		"Cats",
-		"cats.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/emoji/emoji.json",
 		"emoji",
 		"Emoji",
-		"emoji.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/adjs.json",
 		"adjs",
 		"Adjectives",
-		"adjectives.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/harvard_sentences.json",
 		"data",
 		"Sentences",
-		"sentences.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/corporations/industries.json",
 		"industries",
 		"Industries",
-		"industries.go",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/humans/occupations.json",
 		"occupations",
 		"Occupations",
-		"occupations.go",
 	},
 }
 
@@ -110,12 +101,12 @@ func main() {
 			log.Fatal(err)
 		}
 
-		file := filepath.Join(targetDir, task.File)
+		file := filepath.Join(targetDir, strings.ToLower(task.Var)+".go")
 		if err := os.MkdirAll(filepath.Dir(file), 0777); err != nil {
 			log.Fatal(err)
 		}
 
-		content := fmt.Sprintf(fileTemplate, task.Var, task.Key, task.Var, data)
+		content := fmt.Sprintf(fileTemplate, task.Var, data)
 
 		// Write to Go file
 		if err := os.WriteFile(file, []byte(content), 0644); err != nil {
