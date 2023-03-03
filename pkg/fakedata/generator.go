@@ -440,13 +440,15 @@ func newFactory() (f factory) {
 		Func: withList(data.Emoji),
 	})
 
+	generators.addGen(Generator{Name: "adjectives", Desc: "adjective", Func: withList(data.Adjectives)})
+
 	generators.addGen(Generator{Name: "animal", Desc: "animal breed", Func: withList(data.Animals)})
 
 	generators.addGen(Generator{Name: "animal.cat", Desc: "random cat breed", Func: withList(data.Cats)})
 
 	generators.addGen(Generator{Name: "animal.dog", Desc: "dog breed", Func: withList(data.Dogs)})
 
-	generators.addGen(Generator{Name: "adjectives", Desc: "adjective", Func: withList(data.Adjectives)})
+	generators.addGen(Generator{Name: "city", Desc: "US city name", Func: withList(data.Cities)})
 
 	generators.addGen(Generator{Name: "industry", Desc: "industry", Func: withList(data.Industries)})
 

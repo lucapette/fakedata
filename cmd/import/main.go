@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,53 +20,91 @@ const fileTemplate = `package data
 var %s = %#v
 `
 
+var keyExtractor = func(key string) func(io.ReadCloser) []string {
+	return func(body io.ReadCloser) []string {
+		var jsonData map[string]json.RawMessage
+		if err := json.NewDecoder(body).Decode(&jsonData); err != nil {
+			log.Fatal(err)
+		}
+
+		var data []string
+		if err := json.Unmarshal(jsonData[key], &data); err != nil {
+			log.Fatal(err)
+		}
+		return data
+	}
+}
+
 var tasks = []struct {
-	URL, Key, Var string
+	URL       string
+	Extractor func(io.ReadCloser) []string
+	Var       string
 }{
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/nouns.json",
-		"nouns",
+		keyExtractor("nouns"),
 		"Nouns",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/common.json",
-		"animals",
+		keyExtractor("animals"),
 		"Animals",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/dogs.json",
-		"dogs",
+		keyExtractor("dogs"),
 		"Dogs",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/cats.json",
-		"cats",
+		keyExtractor("cats"),
 		"Cats",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/emoji/emoji.json",
-		"emoji",
+		keyExtractor("emoji"),
 		"Emoji",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/adjs.json",
-		"adjs",
+		keyExtractor("adjs"),
 		"Adjectives",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/words/harvard_sentences.json",
-		"data",
+		keyExtractor("data"),
 		"Sentences",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/corporations/industries.json",
-		"industries",
+		keyExtractor("industries"),
 		"Industries",
 	},
 	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/humans/occupations.json",
-		"occupations",
+		keyExtractor("occupations"),
 		"Occupations",
+	},
+	{
+		"https://raw.githubusercontent.com/dariusk/corpora/master/data/geography/us_cities.json",
+		func(body io.ReadCloser) []string {
+			var jsonData struct {
+				Cities []struct {
+					City string `json:"city"`
+				} `json:"cities"`
+			}
+			if err := json.NewDecoder(body).Decode(&jsonData); err != nil {
+				log.Fatal(err)
+			}
+
+			data := make([]string, len(jsonData.Cities))
+			for i, city := range jsonData.Cities {
+				data[i] = city.City
+			}
+
+			return data
+		},
+		"Cities",
 	},
 }
 
@@ -91,20 +130,12 @@ func main() {
 			}
 		}()
 
-		var jsonData map[string]json.RawMessage
-		if err := json.NewDecoder(resp.Body).Decode(&jsonData); err != nil {
-			log.Fatal(err)
-		}
-
-		var data []string
-		if err := json.Unmarshal(jsonData[task.Key], &data); err != nil {
-			log.Fatal(err)
-		}
-
 		file := filepath.Join(targetDir, strings.ToLower(task.Var)+".go")
 		if err := os.MkdirAll(filepath.Dir(file), 0777); err != nil {
 			log.Fatal(err)
 		}
+
+		data := task.Extractor(resp.Body)
 
 		content := fmt.Sprintf(fileTemplate, task.Var, data)
 
