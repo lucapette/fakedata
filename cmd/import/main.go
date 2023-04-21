@@ -91,6 +91,11 @@ var tasks = []struct {
 		"Occupations",
 	},
 	{
+		"https://raw.githubusercontent.com/dariusk/corpora/master/data/geography/nationalities.json",
+		keyExtractor("nationalities"),
+		"Nationalities",
+	},
+	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/geography/us_cities.json",
 		func(body io.ReadCloser) []string {
 			var jsonData struct {

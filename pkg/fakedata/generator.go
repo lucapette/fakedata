@@ -378,6 +378,8 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "username", Desc: `username using the pattern \w+`, Func: username})
 
+	generators.addGen(Generator{Name: "nationality", Desc: "nationality", Func: withList(data.Nationalities)})
+
 	firstNames := withList(data.Firstnames)
 	generators.addGen(Generator{Name: "name.first", Desc: "capitalized first name", Func: firstNames})
 
