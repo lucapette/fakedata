@@ -5,9 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/lucapette/fakedata/pkg/fakedata"
 	flag "github.com/spf13/pflag"
@@ -138,8 +136,6 @@ func main() {
 		fmt.Print(generatorsHelp(generators.WithConstraints()))
 		os.Exit(0)
 	}
-
-	rand.Seed(time.Now().UnixNano())
 
 	if tmpl := findTemplate(*templateFlag); tmpl != "" {
 		if err := fakedata.ExecuteTemplate(tmpl, *limitFlag, *streamFlag); err != nil {
