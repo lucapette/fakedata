@@ -51,6 +51,11 @@ var tasks = []struct {
 		"Animals",
 	},
 	{
+		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/dinosaurs.json",
+		keyExtractor("dinosaurs"),
+		"Dinosaurs",
+	},
+	{
 		"https://raw.githubusercontent.com/dariusk/corpora/master/data/animals/dogs.json",
 		keyExtractor("dogs"),
 		"Dogs",

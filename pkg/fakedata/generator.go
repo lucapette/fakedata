@@ -450,6 +450,8 @@ func newFactory() (f factory) {
 
 	generators.addGen(Generator{Name: "city", Desc: "US city name", Func: withList(data.Cities)})
 
+	generators.addGen(Generator{Name: "dinosaur", Desc: "Dinosaur name", Func: withList(data.Dinosaurs)})
+
 	generators.addGen(Generator{Name: "industry", Desc: "industry", Func: withList(data.Industries)})
 
 	generators.addGen(Generator{Name: "occupation", Desc: "occupation", Func: withList(data.Occupations)})
