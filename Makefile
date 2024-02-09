@@ -25,7 +25,7 @@ build-debug-image:
 	docker build -t fakedata .
 
 build-with-cover: ## Build a cover version of fakedata
-	@rm .coverdata -fr
+	@rm -fr .coverdata
 	@mkdir .coverdata
 	@go build -cover -o ./fakedata-with-cover
 
