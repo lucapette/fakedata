@@ -223,7 +223,6 @@ $ echo "#{{ Int 0 100}} {{ Name }} <{{ Email }}>" | fakedata
 #48 Buck Reid <syropian@test.cg>
 #55 Rico Powell <findingjenny@example.pohl>
 #92 Luise Wood <91bilal@example.link>
-#30 Isreal Henderson <thierrykoblentz@test.scb>
 #96 Josphine Patton <abelcabans@test.wtf>
 #95 Jetta Blair <tgerken@example.jewelry>
 #10 Clorinda Parsons <roybarberuk@test.gives>
@@ -320,7 +319,7 @@ functions:
 
 If you need to create your own loop for advanced templates you can use the `{{ Loop }}` function.
 
-This function takes a single integer as parameter which is the number of
+This function takes a single integer as a parameter which is the number of
 iterations. `Loop` must be used with `range` e.g.
 
 ```html
