@@ -32,9 +32,7 @@ _fakedata () {
 }
 compdef _fakedata fakedata`
 
-const fishTemplate = `
-complete -c fakedata -a '%s'
-`
+const fishTemplate = "complete -c fakedata -a '%s'"
 
 func getTemplate(shell string) (string, error) {
 	switch shell {
@@ -50,7 +48,7 @@ func getTemplate(shell string) (string, error) {
 }
 
 // GetCompletionFunc returns a string representing a completion function for the
-// given shell. It returns an error for unsupported shell.
+// given shell. It returns an error for unsupported shells.
 func GetCompletionFunc(shell string) (string, error) {
 	t, err := getTemplate(shell)
 	if err != nil {
@@ -61,7 +59,10 @@ func GetCompletionFunc(shell string) (string, error) {
 	allCliArgs := &bytes.Buffer{}
 
 	for _, gen := range NewGenerators() {
-		fmt.Fprintf(gens, gen.Name+" ")
+		_, err = fmt.Fprint(gens, gen.Name+" ")
+		if err != nil {
+			return "", err
+		}
 	}
 
 	pflag.VisitAll(func(f *pflag.Flag) {

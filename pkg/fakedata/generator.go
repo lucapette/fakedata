@@ -127,38 +127,40 @@ func domain() string {
 }
 
 func date(options string) (f func() string, err error) {
-	var min, max string
+	var minDate, maxDate string
 
 	endDate := time.Now()
 	startDate := endDate.AddDate(-1, 0, 0)
 
 	dateRange := strings.Split(options, ",")
-	min = dateRange[0]
+	minDate = dateRange[0]
 
 	if len(dateRange) > 1 {
-		max = dateRange[1]
+		maxDate = dateRange[1]
 	}
 
-	if len(min) > 0 {
-		if len(max) > 0 {
-			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", max)
+	if len(minDate) > 0 {
+		if len(maxDate) > 0 {
+			formattedMax := fmt.Sprintf("%sT00:00:00.000Z", maxDate)
 
-			date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
+			var d time.Time
+			d, err = time.Parse("2006-01-02T15:04:05.000Z", formattedMax)
 			if err != nil {
-				return nil, fmt.Errorf("problem parsing max date: %v", err)
+				return nil, fmt.Errorf("problem parsing maxDate date: %v", err)
 			}
 
-			endDate = date
+			endDate = d
 		}
 
-		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", min)
+		formattedMin := fmt.Sprintf("%sT00:00:00.000Z", minDate)
 
-		date, err := time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
+		var d time.Time
+		d, err = time.Parse("2006-01-02T15:04:05.000Z", formattedMin)
 		if err != nil {
 			return nil, fmt.Errorf("problem parsing mix date: %v", err)
 		}
 
-		startDate = date
+		startDate = d
 	}
 
 	if startDate.After(endDate) {
@@ -171,8 +173,8 @@ func date(options string) (f func() string, err error) {
 }
 
 func integer(options string) (func() string, error) {
-	min := 0
-	max := 1000
+	minInt := 0
+	maxInt := 1000
 	var low, high string
 	intRange := strings.Split(options, ",")
 	low = intRange[0]
@@ -187,23 +189,23 @@ func integer(options string) (func() string, error) {
 			return nil, fmt.Errorf("could not convert min: %v", err)
 		}
 
-		min = m
+		minInt = m
 
 		if len(high) > 0 {
-			m, err := strconv.Atoi(high)
+			m, err = strconv.Atoi(high)
 			if err != nil {
 				return nil, fmt.Errorf("could not convert max: %v", err)
 			}
 
-			max = m
+			maxInt = m
 		}
 	}
 
-	if min > max {
-		return nil, fmt.Errorf("max(%d) is smaller than min(%d)", max, min)
+	if minInt > maxInt {
+		return nil, fmt.Errorf("max(%d) is smaller than min(%d)", maxInt, minInt)
 	}
 
-	return func() string { return strconv.Itoa(min + rand.Intn(max+1-min)) }, nil
+	return func() string { return strconv.Itoa(minInt + rand.Intn(maxInt+1-minInt)) }, nil
 }
 
 func file(path string) (func() string, error) {
@@ -213,12 +215,12 @@ func file(path string) (func() string, error) {
 
 	filePath := strings.Trim(path, "'\"")
 
-	file, err := os.ReadFile(filePath)
+	f, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not read file %s: %v", filePath, err)
 	}
 
-	content := strings.Split(strings.Trim(string(file), "\n"), "\n")
+	content := strings.Split(strings.Trim(string(f), "\n"), "\n")
 	list := withList(content)
 
 	return func() string { return list() }, nil
