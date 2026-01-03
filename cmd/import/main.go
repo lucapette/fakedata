@@ -119,7 +119,7 @@ var tasks = []struct {
 }
 
 func main() {
-	// Check if running in repository directory
+	// Check if running in the repository directory
 	_, err := os.Stat(targetDir)
 	if err != nil && !os.IsNotExist(err) {
 		log.Fatal(err)
@@ -130,18 +130,14 @@ func main() {
 
 	for _, task := range tasks {
 		// Get JSON from URL
-		resp, err := http.Get(task.URL)
+		var resp *http.Response
+		resp, err = http.Get(task.URL)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer func() {
-			if err := resp.Body.Close(); err != nil {
-				panic(err)
-			}
-		}()
 
 		file := filepath.Join(targetDir, strings.ToLower(task.Var)+".go")
-		if err := os.MkdirAll(filepath.Dir(file), 0777); err != nil {
+		if err = os.MkdirAll(filepath.Dir(file), 0777); err != nil {
 			log.Fatal(err)
 		}
 
@@ -149,9 +145,12 @@ func main() {
 
 		content := fmt.Sprintf(fileTemplate, task.Var, data)
 
-		// Write to Go file
-		if err := os.WriteFile(file, []byte(content), 0644); err != nil {
+		if err = os.WriteFile(file, []byte(content), 0644); err != nil {
 			log.Fatal(err)
+		}
+
+		if err = resp.Body.Close(); err != nil {
+			panic(err)
 		}
 	}
 }
