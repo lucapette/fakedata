@@ -3,7 +3,7 @@
 We love every form of contribution. By participating to this project, you agree
 to abide to the `fakedata` [code of conduct](/CODE_OF_CONDUCT.md).
 
-## Setup your machine
+## Set up your machine
 
 Our [Makefile](/Makefile) is the entry point for most of the activities you will
 run into as a contributor. To get a basic understanding of what you can do with
@@ -13,7 +13,9 @@ it, you can run:
 make help
 ```
 
-Which shows documented targets. `fakedata` is written in
+Which shows documented targets.
+
+`fakedata` is written in
 [Go](https://golang.org/). Here is a list of prerequisites to build and test the
 code:
 
@@ -66,7 +68,7 @@ contributing to the project!
 
 ### Running the tests
 
-Once you are [setup](#setup-your-machine), you can run the test suite with one
+Once you are [setup](#set-up-your-machine), you can run the test suite with one
 command:
 
 ```sh
