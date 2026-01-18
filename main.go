@@ -14,17 +14,17 @@ import (
 var version = "main"
 
 func generatorsHelp(generators fakedata.Generators) string {
-	max := 0
+	maxInt := 0
 	for _, gen := range generators {
-		if len(gen.Name) > max {
-			max = len(gen.Name)
+		if len(gen.Name) > maxInt {
+			maxInt = len(gen.Name)
 		}
 	}
 
 	buffer := &bytes.Buffer{}
-	pattern := fmt.Sprintf("%%-%ds%%s\n", max+2) //+2 makes the output more readable
+	pattern := fmt.Sprintf("%%-%ds%%s\n", maxInt+2) //+2 makes the output more readable
 	for _, gen := range generators {
-		fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
+		_, _ = fmt.Fprintf(buffer, pattern, gen.Name, gen.Desc)
 	}
 
 	return buffer.String()
@@ -174,7 +174,11 @@ func main() {
 	}
 
 	fOut := bufio.NewWriter(os.Stdout)
-	defer fOut.Flush()
+	defer func() {
+		if err := fOut.Flush(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to flush buffer: %v\n", err)
+		}
+	}()
 
 	if *headerFlag {
 		columns.GenerateHeader(fOut, formatter)

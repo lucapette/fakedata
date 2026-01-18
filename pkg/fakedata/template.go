@@ -50,9 +50,9 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 
 	c := cases.Title(language.English)
 
-	for _, gen := range tf.factory.generators {
+	for _, gen := range tf.generators {
 		if !gen.IsCustom() {
-			name := strings.Replace(c.String(strings.Replace(gen.Name, ".", " ", -1)), " ", "", -1)
+			name := strings.ReplaceAll(c.String(strings.ReplaceAll(gen.Name, ".", " ")), " ", "")
 			funcMap[name] = gen.Func
 		}
 	}
@@ -93,7 +93,11 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 // on the specified tmpl. Will loop forever if streamMode is true
 func ExecuteTemplate(tmpl string, n int, streamMode bool) (err error) {
 	fOut := bufio.NewWriter(os.Stdout)
-	defer fOut.Flush()
+	defer func() {
+		if flushErr := fOut.Flush(); flushErr != nil && err == nil {
+			err = flushErr
+		}
+	}()
 
 	f := newTemplateFactory()
 	t, err := template.New("template").Funcs(f.getFunctions()).Parse(tmpl)

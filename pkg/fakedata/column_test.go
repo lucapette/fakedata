@@ -26,8 +26,8 @@ func columnsEql(a, b fakedata.Columns) bool {
 	}
 
 	for i, col := range a {
-		if !(reflect.DeepEqual(col.Name, b[i].Name) &&
-			reflect.DeepEqual(col.Key, b[i].Key)) {
+		if !reflect.DeepEqual(col.Name, b[i].Name) ||
+			!reflect.DeepEqual(col.Key, b[i].Key) {
 			return false
 		}
 	}
@@ -219,7 +219,7 @@ func TestGenerateRowWithIntRanges(t *testing.T) {
 					t.Fatal(err.Error())
 				}
 
-				if !(actual >= tt.min && actual <= tt.max) {
+				if actual < tt.min || actual > tt.max {
 					t.Fatalf("expected a number between %d and %d, but got %d", tt.min, tt.max, actual)
 				}
 			}
@@ -274,7 +274,7 @@ func TestGenerateRowWithDateRanges(t *testing.T) {
 					t.Fatal(err.Error())
 				}
 
-				if !(actual.After(tt.min) && actual.Before(tt.max)) && !actual.Equal(tt.min) && !actual.Equal(tt.max) {
+				if actual.Before(tt.min) || actual.After(tt.max) {
 					t.Fatalf("expected a date between %s and %s, but got %s", tt.min, tt.max, actual)
 				}
 			}
