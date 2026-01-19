@@ -6,7 +6,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/kr/pretty v0.3.1
 	github.com/spf13/pflag v1.0.10
-	golang.org/x/text v0.32.0
+	golang.org/x/text v0.33.0
 )
 
 require (
