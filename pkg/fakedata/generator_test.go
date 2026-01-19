@@ -24,6 +24,9 @@ func BenchmarkGenerators(b *testing.B) {
 
 func BenchmarkEnum(b *testing.B) {
 	enum := gens.FindByName("enum")
+	if enum == nil {
+		b.Fatal("enum generator not found")
+	}
 
 	enumFunc, err := enum.CustomFunc("")
 	if err != nil {
@@ -37,6 +40,9 @@ func BenchmarkEnum(b *testing.B) {
 
 func BenchmarkInt(b *testing.B) {
 	integer := gens.FindByName("int")
+	if integer == nil {
+		b.Fatal("int generator not found")
+	}
 
 	integerFunc, err := integer.CustomFunc("10000000,9999999999")
 	if err != nil {
@@ -70,6 +76,9 @@ func BenchmarkPhoneLocal(b *testing.B) {
 
 func BenchmarkFile(b *testing.B) {
 	file := gens.FindByName("file")
+	if file == nil {
+		b.Fatal("file generator not found")
+	}
 
 	fileFunc, err := file.CustomFunc("../../testutil/fixtures/file.txt")
 	if err != nil {

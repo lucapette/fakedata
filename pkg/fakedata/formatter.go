@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// Formatter is the interface wraps the Format method we use to format each row
+// Formatter is the interface wrapping the Format method we use to format each row
 type Formatter interface {
 	Format(Columns, []string) string
 }
@@ -23,7 +23,7 @@ type SQLFormatter struct {
 	Table string
 }
 
-// NdJsonFormatter is a Formatter for http://ndjson.org/
+// NdjsonFormatter is a Formatter for http://ndjson.org/
 type NdjsonFormatter struct {
 }
 
@@ -77,7 +77,7 @@ func NewColumnFormatter(sep string) (f *ColumnFormatter) {
 	return &ColumnFormatter{Separator: sep}
 }
 
-// NewSQLFormatter returns a SQLFormatter using the table string for table name generation
+// NewSQLFormatter returns an SQLFormatter using the table string for table name generation
 func NewSQLFormatter(table string) (f *SQLFormatter) {
 	return &SQLFormatter{Table: table}
 }

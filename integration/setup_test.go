@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// In these tests, there's a lot going on. See this blog post for more details:
+// In these tests there's a lot going on. For more details:
 // https://lucapette.me/writing/writing-integration-tests-for-a-go-cli-application
 
 var update = flag.Bool("update", false, "update golden files")

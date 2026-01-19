@@ -175,8 +175,8 @@ func main() {
 
 	fOut := bufio.NewWriter(os.Stdout)
 	defer func() {
-		if err := fOut.Flush(); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to flush buffer: %v\n", err)
+		if err = fOut.Flush(); err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "failed to flush buffer: %v\n", err)
 		}
 	}()
 

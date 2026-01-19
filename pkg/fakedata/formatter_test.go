@@ -86,5 +86,4 @@ func BenchmarkFormatters(b *testing.B) {
 			sql.Format(columns, values)
 		}
 	})
-
 }

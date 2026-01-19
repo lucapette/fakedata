@@ -41,7 +41,8 @@ func NewColumns(keys []string) (cols Columns, err error) {
 			options = specs[1]
 		}
 
-		fn, err := f.extractFunc(key, options)
+		var fn func() string
+		fn, err = f.extractFunc(key, options)
 		if err != nil {
 			return cols, err
 		}
@@ -65,7 +66,7 @@ func (columns Columns) GenerateRow(f io.Writer, formatter Formatter) {
 	_, _ = fmt.Fprintf(f, "%s\n", formatter.Format(columns, values))
 }
 
-// GenerateRow generates an header row using column names
+// GenerateHeader generates a header row using column names
 // in the specified format
 func (columns Columns) GenerateHeader(f io.Writer, formatter Formatter) {
 	values := make([]string, len(columns))

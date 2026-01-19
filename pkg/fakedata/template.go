@@ -28,12 +28,12 @@ func (tf templateFactory) getFunctions() template.FuncMap {
 			if len(minmax) == 1 {
 				n = minmax[0]
 			} else {
-				min := minmax[0]
-				max := minmax[1]
-				if min == max {
-					n = min
+				minInt := minmax[0]
+				maxInt := minmax[1]
+				if minInt == maxInt {
+					n = minInt
 				} else {
-					n = rand.Intn(max-min) + min
+					n = rand.Intn(maxInt-minInt) + minInt
 				}
 			}
 
